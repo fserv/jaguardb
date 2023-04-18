@@ -1,1 +1,3 @@
 Examples on how to import data from Cassandra to Jaguar
+
+download cassandra-java-driver-3.3.0 to here
