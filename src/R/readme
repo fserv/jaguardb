@@ -1,0 +1,30 @@
+R JDBC programs to connect to Jaguar and read/write data
+#sample csv_file: grocery.csv
+1. Download csv file: 
+wget <file_link> 
+
+
+2. Generate sql to create empty table: 
+./createTableFromCSV.sh <csvfilename>
+
+
+3. Run R script to create table from csv:
+./rcon.sh <csvfilename>
+
+
+4. Install R package for analysis
+ 1) cd rpackge 
+ 2) wget <R_PACKAGE_URL_FROM_CRAN>
+ 3) Commandline Install Package
+     R CMD INSTALL -l /home/tina/jaguar/doc/rcon/rlib myRPackage.tar.gz
+     library(myRPackageName, lib.loc="/home/tina/jaguar/lib/rlib")
+OR
+ 1) Setting .Rprofile and .Renviron, then add following two lines in R script
+     ## Refer to following url    https://www.r-bloggers.com/installing-r-packages/
+ 2)     install.packages("arules", lib="//home/tina/jaguar/lib/rlib")
+     library(arules,lib.loc="//home/tina/jaguar/lib/rlib",warn.conflicts = FALSE)
+run lib.r file : ./lib.sh
+
+5. Machine learning using R, refer to following project
+sample csv: cancer.csv
+https://shiring.github.io/machine_learning/2017/03/31/webinar_code

@@ -1,0 +1,37 @@
+OBJS=build/JagRecord.o  build/JagClassInit.o build/murmur.o build/JagColumn.o \
+     build/JagStrSplit.o build/JagStrSplitWithQuote.o build/JagMutex.o  \
+	 build/JagCfg.o build/JagFSMgr.o build/JDFS.o \
+	 build/JagCompFile.o build/JagSimpFile.o build/JagDBMap.o \
+	 build/JagFileMgr.o build/JagNet.o  build/jaghashtable.o build/jaghashset.o build/JagMD5lib.o   \
+	 build/JagExprStack.o build/JagParseParam.o \
+	 build/JagSchemaRecord.o build/JagTime.o build/JagSession.o \
+	 build/JagIndexString.o build/JagFixString.o \
+	 build/JagTextFileBuffReader.o build/JagUUID.o \
+	 build/JagBlockLock.o build/JagDBPair.o \
+	 build/JagUtil.o build/JagDataAggregate.o \
+	 build/JaguarAPI.o build/JagHashLock.o build/JagSystem.o \
+	 build/JagDiskArrayBase.o build/JagLog.o  \
+     build/JagSingleBuffReader.o build/JagBuffReader.o build/JagMergeReaderBase.o \
+     build/JagMergeReader.o build/JagMergeBackReader.o  \
+     build/JagSingleBuffWriter.o build/JagBuffWriter.o build/JagBuffBackReader.o  \
+	 build/JagMemDiskSortArray.o build/JagShapeClient.o \
+	 build/JagLang.o build/JagBoundFile.o build/JagLocalDiskHash.o build/JagSingleMergeReader.o \
+	 build/JagFastCompress.o build/JagSQLFileBuffReader.o build/JagSQLMergeReader.o \
+	 build/JagFixKeyChecker.o build/JagFixHashArray.o build/JagFixGapVector.o build/JagFixBlock.o \
+	 build/JagIPACL.o build/JagDiskKeyChecker.o build/JagFamilyKeyChecker.o build/JagDBLogger.o build/base64.o \
+	 build/JagHashStrInt.o build/JagTableOrIndexAttrs.o build/AbaxCStr.o \
+	 build/JagHashStrStr.o  build/JagMinMax.o build/JagLineFile.o build/JagRange.o build/JagCrypt.o \
+	 build/JagHashSetStr.o build/JagParser.o  build/JagMath.o
+
+CLIENTOBJS=$(OBJS) build/JagParseExprClient.o build/JagParserClient.o 
+
+SERVEROBJS=$(OBJS) \
+            build/JagParseExprServer.o build/JagServer.o build/JagDBServer.o build/JagDBServSchm.o \
+			build/JagTable.o build/JagIndex.o \
+            build/JagServerObjectLock.o build/JagDiskArrayServer.o build/JagSchema.o \
+            build/JagTableSchema.o build/JagIndexSchema.o \
+			build/JagFixKV.o build/JagNode.o build/JagUserID.o build/JagNodeMgr.o build/JagDBConnector.o \
+			build/JagParserServer.o build/JagDiskArrayFamily.o build/JagUserRole.o \
+            build/JagGeom.o build/JagCGAL.o build/JagShapeServer.o build/ACConcaveHull.o \
+			build/JagWalMap.o build/JagMutexMap.o build/JagHashStrPtr.o build/JagHashIntInt.o
+

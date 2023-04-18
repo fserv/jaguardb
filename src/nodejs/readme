@@ -1,0 +1,23 @@
+
+HOWTO:
+
+sudo or root:
+#Download node-v15.4.0-linux-x64.tar.xz to /usr/local/src
+Download node-v16.16.0-linux-x64.tar.xz to /usr/local/src
+# cd /usr/local/src
+# tar xf node-v16.16.0-linux-x64.tar.xz 
+# ln -s /usr/local/src/node-v16.16.0-linux-x64/bin/npm  /usr/local/bin/npm
+# ln -s /usr/local/src/node-v16.16.0-linux-x64/bin/node  /usr/local/bin/node 
+
+
+To dev2 user:
+
+$ npm install -g node-gyp
+
+In this current directory:
+
+git clone https://chromium.googlesource.com/v8/v8
+
+using v8 c++ api
+./compile.sh  to compile
+

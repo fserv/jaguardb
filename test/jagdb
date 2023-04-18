@@ -1,0 +1,9 @@
+#!/bin/sh
+
+### change to valid admin password
+ADMINPASSWD=jaguarjaguarjaguar
+
+jagserver="127.0.0.1"
+
+~/jaguar/bin/rlwrap -n ~/jaguar/bin/jag  -u admin -p $ADMINPASSWD -h $jagserver:8888 -vv yes "$@"
+

@@ -1,0 +1,13 @@
+
+Here is how go 1.15.6 was installed:
+
+download go1.15.6.linux-amd64.tar.gz
+# tar -C /usr/local -xzf go1.15.6.linux-amd64.tar.gz
+# ln -s /usr/local/go/bin/go /usr/bin/go
+
+mkdir jaguargo
+jaguargo/* has all C/C++/header/go files
+
+Here is how go.mod file is created:
+In current directory:
+go mod init jaguargo

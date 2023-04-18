@@ -1,0 +1,94 @@
+all: clean javahdr javalib
+
+buildenv=${BUILD_ENV}
+ifeq ($(buildenv),PROD)
+	USER_DEFINE=-DDEBUG_PRINT1 -DDEBUG_STACK1 -DDEBUG_TABLE1 -DDEBUG_LATENCY1
+else
+	USER_DEFINE=-DDEBUG_PRINT -DDEBUG_STACK1 -DDEBUG_TABLE1 -DDEBUG_LATENCY1
+endif
+
+
+BOOST_INC=Web/Boost/boost_1_81_0_install/include
+BOOST_LIB=Web/Boost/boost_1_81_0_install/lib
+
+CGAL_INC=Web/CGALH/CGAL-5.5.1_install/include
+
+GMP_INC=Web/GMP/gmp-6.2.1_install/include
+GMP_LIB=Web/GMP/gmp-6.2.1_install/lib
+
+MPFR_INC=Web/MPFR/mpfr-4.2.0_install/include
+MPFR_LIB=Web/MPFR/mpfr-4.2.0_install/lib
+
+GEOGRAPH_LIB=Web/GeographicLib-1.49/lib
+
+
+BASICFLAGS=-I. -IWeb/GeographicLib-1.49/include \
+		  -IWeb/Tencent/rapidjson/include -IWeb/TomCrypt/include \
+		  -IWeb/Snappy -IWeb/UTF -I$(BOOST_INC) \
+		  -I$(CGAL_INC) -I$(GMP_INC) -I$(MPFR_INC) \
+		  -IWeb/ConcaveHull \
+          -I/usr/local/src/jdk19.0.2/include \
+          -I/usr/local/src/jdk19.0.2/include/linux \
+	      -D_REENTRANT -std=c++14 -Wno-register \
+          -Wno-unused-result \
+		  -DTFM_DESC $(USER_DEFINE)
+         
+CCFLAGS_DYNAMIC=$(BASICFLAGS) -fPIC
+CCFLAGS=$(CCFLAGS_DYNAMIC)
+
+STDLIBS_DYNAMIC_BASIC =  -LWeb/Boost/boost_1_68_0/lib -lboost_thread -lboost_system -lpthread
+GEOLIBS_DYNAMIC = -LWeb/GeographicLib-1.49/lib -LWeb/CGAL/CGAL-4.13/lib64 -lGeographic -lCGAL 
+STDLIBS_DYNAMIC = $(GEOLIBS_DYNAMIC) $(STDLIBS_DYNAMIC_BASIC)
+
+STDLIBS=$(STDLIBS_DYNAMIC)
+
+JAVA_HOME:=$(shell jrunscript -e "java.lang.System.out.println(new java.io.File(java.lang.System.getProperty(\"java.home\")));")
+JAVAINC=$(JAVA_HOME)/../include
+DRIZZLE=Web/DrizzleJDBC
+DRIZZLEINC=$(DRIZZLE)/src/main/java
+
+GCC=gcc
+GPP=g++
+    
+CPP=$(GPP)  -pg -DJAG_DEBUGCHECK
+CPP=$(GPP)  -g3 -DJAG_DEBUGCHECK
+CPP=$(GPP)  -O3 -g -DJAG_DEBUGCHECK
+CPP=$(GPP)  -O3 -DJAG_DEBUGCHECK
+CPP=$(GPP)  -ggdb
+CPP=$(GPP) 
+CPP=$(GPP)  -O3 -g
+CPP=$(GPP)  -O3
+
+#### makefile.obj has $(OBJS)
+include makefile.obj
+
+EXTOBJS=Web/TomCrypt/lib/*.o Web/Snappy/*.o
+ALLCLIENTOBJS=$(CLIENTOBJS) jclish.obj
+ALLEXTOBJS=$(EXTOBJS) jclish.obj
+
+JagParseExpr.o: JagExprStack.h
+
+#.cc.o: 
+#	date
+#	$(CPP) $(CCFLAGS) -c -o $@ $<  
+#	date
+
+build/%.o:%.cc
+	date
+	$(CPP) $(CCFLAGS) -c -o $@ $<
+	date
+
+clean:
+	/bin/rm -f *.class core.* build/*.o 
+
+Jaguar.o: Jaguar.cc
+	$(CPP) $(CCFLAGS) -I. -I$(JAVAINC) -I$(JAVAINC)/linux -I$(DRIZZLEINC)  -c Jaguar.cc
+
+javahdr:
+	/bin/cp -f Jaguar.java $(DRIZZLE)/src/main/java/com/jaguar/jdbc/internal/jaguar/
+	#cd $(DRIZZLE)/src/main/java; javah -jni com.jaguar.jdbc.internal.jaguar.Jaguar 
+	cd $(DRIZZLE)/src/main/java; javac -h -jni com/jaguar/jdbc/internal/jaguar/Jaguar.java
+
+javalib: Jaguar.o  $(ALLCLIENTOBJS) 
+	$(CPP) $(CCFLAGS) -shared -Wl,-soname,libJaguarClient.so -o libJaguarClient.so \
+	Jaguar.o $(ALLCLIENTOBJS) Web/TomCrypt/lib/*.o Web/Snappy/*.o 

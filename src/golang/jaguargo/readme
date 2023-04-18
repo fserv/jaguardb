@@ -1,0 +1,13 @@
+Copyright DataJaguar, Inc.
+
+To compile code:
+
+./compile.sh
+
+This will create libjaguargo.so for ../main.go to import the package.
+
+libjaguargo.so has dependency on libJaguarClient.so so
+you must set the right path to libJaguarClient.so in -L flags in jaguargo.go:
+
+//#cgo LDFLAGS: -L/home/jaguar/jaguar/lib -L/mypath/to/libdir -lJaguarClient -ldl
+

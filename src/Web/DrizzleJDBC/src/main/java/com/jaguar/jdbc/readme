@@ -1,0 +1,14 @@
+1. internal/common/queryresults/JaguarQueryResult.java
+  make new JaguarQueryResult
+  JaguarClient was in jauarprotocol
+  replyHeader
+
+2. JaguarResultSet.java calls JaguarResultSetMetaData.java new
+
+3. JaguarResultSetMetaData.java
+	is class of resutsetmetdata
+
+4. internal/common/queryresults/JaguarQueryResult.java
+   is queryresult
+
+
