@@ -1,0 +1,564 @@
+
+JaguarDB 3.2.6 04/16/2023
+------------------------------------------------------------------
+. When a server is down and backup, the replica servers replay delta logs
+. If replay of deltalog has failed, it will restore the old delta logs
+. Ordering of delta logs is preserved.
+
+JaguarDB 3.2.5 04/15/2023
+------------------------------------------------------------------
+. Use compressed fraction part in base254 format
+. Get file attributes on multiple records
+. If a node or nodes are down, the records and attached files are resent.
+
+JaguarDB 3.2.4 03/24/2023
+------------------------------------------------------------------
+. Use compressed base254 storage method to store numerical and time data
+. Fixed rollup of numerical columns on client
+. Client selects constants, e.g. select 100+200 as v;
+. Server selects constants, e.g. select curdate(), curtime(), now() from _SYS_;
+. Aggragating without group by (in addition to aggregaton in group by)
+
+The significance of this release is to use compressed format for numerical values
+such as timestamp and integer fields.  A timestamp for seconds since the epoch now takes
+only 4 bytes. Database files and JagDBPair in memory all use the same format.
+
+
+JaguarDB 3.2.3 03/01/2023
+------------------------------------------------------------------
+. UUID now has 32 bytes (old was 48 bytes)
+. Before insert checks if record non-UUID key exists
+. Removed dinsert cinsert
+. Fixed bug where selecting table and index return more records
+. Existing client connection is refreshed after adding a new cluster
+. Added "show cluster" command
+. Simplifies messaing END and MORE logic
+
+JaguarDB 3.2.2 10/22/2022
+------------------------------------------------------------------
+. added client.getLastUuid() to get uuid of immediate last insert
+. added client.getCluster() to get current cluster number
+. above two methods in Java, Python, Go, Ruby, PHP, Nodejs
+
+The significance of this release is to enable developers to get the handle 
+(UUID) of just-inserted records.  With this UUID of a record, the application 
+will be able to use this UUID to search the profile or all data associated with it
+instantly in a targeted cluster in your JaguarDB distributed database system. If 
+identities or transactions are characterized by their UUIDs, then instant searching, 
+on top of instant scaling,  is also achieved.
+
+
+JaguarDB 3.2.1 05/12/2022
+------------------------------------------------------------------
+. Used static libstdc++.a
+. Fixed some missing return values
+. Update compilecc.sh in client directory
+
+JaguarDB 3.2.0 04/15/2021
+------------------------------------------------------------------
+. Added time series data support
+. Create time window tick tables and ingest time series data
+. Automatic aggregation and rollup of tick table data
+. Indexes for tick tables
+. Query data in time windows
+. Fixed bugs in video file upload
+
+JaguarDB 3.1.1 12/30/2020
+------------------------------------------------------------------
+. Uses memory buffer for caching inserted data
+. Uses complex and simple files to store data records
+. Sets config parameter for storing duplicate records on old/new clusters
+. Added more support in Geometry functions
+
+JaguarDB 3.0.3 05/18/2019
+------------------------------------------------------------------
+. Trimmed code and reduced memory in insert data 
+
+JaguarDB 3.0.2 04/21/2019
+------------------------------------------------------------------
+. Refactored code to separate some client and server linraries
+. Client library does not depend on geolib and CGAL libraries
+. added PHP 7.3.3 extension support
+
+------------------------------------------------------------------
+Added:
+tomultipoint(geom)             -- Well Known Text of geom
+tomultipoint(geom,N)           -- converting geom to multipoint. N is number of points for vector shapes
+wkt(geom)                      -- Well Known Text of geom
+minimumboundingcircle(geom)    -- minimum bounding circle of 2D geom
+minimumboundingsphere(geom)    -- minimum bounding sphere of 3D geom
+isonleft(geom1,geom2)          -- check if geom1 is on the left of geom2 (point and linear objects)
+isonright(geom1,geom2)         -- check if geom1 is on the right of geom2 (point and linear objects)
+leftratio(geom1,geom2)         -- ratio of geom1 on the left of geom2 (point and linear objects)
+rightratio(geom1,geom2)        -- ratio of geom1 on the right of geom2 (point and linear objects)
+knn(geom,point,K)              -- K-nearest neighbors in geom of point
+knn(geom,point,K,min,max)      -- K-nearest neighbors in geom of point within maximum and mininum distance
+metricn(geom)                  -- metrics of vector shapes
+metricn(geom,N)                -- metric of N-th point. If vector shape, N-th metric
+metricn(geom,N,m)              -- metric of N-th point, m-th metric. 1-based\
+create table column type(srid:N,metrics:M  -- select col:m1, col:m2, ... update tab set col:m1=... where ...
+
+
+JaguarDB 3.0.0 02/12/2019
+------------------------------------------------------------------
+Fixe bug in nested functions
+Added:
+JaguarDB 2.9.9 02/08/2019
+------------------------------------------------------------------
+added:
+ voronoipolygons(mpoint)                 -- find Voronoi polygons from multipoints
+ voronoipolygons(mpoint,tolerance)       -- find Voronoi polygons from multipoints with tolerance
+ voronoipolygons(mpoint,tolerance,bbox)  -- find Voronoi polygons from multipoints with tolerance and bounding box
+ voronoilines(mpoint)                    -- find Voronoi lines from multipoints
+ voronoilines(mpoint,tolerance)          -- find Voronoi lines from multipoints with tolerance
+ voronoilines(mpoint,tolerance,bbox)     -- find Voronoi lines from multipoints with tolerance and bounding box
+ delaunaytriangles(mpoint)               -- find Delaunay triangles from multipoints
+ delaunaytriangles(mpoint,tolerance)     -- find Delaunay triangles from multipoints with tolerance
+ geojson(geom)                  -- GeoJSON string of geom
+ geojson(geom,N)                -- GeoJSON string of geom, sending maximum of N points (default 3000)
+ geojson(geom,N,n)              -- GeoJSON string, receiving maximum of N points, n samples on 2D vector shapes
+ numlines(geom,N,n)             -- number of linestrings in multilinestring, polygons
+
+ union/collect/difference/intersection of 2D vector shapes
+
+
+JaguarDB 2.9.8 02/01/2019
+------------------------------------------------------------------
+added:
+
+ locatepoint(lstr,point) -- fraction where on linestring a point is closest to a given point
+ addpoint(lstr,point)    -- add a point to end of a linestring
+ addpoint(lstr,point,position)  -- add a point to the position of a linestring
+ setpoint(lstr,point,position)  -- change a point at position of a linestring
+ removepoint(lstr,position)     -- remove a point at position of a linestring
+ reverse(geom)                  -- reverse the order of points on a line, linestring, polygon, and multipolygon
+ scale(geom,factor)             -- scale the coordinates of geom by a factor
+ scale(geom,xfac,yfac)          -- scale the x-y coordinates of geom by factors
+ scale(geom,xfac,yfac,zfac)     -- scale the x-y-z coordinates of geom by factors
+ scaleat(geom,point,factor)     -- scale the coordinates of geom relative to a point by a factor
+ scaleat(geom,point,xfac,yfac)  -- scale the coordinates of geom relative to a point by a factor
+ scaleat(geom,point,xfac,yfac,zfac) -- scale the coordinates of geom relative to a point by a factor
+ scalesize(geom,factor)         -- scale the size of vector shapes by a factor
+ scalesize(geom,xfac,yfac)      -- scale the size of vector shapes by diffeent factors
+ scalesize(geom,xfac,yfac,zfac) -- scale the size of vector shapes by diffeent factors
+ translate(geom,dx,dy)          -- translate the location of 2D geom by dx,dy
+ translate(geom,dx,dy,dz)       -- translate the location of 3D geom by dx,dy,dz
+ transscale(geom,dx,dy,fac)     -- translate and then scale 2D geom
+ transscale(geom,dx,dy,xfac,yfac)  -- translate and then scale 2D geom with xfac, yfac factors
+ transscale(geom,dx,dy,dz,xfac,yfac,zfac)  -- translate and then scale 3D geom
+ rotate(geom,N)                 -- rotate 2D geom by N degrees counter-clock-wise with respect to point(0,0)
+ rotate(geom,N,'radian')        -- rotate 2D geom by N radians counter-clock-wise with respect to point(0,0)
+ rotate(geom,N,'degree')        -- rotate 2D geom by N degrees counter-clock-wise with respect to point(0,0)
+ rotateself(geom,N)             -- rotate 2D geom by N degrees counter-clock-wise with respect to self-center
+ rotateself(geom,N,'radian')    -- rotate 2D geom by N radians counter-clock-wise with respect to self-center
+ rotateself(geom,N,'degree')    -- rotate 2D geom by N degrees counter-clock-wise with respect to self-center
+ rotateat(geom,N,'radian',x,y)  -- rotate 2D geom by N radians counter-clock-wise with respect to point(x,y)
+ rotateat(geom,N,'degree',x,y)  -- rotate 2D geom by N degrees counter-clock-wise with respect to point(y,y)
+ affine(geom,a,b,d,e,dx,dy)     -- affine transformation on 2D geom
+ affine(geom,a,b,c,d,e,f,g,h,i,dx,dy,dz)  -- affine transformation on 3D geom
+
+
+JaguarDB 2.9.7 01/27/2019
+------------------------------------------------------------------
+added:
+1. isconvex() -- check if the outer ring of a polygon is convex
+2. interpolate() -- the point on linestring where linelength is at a fraction
+3. linesubstring()  -- substring of linestring between start fraction and end fraction
+4. linelength() -- linear length of line strings
+
+fixed bug: 
+1. closestpoint()  
+2. order by with limit
+3. getDouble() in jar file
+4. select count(*) error
+
+JaguarDB 2.9.6 01/22/2019
+------------------------------------------------------------------
+Added:
+
+convexhull(geom)        -- get the convex hull of a shape with raster data
+centroid(geom)          -- get the centroid coordinates of a vector or raster shape
+volume(geom)            -- get the volume of a 3D shape
+closestpoint(point(x y), geom)   -- get the closest point on geom from point(x y)
+angle(line(x y), geom)    -- get the angle in degrees between two lines
+buffer(geom, 'STRATEGY')  -- get polygon buffer of a shape. The STRATEGY is:
+             distance=symmetric/asymmetric:RADIUS,join=round/miter:N,end=round/flat,point=circle/square:N
+length(geom)            -- get length of line/3d, linestring/3d, multilinestring/3d
+perimeter(geom)         -- get perimeter length of a closed shape (vector or raster)
+equal(geom1,geom2)      -- check if shape geom1 is exactly the same as shape geom2
+issimple(geom)          -- check if shape geom has no self-intersecting or tangent points
+isvalid(geom )          -- check if multipoint, linestring, polygon, multilinestring, multipolygon is valid
+isring(geom )           -- check if linestring is a ring
+ispolygonccw(geom )     -- check if the outer ring is counter-clock-wise, inner rings clock-wise
+ispolygoncw(geom  )     -- check if the outer ring is clock-wise, inner rings couter-clock-wise
+outerring(polygon)      -- the outer ring as linestring of a polygon
+outerrings(mpolygon)    -- the outer rings as multilinestring of a multipolygon
+innerrings(polygon)     -- the inner rings as multilinestring of a polygon or multipolygon
+ringn(polygon,n)        -- the n-th ring as linestring of a polygon. n is 1-based
+innerringn(polygon,n)   -- the n-th inner ring as linestring of a polygon. n is 1-based
+polygonn(multipgon,n)   -- the n-th polygon of a multipolygon. n is 1-based
+unique(geom)            -- geom with consecutive duplicate points removed
+union(geom1,geom2)      -- union of two geoms. Polygon outer ring should be counter-clock-wise
+collect(geom1,geom2)    -- collection of two geoms
+topolygon(geom)         -- converting square, rectangle, circle, ellipse, triangle to polygon
+text(geom)              -- text string of a geometry shape
+difference(g1,g2)       -- g1 minus the common part of g1 and g2
+symdifference(g1,g2)    -- g1+g2 minus the common part of g1 and g2
+
+Added: select expr;    // no from table
+Fixed bugs on insert line data
+
+
+Jaguar 2.9.5 11/30/2018
+--------------------------------------------------------------
+. added dimension(col)         -- get dimension as integer of a shape column
+. added geotype(col)           -- get type as string of a shape column
+. added pointn(col,n)          -- get n-th point (1-based) of a shape column. (x y [z])
+. added bbox(col)              -- get bounding box of a shape column. (xmin ymin [zmin] xmax ymax [zmax])
+. added startpoint(col)        -- get start point of a line string column. (x y [z])
+. added endtpoint(col)         -- get end point of a line string column. (x y [z])
+. added isclosed(col)          -- check if points of a line string column is closed. (0 or 1)
+. added numpoints(col)         -- get total number of points of a line string or polygon
+. added numrings(col)          -- get total number of rings of a polygon or multipolygon
+. added srid(col)              -- get SRID of a shape column
+. added summary(col)           -- get a text summary of a shape column
+. added xmin(col)              -- get the minimum x-coordinate of a shape with raster data
+. added ymin(col)              -- get the minimum y-coordinate of a shape with raster data
+. added zmin(col)              -- get the minimum z-coordinate of a shape with raster data
+. added xmax(col)              -- get the maximum x-coordinate of a shape with raster data
+. added ymax(col)              -- get the maximum y-coordinate of a shape with raster data
+. added zmax(col)              -- get the maximum z-coordinate of a shape with raster data
+
+
+Jaguar 2.9.4.5 11/23/2018
+--------------------------------------------------------------
+. added area(geocolumn) area( geocolconstant() ) function
+. fixed bug in trim end zero function
+
+Jaguar 2.9.4.4 11/15/2018
+--------------------------------------------------------------
+. added select * from tab where col match 'regularexpression';
+. added select diff(col, 'string123') from tab where diff(col, 'string123') < 10;
+. diff(s1, s2) is Levenshtein distance (edit distance) between two strings
+. diff() can be used for fuzzy string matching
+
+Jaguar 2.9.4.3 11/10/2018
+--------------------------------------------------------------
+. fixed libJaguarClient.so dependency of libGeographic.so
+. added show tables like PAT;
+. added show indexes like PAT;
+
+Jaguar 2.9.4.2 10/22/2018
+--------------------------------------------------------------
+. fixed distance in meters
+. added distance calculation for more shapes
+. fix bug in create table    a    type
+
+
+Jaguar 2.9.4.1 10/15/2018
+--------------------------------------------------------------
+. fixed bug in getnthvalue in JaguarCPPClient
+. added client jql expect number of correct/error
+. fix: select * from "table";
+. fixed bug in insert into table with uuid as first key
+. fixed create table d1 double precison
+. fixed parser to handle newlines in create table statement
+
+
+Jaguar 2.9.4 09/20/2018
+--------------------------------------------------------------
+. added support for geometry and geographic data storage
+. support for location relation between geometric objects
+. support for GeoJson data input and output 
+. point, line, linestring, square, circle, ellipse, rectangle
+. sphere, ellipsoid, box, cube, cone, triangle, multipoint
+. multilinestring, polygon, multipolygon
+. within(), distance(), nearby(), coveredby(), disjoint()
+
+
+Jaguar 2.9.2 05/18/2018
+--------------------------------------------------------------
+. added support for "grant PERM1, PERM2, .. PERM on db.tab.col to user"
+. added support for "grant select on db.tab.col to user [where ...]"
+. added support for "revoke PERM1, PERM2, ... PERM on db.tab.col from user"
+
+Jaguar 2.9.1.2 05/10/2018
+--------------------------------------------------------------
+. added freetrial and enterprise versions
+
+Jaguar 2.9.1.1 04/30/2018
+--------------------------------------------------------------
+. fixed bug in creaate uer
+. fixed bug in changepass
+. fixed bug in displaying double columns
+
+Jaguar 2.9.1 04/22/2018
+--------------------------------------------------------------
+. Gateway and hosts support
+. Forward data between hosts and gateway
+
+Jaguar 2.9.0.5 04/10/2018
+--------------------------------------------------------------
+. fixed minus sign parser error in where clause
+
+Jaguar 2.9.0.4 04/03/2018
+--------------------------------------------------------------
+. improved multiple clients select range using thread pool
+
+Jaguar 2.9.0.3 04/01/2018
+--------------------------------------------------------------
+. fixed bug of inserting invalid scientific number to float column
+
+Jaguar 2.9.0.2 03/28/2018
+--------------------------------------------------------------
+. added INIT_EXTRA_THREADS in server.conf for more initial threads
+. fixed bug of 256 buffer in client
+. displaying subcluster number in cluster.conf
+. fixed jaguarstop bug in Chinese windows
+
+Jaguar 2.9.0.1 03/12/2018
+--------------------------------------------------------------
+. Fix  thread queue bug where a small cluster had not enoough sockets
+
+Jaguar 2.9.0 03/07/2018
+--------------------------------------------------------------
+. Use dynamic thread queue, according to # of servers
+. Dropdb [force] DB;
+. Drop table [force] tab123;
+. No backgrund threads for one-client ops
+
+Jaguar 2.8.9 03/06/2018
+--------------------------------------------------------------
+. Fixed bug when join of tables need new connections to hosts
+. Added Windows static lib library
+
+Jaguar 2.8.8.5 03/03/2018
+--------------------------------------------------------------
+. Fixed bug when there are multiple clusters, update/delete error
+
+Jaguar 2.8.8.4 03/02/2018
+--------------------------------------------------------------
+. Fixed getfile bug, parser no check valid path, client does
+. Cross data center insert file bug fix
+. jql goes back to no-keep new line mode
+
+Jaguar 2.8.8.3 03/01/2018
+--------------------------------------------------------------
+. Fixed bug of jql wait on ; in same line
+. getfile COL time, COL size, COL md5 from table where ...
+. Fixed hostname and IP mismatch on client and newcluster.conf
+
+Jaguar 2.8.8 02/25/2018
+--------------------------------------------------------------
+. Fixed bug of hostname and IP address mixed case
+
+Jaguar 2.8.7.3 02/23/2018
+--------------------------------------------------------------
+. Fixed bug of too many recursion in client 
+
+Jaguar 2.8.7.2 02/20/2018
+--------------------------------------------------------------
+. Fixed bug in getfile COL into localfile from t where ...;
+
+Jaguar 2.8.7 02/15/2018
+--------------------------------------------------------------
+. Supports storage of any type of documents:
+  (audio, video, image, photo, word, ppt, pdf, mp4, etc)
+. Jaguar admin package supports 2D bar chart of query result
+
+Jaguar 2.8.6 02/07/2018
+--------------------------------------------------------------
+. Adding conf/datacenter.conf to support multipe active-active support
+
+Jaguar 2.8.5.3 02/05/2018
+--------------------------------------------------------------
+. Fixed crash bug in client connection due to lack of pubblic key
+
+Jaguar 2.8.5.2 01/22/2018
+--------------------------------------------------------------
+. Added encryption of password during connection to server
+. Check system API commands for authentication
+
+--------------------------------------------------------------
+. Optimize number of threads usage for JDB files
+. If server is doing initialization, client gets server not ready error
+
+Jaguar 2.8.4 12/28/2017
+--------------------------------------------------------------
+. Enterprise and freetrial are merged into one version, requiring no license
+. Added load_file(fpath) support for binary file loading
+. Fixed bug in drop database, invalid database name
+
+Jaguar 2.8.3.1 12/01/2017
+--------------------------------------------------------------
+. Fixed bug where show empty tables in a new database
+
+Jaguar 2.8.3 11/28/2017
+--------------------------------------------------------------
+. Added support of default value of a string
+. Added support of enum 
+
+Jaguar 2.8.2.4 11/25/2017
+--------------------------------------------------------------
+. Added support of insert into tab1 select from tab2 ...
+
+Jaguar 2.8.2.3 11/05/2017
+--------------------------------------------------------------
+. Use different length-key
+
+Jaguar 2.8.2.2 11/05/2017
+--------------------------------------------------------------
+. fixed a bug in negative file number
+
+Jaguar 2.8.2 10/31/2017
+--------------------------------------------------------------
+. added bin/tools/convert_mysql_to_jaguar_schema.sh to convert schema
+. details printed in parser error
+. less threads in parallel parser
+. desc table showing default values
+. added default values in create table
+. fixed bug in resize local file
+. improved concurrency control
+. logging command or error by $DB.log $DB.err
+. added @file or source file in jql
+. uuid value override by user-input
+
+Jaguar 2.8.1 09/30/2017
+--------------------------------------------------------------
+. Fixed bug with database import from exported data
+. Improved order by key desc
+
+Jaguar 2.8.0 09/27/2017
+--------------------------------------------------------------
+. Added exportcsv/importcsv commands
+. Added spare_ column in creating table
+. Added "alter table TAB123 add COL TYPE;" support using spare_
+. JAGUAR_HOME now defaults to $HOME/jaguar
+. Expand $ENVVAR/dir/file in load and spool file path
+. Alias varchar type with char
+. Improved install and start/stop shell scripts
+
+
+Jaguar 2.7.9 09/15/2017
+--------------------------------------------------------------
+. Fixed bug in update
+
+Jaguar 2.7.8 09/12/2017
+--------------------------------------------------------------
+. Fixed bug in update set invalid column
+. MEMORY_MODE high and low two way automatic conversion
+
+Jaguar 2.7.7 09/08/2017
+Jaguar 2.8.2.1 11/02/2017
+--------------------------------------------------------------
+. reduced number of sleeping threads
+. fixed a bug in key collision for loss of records
+
+Jaguar 2.8.2 10/31/2017
+--------------------------------------------------------------
+. added bin/tools/convert_mysql_to_jaguar_schema.sh to convert schema
+. details printed in parser error
+. less threads in parallel parser
+. desc table showing default values
+. added default values in create table
+. fixed bug in resize local file
+. improved concurrency control
+. logging command or error by $DB.log $DB.err
+. added @file or source file in jql
+. uuid value override by user-input
+
+Jaguar 2.8.1 09/30/2017
+--------------------------------------------------------------
+. Fixed bug with database import from exported data
+. Improved order by key desc
+
+Jaguar 2.8.0 09/27/2017
+--------------------------------------------------------------
+. Added exportcsv/importcsv commands
+. Added spare_ column in creating table
+. Added "alter table TAB123 add COL TYPE;" support using spare_
+. JAGUAR_HOME now defaults to $HOME/jaguar
+. Expand $ENVVAR/dir/file in load and spool file path
+. Alias varchar type with char
+. Improved install and start/stop shell scripts
+
+
+Jaguar 2.7.9 09/15/2017
+--------------------------------------------------------------
+. Fixed bug in update
+
+Jaguar 2.7.8 09/12/2017
+--------------------------------------------------------------
+. Fixed bug in update set invalid column
+. MEMORY_MODE high and low two way automatic conversion
+
+Jaguar 2.7.7 09/08/2017
+--------------------------------------------------------------
+. Optimized join by value columns
+. Fixed bug in file name splitting of jdb files
+
+
+Jaguar 2.7.6 09/05/2017
+--------------------------------------------------------------
+. Fixed bug in float columns
+. Fixed bug in timeout print
+. Fixed bug in shell scripts
+. Added support for scientiic notation
+
+Jaguar 2.7.5 09/02/2017
+--------------------------------------------------------------
+. Added support for Windows server
+
+Jaguar 2.7.4 08/26/2017
+--------------------------------------------------------------
+. Added support for Windows client dll
+. Fixed bug in deleting records
+
+Jaguar 2.7.3 08/17/2017
+--------------------------------------------------------------
+. Added support for SSD STORAGE_TYPE=SSD in conf/server.conf
+  so that Jaguar uses less memory and leverage SSD's fast speed
+. Added Hash Join: a small table (<=500K rows) is loaded in memory
+  for two-table join
+. Fixed a bug in deleting many rows
+
+Jaguar 2.7.2 08/12/2017
+--------------------------------------------------------------
+. Fixed bugs in select and memory buffer
+
+Jaguar 2.7.1 08/04/2017
+--------------------------------------------------------------
+. Added inner join (or simply join) of two tables in Jaguar
+Jaguar 2.7.1 08/04/2017
+--------------------------------------------------------------
+. Added inner join (or simply join) of two tables in Jaguar
+
+Jaguar 2.7.0.3 07/28/2017
+--------------------------------------------------------------
+. Fixed bug metata info from JDBC
+
+Jaguar 2.7.0.2 07/26/2017
+--------------------------------------------------------------
+. Fixed bug in getValue() method in client. This affected Java
+  Python and other API clients.
+
+
+Jaguar 2.7.0.1 07/07/017
+--------------------------------------------------------------
+. Added scripts for installing Jaguar on all hosts in cluster
+. Added Big data components (Kafka, Hadoop, Spark), one key installation
+  on all hosts
+. Added TensorFlow AI software
+. Added jaguar-admin-2.7.0.1.tar.gz for JaguarDB admin/monitor package
+
+Jaguar 2.7.0  06/27/2017
+--------------------------------------------------------------
+1. Make sure there are no duplicates in saved data.
+
+
+Jaguar 2.6.9 06/18/2017
+--------------------------------------------------------------
+1. Make scaling of Jaguar cluster easy and fast
+2. Free trial version can run on any number of nodes with all
+   basic features (except the fault-tolerance support).
+

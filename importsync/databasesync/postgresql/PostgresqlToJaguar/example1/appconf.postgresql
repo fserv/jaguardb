@@ -1,0 +1,16 @@
+source_jdbcurl=jdbc:postgresql://192.168.7.120:5432/mydb
+source_table=t1
+source_user=dev2
+source_password=dev2
+sleep_in_millis=3000
+keep_rows=10000
+
+dest_jdbcurl=jdbc:jaguar://localhost:9999/mydb
+dest_user=admin
+dest_password=jaguar
+
+### set true to stop java server anytime when java is running
+#stop=true
+
+## print more debug info
+debug=true

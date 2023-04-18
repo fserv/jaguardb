@@ -1,0 +1,20 @@
+How to export data from Oracle and import to Jaguar
+
+1. See example1
+
+   ./create_jaguar_table.sh   <arg1> .....
+   to create a Jaguar table corresponding to Oracle table
+
+2. Use the code in example1 to import ONE table
+   1) edit app.conf.oracle   for connection, db info etc.
+   2) execute ./import_from_oracle.sh
+
+3. For more tables, create more app.conf.oracle.tableN files and
+   use it in  import_from_oracle.sh
+
+   app.conf.oracle.table1  --> import_from_oracle_table1.sh
+   app.conf.oracle.table2  --> import_from_oracle_table2.sh
+   app.conf.oracle.table3  --> import_from_oracle_table3.sh
+   app.conf.oracle.table4  --> import_from_oracle_table4.sh
+
+   etc.

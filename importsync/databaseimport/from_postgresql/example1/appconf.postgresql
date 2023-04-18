@@ -1,0 +1,13 @@
+source_jdbcurl=jdbc:postgresql://192.168.7.120:5432/mydb
+source_table=t1
+source_user=dev2
+source_password=dev2
+
+dest_jdbcurl=jdbc:jaguar://localhost:9999/mydb
+dest_user=admin
+dest_password=jaguar
+
+### max number of rows to be imported, testing only
+# import_rows=1
+
+

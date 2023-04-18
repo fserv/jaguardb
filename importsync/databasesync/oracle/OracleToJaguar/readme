@@ -1,0 +1,6 @@
+
+If you have an Oracle table, script oracle_create_changelog_trigger.sh
+creates changelog table and triggers to update the changelog table,
+so that Java program can pull the records from changelog and update
+the Jaguar database. The changelog table name is   ${table}_jagchangelog
+

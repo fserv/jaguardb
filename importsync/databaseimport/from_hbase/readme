@@ -1,0 +1,157 @@
+             How to import data to Jaguar DataBase from HBase
+
+Each column of HBase data table consists of a column family and a column qualifier.
+So if we want to import data of HBase to Jaguar Database, we have to specify
+the names of all column families and qualifiers in each family in order to create
+a Jaguar data table to accept data from HBase. For example, if one HBase table has
+two column families, 'addr' and 'contact'. And in the family of 'addr', there are
+three qualifiers, 'state', 'city' and 'street' and in 'contact' family, there are 
+'tel' and 'email'. We will use 'addr_state', 'addr_city', 'addr_street' and 
+'contact_tel', 'contact_email' to create Jaguar table.
+
+One example will illustrate how to use JAVA program to import data of HBase to Jaguar.
+
+1. Start Jaguar servers on all hosts.
+   $ cd $HOME/jaguar/bin
+   $ ./jaguarstart_on_all_hosts.sh
+   
+   After a few seconds, you can login to Jaguar server and create a table.
+   $ ./jag -u admin -p jaguar -d Example1 -h 192.168.7.120:5555
+
+   User name, password, IP address, port number and database name may vary
+   depending on your own case.
+
+2. Start HBase server.
+
+   In this example, it is assumed that you know how to start HBase and how to use 
+   HBase commands.
+
+3. Create HBase table and insert data.
+   Create a HBase table called 'test' with two column families, 'addr' and 'contact'.
+   Insert data with column qualifiers 'state','city' and 'street' in 'addr' family and
+   'tel' and 'email' in 'contact' family.
+   Later, data in this HBase table will be imported to Jaguar Database.
+
+   hbase> create 'test', 'addr', 'contact'
+   hbase> put 'test', 'Ali', 'addr:state'   , 'CA'
+   hbase> put 'test', 'Ali', 'addr:city'    , 'LA'
+   hbase> put 'test', 'Ali', 'addr:street'  , '1st'
+   hbase> put 'test', 'Ali', 'contact:tel'  , '213275' 
+   hbase> put 'test', 'Ali', 'contact:email', 'ali@com'
+   hbase> put 'test', 'Bob', 'addr:state'   , 'WA'
+   hbase> put 'test', 'Bob', 'addr:city'    , 'SEA'
+   hbase> put 'test', 'Bob', 'contact:email', 'bob@com'
+   hbase> put 'test', 'Cub', 'addr:city'    , 'POR'
+   hbase> put 'test', 'Dav', 'contact:tel'  , '323478'
+
+4. Change some parameters in ExportHBaseToJaguar.java. 
+   In order to compile ExportHBaseToJaguar.java and run this JAVA program, we have to 
+   change some parameters. *** or **** in ExportHBaseToJaguar.java have to be replaced
+   by other contents. Also, there are some comments in ExportHBaseToJaguar.java to explain
+   where to change parameters and how to change.
+
+   (1) Provide the name of table.
+       Please find the following line in ExportHBaseToJaguar.java.
+       
+	   String tableName = "***";
+	   
+	   And change *** to test and new line should be like below:
+	   
+	   String tableName = "test";
+   
+   (2) Provide the names of value column used to create Jaguar table.
+       Please find the following lines. In jaguarColNames.add("***_***"), *** before '_'
+	   indicates column family and *** after '_' indicates column qualifier.
+       
+	   HashSet<String> jaguarColNames = new HashSet<String>();
+       jaguarColNames.add("***_***");
+	   jaguarColNames.add("***_***");
+       
+       New lines would be like below:
+	   HashSet<String> jaguarColNames = new HashSet<String>();
+	   jaguarColNames.add("addr_state");
+	   jaguarColNames.add("addr_city");
+	   jaguarColNames.add("addr_street");
+	   jaguarColNames.add("contact_tel");
+	   jaguarColNames.add("contact_email");
+   
+   (3) Provide the name of key column used to create Jaguar table.
+	   In this example, we use "name" as the name of key column in Jaguar database.
+	   Change the following line:
+	   
+	   String keyJaguar = "***";
+
+       New line should be like:
+
+	   String keyJaguar = "name";
+
+   (4) Provide the names of column families of HBase table.
+       Find the following lines:
+
+       ArrayList<String> familyNamesHBase = new ArrayList<String>();
+       familyNamesHBase.add("***");
+	   familyNamesHBase.add("***");
+       
+       New lines:
+
+       ArrayList<String> familyNamesHBase = new ArrayList<String>();
+	   familyNamesHBase.add("addr");
+	   familyNamesHBase.add("contact");
+
+   (5) Provide IP address, listening port connected to Jaguar database and 
+       the name of Jaguar database.
+       Find the following line:
+	   DataSource ds = new JaguarDataSource("***.***.***.***", ****, "***");
+
+	   First parameter, ***.***.***.*** is IP address.
+	   Second parameter is listening port number.
+	   Third parameter is the name Jaguar database.
+
+	   For example, the new line may be like below:
+	   DataSource ds = new JaguarDataSource("192.168.7.101", 8888, "test");
+
+   (6) Provide user name and password used to login Jaguar database.
+       Find the following line:
+
+	   java.sql.Connection connectionJ = ds.getConnection("***", "***");
+
+	   First parameter is user name. And second one is password.
+
+	   For example, new line may be like below:
+
+	   java.sql.Connection connectionJ = ds.getConnection("admin", "jaguar");
+
+5. Modify compile.sh and run.sh.
+   compile.sh is used to compile ExportHBaseToJaguar.java and run.sh is used to
+   run the JAVA program.
+   But before running the two files, class path needs to be added.
+   Class path should include the library of HBase and Jaguar.
+   Library of HBase : [HBASE-DIRECTORY]/lib/
+   Library of Jaguar: [JAGUAR-DIRECTORY]/lib/
+
+   In compile.sh and run.sh, please modify the values of HBASE_HOME and JAGUAR_HOME.
+   
+   For example, if HBase and Jaguar are installed in home directory and the directory
+   of HBase is named as hbase and the direcotry of Jaguar is named as jaguar, 
+   we should do some modifications like below:
+
+   HBASE_HOME=/home/user/hbase
+   JAGUAR_HOME=/home/user/jaguar
+
+6. Compile and run JAVA program.
+   After ExportHBaseToJaguar.java , compile.sh and run.sh are modified correctly,
+   please execute the commands below:
+
+   $ ./compile.sh
+   $ ./run.sh
+
+7. Check Jaguar database with imported data.
+   
+
+   jaguar> select * from test;
+   name:[Dav] addr_state:[] contact_tel:[323478] addr_city:[] addr_street:[] contact_email:[] 
+   name:[Ali] addr_state:[CA] contact_tel:[213275] addr_city:[LA] addr_street:[1st] contact_email:[ali@com] 
+   name:[Bob] addr_state:[WA] contact_tel:[] addr_city:[SEA] addr_street:[] contact_email:[bob@com] 
+   name:[Cub] addr_state:[] contact_tel:[] addr_city:[POR] addr_street:[] contact_email:[] 
+
+   The sequence may vary.

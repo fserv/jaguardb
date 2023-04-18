@@ -1,0 +1,13 @@
+source_jdbcurl=jdbc:mysql://localhost:3306/mydb
+source_table=pet|tab888|tab92
+source_user=test
+source_password=test
+
+dest_jdbcurl=jdbc:jaguar://localhost:8888/mydb
+dest_user=admin
+dest_password=jaguar
+
+
+### max number of rows to be imported, testing only
+# import_rows=1
+

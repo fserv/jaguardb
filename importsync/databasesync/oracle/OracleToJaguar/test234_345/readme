@@ -1,0 +1,18 @@
+Example of synchronizing Oracle to Jaguar table
+
+1. create Oracle trigger and changelog table
+
+   ../oracle_create_changelog_trigger.sh table234 table234_changelog
+
+
+2. Configure app.conf.oracle and make sure DB/table
+   information is correct
+
+3. Start Jaguar dbsync server to monitor and synching data Oracle-->Jaguar:
+
+    $ ./start_sync_oracle_to_jaguar.sh
+
+4. Stop Jaguar dbsync server
+
+    $ ./stop_sync_oracle_to_jaguar.sh
+

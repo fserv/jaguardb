@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="jdbcsql" default="all" basedir="./">
+
+<property name="src.dir"          value="${basedir}/src"/>
+<property name="build.dir"        value="${basedir}/build"/>
+<property name="classes.dir"      value="${basedir}/build/classes"/>
+<property name="lib"           value="${basedir}/lib"/>
+
+    <path id="classpath">
+        <pathelement location="${classes.dir}"/>
+        <fileset dir="${lib}/">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+   <target name="clean" description="Delete build directory.">
+        <delete dir="${build.dir}"/>
+        <mkdir dir="${build.dir}"/>
+   </target>
+
+<target name="compile" depends="clean" description="Compile all Java files in 'src' directory.">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on" includeantruntime="false">
+            <classpath refid="classpath"/>
+        </javac>
+</target>
+
+<target name="all" depends="compile">
+    <jar destfile="${build.dir}/jdbcsql.jar">
+            <fileset dir="${classes.dir}">
+                <include name="com/**"/>
+            </fileset>
+    </jar>
+
+</target>
+
+</project>

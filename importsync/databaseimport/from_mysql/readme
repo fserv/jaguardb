@@ -1,0 +1,19 @@
+How to export data from MySQL and import to Jaguar
+
+1. Create table in jaguar given a table on MySQL
+
+   ./create_jaguar_table.sh  <DATABASE> <TABLE_NAME>
+
+2. Use the code in example1 to import ONE table
+   1) edit app.conf.mysql   for connection, db info etc.
+   2) execute ./import_from_mysql.sh
+
+3. For more tables, create more app.conf.mysql.tableN files and
+   use it in  import_from_mysql.sh
+
+   app.conf.mysql.table1  --> import_from_mysql_table1.sh
+   app.conf.mysql.table2  --> import_from_mysql_table2.sh
+   app.conf.mysql.table3  --> import_from_mysql_table3.sh
+   app.conf.mysql.table4  --> import_from_mysql_table4.sh
+
+   etc.

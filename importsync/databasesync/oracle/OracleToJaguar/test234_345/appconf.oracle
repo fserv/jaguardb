@@ -1,0 +1,16 @@
+source_jdbcurl=jdbc:oracle:thin:@//localhost:1522/test
+source_table=table234|table345
+source_user=test
+source_password=test
+sleep_in_millis=3000
+keep_rows=10000
+
+dest_jdbcurl=jdbc:jaguar://localhost:9999/test
+dest_user=test
+dest_password=test
+
+### set true to stop java server anytime when java is running
+#stop=true
+
+## print more debug info
+debug=true
