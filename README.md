@@ -34,11 +34,12 @@ variety of perspectives and make more accurate predictions or decisions when app
 
 
 ```
+
        JaguarDB                          Model                            JaguarDB
 
                                                                      --------------------
     ----------------            --------------------------          | Generated Content  |
-   | Training Data  |   ===>   |                          |  ====>  | Embedding Vectors  |  <===== Search/Share
+   | Training Data  |   ===>   |                          |  ====>  | Embedding Vectors  |  <===== Search
     ----------------           |    AI  Neural Network    |          --------------------
                                |                          |        
     ---------------            |         Text             |          --------------------    
@@ -55,6 +56,7 @@ variety of perspectives and make more accurate predictions or decisions when app
                                        |                                                                |
       Realtime AI                      |                                                                |
                                        ^----------------------------------------------------------------<
+
 ```
 
 Therefore, having lots of good data is essential for developing robust and accurate AI models that can be applied 
