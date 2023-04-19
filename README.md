@@ -42,9 +42,9 @@ variety of perspectives and make more accurate predictions or decisions when app
    | Training Data  |   ===>   |                          |  ====>  | Embedding Vectors  |  <===== Search
     ----------------           |    AI  Neural Network    |          --------------------
                                |                          |        
-    ---------------            |         Text             |          --------------------    
-   |  Knowdge Base  |   ===>   |         Audio            |  ====>  |   False Positives  |  ------------v
-    ---------------            |         Video            |          --------------------               |
+    ----------------           |         Text             |          --------------------    
+   | Knowledge Base |   ===>   |         Audio            |  ====>  |   False Positives  |  ------------v
+    ----------------           |         Video            |          --------------------               |
                                |        Images            |                                             |
     ----------------           |                          |          --------------------               |
    |  Dynamic Data  |   ===>   |       Embeddings         |  ====>  |  False Negatives   |  ------v     |
@@ -58,6 +58,7 @@ variety of perspectives and make more accurate predictions or decisions when app
                                        ^----------------------------------------------------------------<
 
 ```
+
 
 Therefore, having lots of good data is essential for developing robust and accurate AI models that can be applied 
 in a variety of contexts and provide value to businesses and individuals alike. Good data comes from a well-managed database
