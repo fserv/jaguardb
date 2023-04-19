@@ -1,5 +1,5 @@
 
-## JaguarDB is the Best NoSQL Database For AI, IoT ##
+## JaguarDB is the Best Database For AI, IoT, Robots ##
 
 **AI and IoT Data**
 
@@ -31,6 +31,31 @@ learn and generalize from that data.
 To create accurate and reliable AI models, it is important to ensure that the data used for training is of high quality, 
 well-structured, and covers a wide range of scenarios and use cases. This allows the AI to learn from a 
 variety of perspectives and make more accurate predictions or decisions when applied to new data.
+
+
+```
+       JaguarDB                          Model                            JaguarDB
+
+                                                                     --------------------
+    ----------------            --------------------------          | Generated Content  |
+   | Training Data  |   ===>   |                          |  ====>  | Embedding Vectors  |  <===== Search/Share
+    ----------------           |    AI  Neural Network    |          --------------------
+                               |                          |        
+    ---------------            |         Text             |          --------------------    
+   |  Knowdge Base  |   ===>   |         Audio            |  ====>  |   False Positives  |  ------------v
+    ---------------            |         Video            |          --------------------               |
+                               |        Images            |                                             |
+    ----------------           |                          |          --------------------               |
+   |  Dynamic Data  |   ===>   |       Embeddings         |  ====>  |  False Negatives   |  ------v     |
+    ----------------            --------------------------           --------------------         |     |
+                                       ^      ^                                                   |     |
+                                       |      |                                                   |     |
+                                       |      |                                                   |     |
+       Achieving                       |      ^---------------------------------------------------<     |
+                                       |                                                                |
+      Realtime AI                      |                                                                |
+                                       ^----------------------------------------------------------------<
+```
 
 Therefore, having lots of good data is essential for developing robust and accurate AI models that can be applied 
 in a variety of contexts and provide value to businesses and individuals alike. Good data comes from a well-managed database
