@@ -9810,6 +9810,15 @@ void JagDBServer::receiveFile( const char *mesg, const JagRequest &req )
 int JagDBServer::processDeltaLog( const Jstr &fpath, FILE *& logf, pthread_mutex_t *mtx )
 {
     in("s340288 processDeltaLog fpath=[%s] ...", fpath.s() );
+
+    Jstr errmsg;
+    int src = _dbConnector->_parentCli->pingFileHost( fpath, errmsg );
+    if ( src < 0 ) {
+        in("s345128 pingFileHost fpath=[%s] error=[%s] deltalog not sent", fpath.s(), errmsg.s() );
+        return -888;
+    }
+    in("s35228 pingFileHost fpath=[%s] OK, continue ....", fpath.s() );
+
     Jstr histFile;
 
     JAG_BLURT jaguar_mutex_lock ( mtx ); JAG_OVER

@@ -195,8 +195,10 @@ class JaguarCPPClient
 	int   getInsertFilesWithoutNames(int tdiff, const JagParseParam &param, JagVector<Jstr> &fvec, 
                                      JagVector<Jstr> &dvec, Jstr &errmsg );
 
-    int getKeyWithoutNames( int tdiff, const JagTableOrIndexAttrs *objAttr, const JagParseParam &parseParam, 
-                            JagFixString &kstr, Jstr &errmsg );
+    int   getKeyWithoutNames( int tdiff, const JagTableOrIndexAttrs *objAttr, const JagParseParam &parseParam, 
+                              JagFixString &kstr, Jstr &errmsg );
+
+    int   pingFileHost( const Jstr &fpath, Jstr &errmsg );
 
     // public data members
 	Jstr 		_version;	
