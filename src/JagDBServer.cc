@@ -7350,6 +7350,8 @@ void JagDBServer::addClusterMigrate( const char *mesg, const JagRequest &req )
 	}
     ***/
 
+    dn("s4780188 addClusterMigrate() mesg=[%s]", mesg );
+
 	Jstr oldHosts = _dbConnector->_nodeMgr->_allNodes.s(); // existing hosts "ip1|ip2|ip3"
 	this->_migrateOldHosts = oldHosts;
 	JagHashMap<AbaxString, AbaxInt> ipmap;
@@ -7359,11 +7361,16 @@ void JagDBServer::addClusterMigrate( const char *mesg, const JagRequest &req )
 	const char *end = strchr( mesg+elen, '|' ); // skip _ex_addcluster_migrate|#
 	if ( !end ) end = strchr( mesg+elen, '!' );
 	if ( !end ) end = mesg+elen;
+
 	Jstr hstr = mesg+elen-1;
     Jstr absfirst( mesg+elen, end-mesg-elen );
+
+    dn("s870001 hstr=[%s] absfirst=[%s]", hstr.s(), absfirst.s() );
+
 	// split to get original cluster(s) and new added cluster
 	JagStrSplit sp( hstr, '!', true );
 	JagStrSplit sp2( sp[1], '|', true ); // new nodes
+
 	_objectLock->writeLockSchema( -1 );
 	
 	// form new cluster.conf string as the form of: #\nip1\nip2\n#\nip3\nip4...
@@ -7372,8 +7379,11 @@ void JagDBServer::addClusterMigrate( const char *mesg, const JagRequest &req )
 	JagStrSplit sp3( sp[0], '#', true );
 
 	for ( int i = 0; i < sp3.length(); ++i ) {
+        dn("s87005 i=%d sp3[i]=[%s]", i, sp3[i].s() );
+
 		++ clusternum;
 		JagStrSplit sp4( sp3[i], '|', true );
+
 		for ( int j = 0; j < sp4.length(); ++j ) {
 			ip = JagNet::getIPFromHostName( sp4[j] );
 			if ( ip.length() < 2 ) {
@@ -7413,13 +7423,16 @@ void JagDBServer::addClusterMigrate( const char *mesg, const JagRequest &req )
 	// nhstr has all hosts now ( old + new )
 	jd(JAG_LOG_LOW, "addcluster migrate updated set of hosts:\n%s\n", nhstr.c_str() );
 
-	Jstr fpath, cmd, dirpath, tmppath, passwd = "anon", connectOpt = Jstr("/TOKEN=") + _servToken;
+	Jstr fpath, cmd, dirpath, tmppath, passwd = "anon";
+    Jstr connectOpt = Jstr("/TOKEN=") + _servToken;
 	unsigned int uport = _port;
 	// first, let host0 of cluster0 send schema info to new server(s)
 	bool isDirector = false;
 
 	if ( _dbConnector->_nodeMgr->_selfIP == absfirst ) {
+        dn("s87006 i am old main host");
 		isDirector = true; // the main old host
+
 		dirpath = _cfg->getJDBDataHOME( JAG_MAIN );
 		tmppath = _cfg->getTEMPDataHOME( JAG_MAIN );
 		// make schema package -- empty database dirs and full system dir
@@ -7432,6 +7445,7 @@ void JagDBServer::addClusterMigrate( const char *mesg, const JagRequest &req )
 		cmd = Jstr("cd ") + tmppath + "; tar -zxf a.tar.gz; tar -zxf b.tar.gz; rm -f a.tar.gz b.tar.gz; tar -zcf c.tar.gz *";
 		system(cmd.c_str());
 		jd(JAG_LOG_LOW, "s6302 [%s]\n", cmd.c_str() );
+
 		fpath = tmppath + "/c.tar.gz";
 		// make connection and transfer package to each server
 		for ( int i = 0; i < sp2.length(); ++i ) {
@@ -7459,6 +7473,7 @@ void JagDBServer::addClusterMigrate( const char *mesg, const JagRequest &req )
 				jagsleep(1, JAG_SEC);
 				d("s402981 sleep 1 sec ...\n");
 			}
+
 			d("s307371 i am a new server %s , _addClusterFlag=%d schema files arrived\n", sp2[i].s(), (int)_addClusterFlag );
 			// received new schema package
 			// 1. cp tar.gz to pdata and ndata
@@ -7580,12 +7595,14 @@ void JagDBServer::addClusterMigrate( const char *mesg, const JagRequest &req )
 	jd(JAG_LOG_LOW, "s1927 existing allnodes: [%s]\n", _dbConnector->_nodeMgr->_allNodes.s() );
 
 	_dbConnector->_nodeMgr->refreshClusterFile( nhstr );
+
 	jaguar_mutex_lock ( &g_dbconnectormutex );
 	if ( _dbConnector ) {
 		delete _dbConnector;
 		_dbConnector = newObject<JagDBConnector>( );
 	}
 	jaguar_mutex_unlock ( &g_dbconnectormutex );
+
 	jd(JAG_LOG_LOW, "s13 new allnodes: [%s]\n", _dbConnector->_nodeMgr->_allNodes.s() );
 	jd(JAG_LOG_LOW, "s132 _sendAllNodes: [%s]\n", _dbConnector->_nodeMgr->_sendAllNodes.s() );
 
@@ -7611,20 +7628,25 @@ void JagDBServer::addClusterMigrateContinue( const char *mesg, const JagRequest 
 		return;
 	}
     **/
+    dn("s8701004 addClusterMigrateContinue ...");
 
 	Jstr oldHosts = this->_migrateOldHosts;
 
 	if ( ! this->_isDirectorNode ) {
 		sendEOM( req, "addclsmigcont");
+        dn("s029289 i am not _isDirectorNode return");
 		return;
 
 	}
+
+    dn("s8701004 addClusterMigrateContinue go on ...");
 
 	JagVector<AbaxString> *vec = _tableschema->getAllTablesOrIndexesLabel( JAG_TABLE_OR_CHAIN_TYPE, "", "" );
 	Jstr sql;
 	int bad = 0;
 	bool erc;
 	Jstr dbtab, db, tab;
+
 	for ( int j=0; j < vec->length(); ++j ) {
 		dbtab = (*vec)[j].s();  // "db.tab123"
 		sql = Jstr("select * from ") + dbtab + " export;";
@@ -7700,34 +7722,46 @@ void JagDBServer::addCluster( const char *mesg, const JagRequest &req )
 		return;
 	}
     ***/
-    dn("s2009718 addCluster mesg=[%s]", mesg );
+    dn("s2009718 addCluster()  mesg=[%s]", mesg );
+    // pmesg=[_ex_addcluster|#192.168.1.207#192.168.1.203!192.168.2.97]
+    // pmesg=[_ex_addcluster|#192.168.1.207#192.168.1.203#192.168.2.97!192.168.1.11|192.18.1.16]
+    // # separates old clusters, ! introdueces a new cluster ( | separated new nodes)
+    // addCluster mesg=[_ex_addcluster|#192.168.1.17|192.168.1.13!192.168.1.51|192.168.1.36]
 
 	JagHashMap<AbaxString, AbaxInt> ipmap;
 
 	int elen = strlen("_ex_addcluster") + 2; 
-	const char *end = strchr( mesg+elen, '|' ); // skip _ex_addcluster|#
-	if ( !end ) end = strchr( mesg+elen, '!' );
-	if ( !end ) end = mesg+elen;
-	Jstr hstr = mesg+elen-1, absfirst( mesg+elen, end-mesg-elen );
+
+	Jstr hstr = mesg+elen-1;  // #192.18.1.17#192.18.1.13!192.168.2.9
+
 	JagStrSplit sp( hstr, '!', true );
-	JagStrSplit sp2( sp[1], '|', true );
+
+	JagStrSplit sp3( sp[0], '#', true ); // old clusters
+	JagStrSplit sp2( sp[1], '|', true ); // nodes in new cluster
+
+	JagStrSplit sph( sp3[0], '|', true ); // first node in first cluster
+    Jstr absfirst = sph[0];
+
+    dn("s8710003 hstr=[%s]  absfirst=[%s]", hstr.s(), absfirst.s() );
+
 	_objectLock->writeLockSchema( -1 );
 	
 	int clusternum = 1;
 	Jstr nhstr, ip, err, clustname;
-	JagStrSplit sp3( sp[0], '#', true );
 
     nhstr =  Jstr("######## !!!!!!!! PLEASE DO NOT MANUALLY EDIT THIS FILE !!!!!!!! ########\n");
     nhstr += Jstr("######## !!!!!!!! IF IT IS MANUALLY EDITED, THE SYSTEM WILL STOP WORKING !!!!!!!! ########\n");
 
 	for ( int i = 0; i < sp3.length(); ++i ) {
+        dn("s32018 sp3[i=%d]=[%s]", i, sp3[i].s() );
+
 		clustname = Jstr("@ Cluster ") + intToStr(clusternum);
 		nhstr += clustname + "\n";
 		++ clusternum;
 		JagStrSplit sp4( sp3[i], '|', true );
+
 		for ( int j = 0; j < sp4.length(); ++j ) {
 			ip = JagNet::getIPFromHostName( sp4[j] );
-			// nhstr += sp4[j] + "\n";
 			if ( ip.length() < 2 ) {
 				err = Jstr( "E13003 Command Failed. Unable to resolve IP address of " ) +  sp4[j] ;
 				jd(JAG_LOG_LOW, "E13003 addcluster error %s \n", err.c_str() );
@@ -7743,11 +7777,10 @@ void JagDBServer::addCluster( const char *mesg, const JagRequest &req )
 		}
 	}
 
-	// nhstr += "# Do not delete this line\n";
 	clustname = Jstr("@ Cluster ") + intToStr(clusternum);
 	nhstr += clustname + "\n";
+
 	for ( int i = 0; i < sp2.length(); ++i ) {
-		// nhstr += sp2[i] + "\n";
 		ip = JagNet::getIPFromHostName( sp2[i] );
 		if ( ip.length() < 2 ) {
 			err = Jstr( "E132207 E=Command Failed. Unable to resolve IP address of newhost " ) +  sp2[i] ;
@@ -7764,10 +7797,13 @@ void JagDBServer::addCluster( const char *mesg, const JagRequest &req )
 	}
 	jd(JAG_LOG_LOW, "addcluster newhosts:\n%s\n", nhstr.c_str() );
 
-	Jstr fpath, cmd, dirpath, tmppath, passwd = "anon", connectOpt = Jstr("/TOKEN=") + _servToken;
+	Jstr fpath, cmd, dirpath, tmppath, passwd = "anon";
+    Jstr connectOpt = Jstr("/TOKEN=") + _servToken;
 	unsigned int uport = _port;
 
 	// first, let host0 of cluster0 send schema info to new server(s)
+    dn("s87105005 selfIP=[%s]  =?=  absfirst=[%s]", _dbConnector->_nodeMgr->_selfIP.s(),  absfirst.s() );
+
 	if ( _dbConnector->_nodeMgr->_selfIP == absfirst ) {
         dn("s7101827 _selfIP == absfirst send schema files ");
 		dirpath = _cfg->getJDBDataHOME( JAG_MAIN );
@@ -7801,11 +7837,15 @@ void JagDBServer::addCluster( const char *mesg, const JagRequest &req )
 	// for new added servers, wait for package receive, and then format schema
 	//bool amNewNode = false;
 	for ( int i = 0; i < sp2.length(); ++i ) {
+        dn("s600018 _selfIP=[%s]   sp2[i=%d]=[%s]", _dbConnector->_nodeMgr->_selfIP.s(), sp2[i].s() );
+        dn("s20018287 _addClusterFlag=%d", (int)_addClusterFlag );
+
 		if ( _dbConnector->_nodeMgr->_selfIP == sp2[i] ) {
 			while ( _addClusterFlag < 1 ) {
-				jagsleep(1, JAG_SEC);
-				d("s402981 sleep 1 sec ...\n");
+				jagsleep(100, JAG_MSEC);
+				d("s402981 sleep 100 msec ...\n");
 			}
+
 			// received new schema package
 			// 1. cp tar.gz to pdata and ndata
 			// 1. drop old tables, untar packages, cp -rf of data to pdata and ndata and rebuild new table objects
@@ -7886,6 +7926,7 @@ void JagDBServer::addCluster( const char *mesg, const JagRequest &req )
 // pmesg: "_ex_addclustr_mig_complete|#ip1|ip2#ip3|ip4!ip5|ip6"
 void JagDBServer::addClusterMigrateComplete( const char *mesg, const JagRequest &req )
 {
+    dn("s8701003 addClusterMigrateComplete() ...");
     /***
 	if ( req.session->uid!="admin" || !req.session->exclusiveLogin ) {
 		jd(JAG_LOG_LOW, "adding cluster rejected. admin exclusive login is required\n" );
@@ -8578,6 +8619,7 @@ void JagDBServer::processInternalCommands( int rc, const JagRequest &req, const 
 	} else if ( JAG_SCMD_CHOST == rc ) {
 		sendHostInfo( pmesg, req, true );
 	} else if ( JAG_SCMD_CRECOVER == rc ) {
+        dn("s176288 JAG_SCMD_CRECOVER cleanRecovery()...");
 		cleanRecovery( pmesg, req );
 		sendEOM( req, "crecov");
 	} else if ( JAG_SCMD_CHECKDELTA == rc ) {
