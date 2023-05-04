@@ -1,4 +1,9 @@
 
+JaguarDB 3.2.7 05/04/2023
+------------------------------------------------------------------
+. Fix the bug on server side on waiting for schema change at new nodes
+. Use multithreads on client side when implementing addcluster
+
 JaguarDB 3.2.6 04/16/2023
 ------------------------------------------------------------------
 . When a server is down and backup, the replica servers replay delta logs

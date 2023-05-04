@@ -19,7 +19,7 @@
 #ifndef _jag_def_h_
 #define _jag_def_h_
 
-#define JAG_VERSION			        "3.2.6"
+#define JAG_VERSION			        "3.2.7"
 #define JAG_BLOCK_SIZE				32
 #define JAG_ARJAG_FILE_HEAD  		0
 #define JAG_BID_FILE_HEADER_BYTES	64
