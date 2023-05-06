@@ -1,0 +1,5 @@
+This directory has C++ files and shell scripts to benchmark
+six servers running LevelDB where data is distributed with
+Consistent hashing ring.
+
+Each node should have its own file myip.txt having its own IP address.

@@ -1,0 +1,9 @@
+git clone https://github.com/fpagliughi/sockpp.git
+
+cp -f sockpp/CMakeLists.txt sockpp/CMakeLists.txt.orig
+cp -f CMakeLists.txt.static sockpp/CMakeLists.txt
+mkdir -p sockpp/build
+cd sockpp/build
+cmake ..
+make
+
