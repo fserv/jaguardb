@@ -1200,5 +1200,15 @@ select avg(b) v from dv;
 expect value v 35000.0;
 select avg(c) v from dv;
 
+### vector table
+drop table if exists vec1;
+create table vec1 ( key: a int, value: v vector, b char(4) );
+expect words "vec1 vector b";
+desc vec1;
+
+insert into vec1 values (10, vector(1.2, 2.4, 3.2, 4.3, 5.7, 6.3, 100, 103.4), 'west' );
+select * from vec1;
+
+
 
 quit;

@@ -15,8 +15,8 @@ CPP=$(GPP)  -pg
 CPP=$(GPP)  -O3 -g
 CPP=$(GPP) 
 CPP=$(GPP)  -ggdb  -O0
-CPP=$(GPP) -g
 CPP=$(GPP) -O3
+CPP=$(GPP) -g
 
 
 BOOST_INC=Web/Boost/boost_1_81_0_install/include

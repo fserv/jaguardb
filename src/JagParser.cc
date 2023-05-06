@@ -2652,6 +2652,16 @@ int JagParser::setInsertVector()
 				}
 
 				q = _saveptr;
+			} else if ( strncasecmp( p, "vector(", 7 )==0 ) {
+				// cvector( x1, x2, x3, x4)
+				while ( *p != '(' ) ++p;  ++p;
+				if ( *p == 0 ) return -2784;
+				rc = checkVectorData( p );
+				if ( rc < 0 ) return rc;
+				other.type =  JAG_C_COL_TYPE_VECTOR;
+				q = _saveptr;
+				_ptrParam->hasPoly = true;
+				_ptrParam->polyDim = 1;
 			} else if ( strncasecmp( p, "linestring(", 11 )==0 ) {
 				// linestring( x1 y1, x2 y2, x3 y3, x4 y4)
 				//d("s2834 linestring( p=[%s]\n", p );
@@ -3880,6 +3890,8 @@ Jstr JagParser::fillDataType( const char* gettok )
 		rc = JAG_C_COL_TYPE_LINE;
 	} else if (strcasecmp(gettok, "line3d") == 0) {
 		rc = JAG_C_COL_TYPE_LINE3D;
+	} else if (strcasecmp(gettok, "vector") == 0) {
+		rc = JAG_C_COL_TYPE_VECTOR;
 	} else if (strcasecmp(gettok, "linestring") == 0) {
 		rc = JAG_C_COL_TYPE_LINESTRING;
 	} else if (strcasecmp(gettok, "linestring3d") == 0) {
@@ -4055,6 +4067,7 @@ bool JagParser::isPolyType( const Jstr &rcs )
 {
 	if ( rcs.size() < 1 ) return false;
 	if ( rcs == JAG_C_COL_TYPE_LINESTRING || rcs == JAG_C_COL_TYPE_LINESTRING3D
+		 || rcs == JAG_C_COL_TYPE_VECTOR 
 		 || rcs == JAG_C_COL_TYPE_MULTIPOINT || rcs == JAG_C_COL_TYPE_MULTIPOINT3D
 		 || rcs == JAG_C_COL_TYPE_MULTILINESTRING || rcs == JAG_C_COL_TYPE_MULTILINESTRING3D
 		 || rcs == JAG_C_COL_TYPE_MULTIPOLYGON || rcs == JAG_C_COL_TYPE_MULTIPOLYGON3D
@@ -4125,6 +4138,7 @@ bool JagParser::isGeoType( const Jstr &rcs )
              || rcs == JAG_C_COL_TYPE_POINT3D
 		     || rcs == JAG_C_COL_TYPE_LINE 
              || rcs == JAG_C_COL_TYPE_LINE3D
+		     || rcs == JAG_C_COL_TYPE_VECTOR 
 		     || rcs == JAG_C_COL_TYPE_LINESTRING 
              || rcs == JAG_C_COL_TYPE_LINESTRING3D
 		     || rcs == JAG_C_COL_TYPE_MULTILINESTRING 
@@ -4293,6 +4307,14 @@ void JagParser::addCreateAttrAndColumn(bool isValue, CreateAttribute &cattr, int
 		 _ptrParam->createAttrVec.append( cattr );
 		 _ptrParam->addLineColumns( cattr, 1 );
 		 coloffset += JAG_LINE3D_DIM*JAG_GEOM_TOTLEN + cattr.metrics*JAG_METRIC_LEN;  // 6 columns x1 y1 z1 x2 y2 z2
+    } else if ( cattr.type == JAG_C_COL_TYPE_VECTOR ) {
+		 ncol=JAG_VECTOR_DIM;
+		 cattr.begincol = _ptrParam->createAttrVec.size() +1;
+		 cattr.endcol = _ptrParam->createAttrVec.size() +ncol + cattr.metrics;
+		 *(cattr.spare+2) = JAG_ASC;
+		 _ptrParam->createAttrVec.append( cattr );
+		 _ptrParam->addVectorColumns( cattr );
+		 coloffset += ncol*JAG_GEOM_TOTLEN + cattr.metrics*JAG_METRIC_LEN;  // 3 columns seg x y 
     } else if ( cattr.type == JAG_C_COL_TYPE_LINESTRING ) {
 		 ncol=JAG_LINESTRING_DIM;
 		 cattr.begincol = _ptrParam->createAttrVec.size() +1;
@@ -4619,6 +4641,13 @@ void JagParser::addExtraOtherCols( const JagColumn *pcol, ValueAttribute &other,
 			_ptrParam->valueVec.append(other);
 			++numCols;
 		}
+	} else if ( pcol->type == JAG_C_COL_TYPE_VECTOR ) {
+		on = other.objName.colName;
+
+		other.objName.colName = on + ":x";
+		_ptrParam->valueVec.append(other);
+		++numCols;
+
 	} else if ( pcol->type == JAG_C_COL_TYPE_LINESTRING3D || pcol->type == JAG_C_COL_TYPE_LINESTRING ) {
 		on = other.objName.colName;
 
@@ -4877,8 +4906,8 @@ bool JagParser::hasPolyGeoType( const char *createSQL, int &dim )
 	++p; if ( *p == '\0' ) return false;
 
 	JagStrSplitWithQuote sp(p, ',');
-	//JagStrSplit sp(p, ',');
 	if ( sp.length() < 1 ) return false;
+
 	for ( int i=0; i < sp.length(); ++i ) {
 		if ( sp[i].size() < 1 ) continue;
 		// sp[i]: "key: a int" "value: b int"   "c linestring(43)" "e enum('a', 'b', 'c')"  "f point3d"
@@ -4902,6 +4931,8 @@ bool JagParser::hasPolyGeoType( const char *createSQL, int &dim )
 			if ( dim < 3 ) dim = 3;
 		} else if ( 0==strncasecmp(nt[1].c_str(), "linestring", 10) ) {
 			if ( dim < 2 ) dim = 2;
+		} else if ( 0==strncasecmp(nt[1].c_str(), "vector", 6) ) {
+			if ( dim < 2 ) dim = 1;
 		} else if ( 0==strncasecmp(nt[1].c_str(), "multipoint", 10) ) {
 			if ( dim < 2 ) dim = 2;
 		} else if ( 0==strncasecmp(nt[1].c_str(), "polygon", 7) ) {
@@ -4913,7 +4944,7 @@ bool JagParser::hasPolyGeoType( const char *createSQL, int &dim )
 		}
 	}
 
-	if ( dim >=2 ) return true;
+	if ( dim >=1 ) return true;
 	return false;
 }
 
@@ -5044,6 +5075,17 @@ Jstr JagParser::getColumns( const char *str )
 	}
 }
 
+int JagParser::checkVectorData( const char *p )
+{
+	if ( *p == 0 ) return -3527;
+	JagStrSplit sp( p, ',', true );
+	int len = sp.length();
+	for ( int i = 0; i < len; ++i ) {
+		if ( sp[i].length() >= JAG_POINT_LEN ) { return -4516; }
+	}
+	return 0;
+}
+
 int JagParser::checkLineStringData( const char *p )
 {
 	if ( *p == 0 ) return -3427;
@@ -5058,6 +5100,35 @@ int JagParser::checkLineStringData( const char *p )
 		if ( ss[0].length() >= JAG_POINT_LEN ) { return -4416; }
 		if ( ss[1].length() >= JAG_POINT_LEN ) { return -4417; }
 	}
+	return 0;
+}
+
+int JagParser::getVectorMinMax( char sep, const char *p, double &xmin, double &xmax )
+{
+	dn("s222921 getVectorMinMax p=[%s]", p );
+	if ( *p == 0 ) {
+        return -4450;
+    }
+
+	double xv ;
+	JagStrSplit sp( p, sep, true );
+	int len = sp.length();
+
+    dn("s5133005 getVectorMinMax sp.length=%d", len );
+
+	for ( int i = 0; i < len; ++i ) {
+
+    	if ( sp[i].length() >= JAG_POINT_LEN ) { 
+            return -46316; 
+        }
+
+    	xv = jagatof( sp[i].c_str() );
+
+		if ( xv > xmax ) xmax = xv;
+		if ( xv < xmin ) xmin = xv;
+	}
+
+	dn("s103988 getVectorMinMax() xmin=%f xmax=%f\n", xmin, xmax );
 	return 0;
 }
 
@@ -5113,11 +5184,58 @@ int JagParser::getLineStringMinMax( char sep, const char *p, double &xmin, doubl
 	return 0;
 }
 
+int JagParser::addVectorData( JagVectorString &linestr, const char *p )
+{
+	if ( *p == 0 ) return -14410;
+	d("s283778 p=[%s]\n", p );
+
+	JagStrSplit sp( p, ',', true );
+	int len = sp.length();
+    char c;
+
+    //  100 'metric1' 'metric2' 'metric3', 300 'metric1' 'metric2' 'metric3', 
+    //  400 'metric1' 'metric2' 'metric3',
+
+	for ( int i = 0; i < len; ++i ) {
+        dn("s222009 sp[i=%d]=[%s]", i, sp[i].s() );
+		if ( strchr(sp[i].c_str(), ':') ) { 
+            c = ':'; 
+        } else { 
+            c = ' '; 
+        }
+
+		//JagStrSplit ss( sp[i], c, true );
+		JagStrSplitWithQuote ss( sp[i].s(), c, true, true );
+		if ( ss.length() < 1 ) {  continue; }
+		if ( ss[0].length() >= JAG_POINT_LEN ) { return -44036; }
+
+		JagPoint2D pt( ss[0].s(), "0" );
+
+		if ( ! getMetrics( ss, pt.metrics ) ) return -491039;
+        dn("s2022512 addLineStringData point.x=%f  point.y=%f", pt.x, pt.y );
+
+		linestr.add(pt);
+	}
+
+	d("s870394 appended vector other.linestr.size=%d\n", linestr.size() );
+	return 0;
+}
+
+int JagParser::addVectorData( JagVectorString &linestr, const JagStrSplit &sp )
+{
+	for ( int i=JAG_SP_START; i < sp.length(); ++i ) {
+		linestr.add( sp[i].tof() );
+	}
+    return 0;
+}
+
 int JagParser::addLineStringData( JagLineString &linestr, const char *p )
 {
 	if ( *p == 0 ) return -4410;
 	d("s2838 linestring( p=[%s]\n", p );
 
+    //  100 200 'metric1' 'metric2' 'metric3', 300 400 'metric1' 'metric2' 'metric3', 
+    //  400 500 'metric1' 'metric2' 'metric3',
 	JagStrSplit sp( p, ',', true );
 	int len = sp.length();
 
@@ -6717,6 +6835,7 @@ bool JagParser::getMetrics( const JagStrSplitWithQuote &sp, JagVector<Jstr> &met
 	d("s422398 getMetrics \n");
 	Jstr t;
 	int cnt = 0;
+
 	for ( int i = 0; i < sp.size(); ++i ) {
 		t = sp[i];
 		if ( '\'' == *(t.c_str()) ) {
@@ -6735,6 +6854,26 @@ bool JagParser::getMetrics( const JagStrSplitWithQuote &sp, JagVector<Jstr> &met
 
 	return true;
 }
+
+/**
+bool JagParser::getMetrics( const Jstr &tok, JagVector<Jstr> &metrics )
+{
+	if ( strchr(tok.s(), '#') ) return false;
+
+	Jstr t;
+
+	t = tok;
+	if ( '\'' == *(t.c_str()) ) {
+		t.trimChar( '\'');
+		metrics.append( t );
+	} else if ( '"' == *(t.c_str()) ) {
+		t.trimChar( '"');
+		metrics.append( t );
+	}
+
+	return true;
+}
+*/
 
 int JagParser::convertConstantObjToJAG( const JagFixString &instr, Jstr &outstr )
 {
@@ -6926,6 +7065,17 @@ int JagParser::convertConstantObjToJAG( const JagFixString &instr, Jstr &outstr 
 		othertype =  JAG_C_COL_TYPE_LINE3D;
 		outstr = Jstr("CJAG=0=0=") + othertype + "=d 0:0:0:0:0:0 " + sp[0] + " " + sp[1] + " " + sp[2] + " " + sp[3] + " ";
 		outstr += sp[4] + " " + sp[5];
+		++cnt;
+	} else if ( strncasecmp( p, "vector(", 7 )==0 ) {
+		while ( *p != '(' ) ++p;  ++p;
+		if ( *p == 0 ) return -64;
+		othertype =  JAG_C_COL_TYPE_VECTOR;
+		outstr = Jstr("CJAG=0=0=") + othertype + "=d 0:0:0:0 ";
+		JagStrSplit sp(p, ',', true );
+		int len = sp.length();
+		for ( int i = 0; i < len; ++i ) {
+			outstr += Jstr(" ") + sp[i];
+		}
 		++cnt;
 	} else if ( strncasecmp( p, "linestring(", 11 )==0 ) {
 		while ( *p != '(' ) ++p;  ++p;

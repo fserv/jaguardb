@@ -14770,8 +14770,8 @@ double JagGeo::dotProduct( const JagPoint2D &p1, const JagPoint2D &p2 )
 
 bool JagGeo::distance( const JagFixString &inlstr, const JagFixString &inrstr, const Jstr &arg, double &dist )
 {
-	d("s3083 JagGeo::distance inlstr=[%s] arg=[%s]\n", inlstr.c_str(), arg.c_str() );
-	d("s3083 JagGeo::distance inrstr=[%s] arg=[%s]\n", inrstr.c_str(), arg.c_str() );
+	d("s328083 JagGeo::distance inlstr=[%s] arg=[%s]\n", inlstr.c_str(), arg.c_str() );
+	d("s328083 JagGeo::distance inrstr=[%s] arg=[%s]\n", inrstr.c_str(), arg.c_str() );
 
 	Jstr lstr;
 	int rc = 0;
@@ -14953,6 +14953,103 @@ bool JagGeo::distance( const JagFixString &inlstr, const JagFixString &inrstr, c
 	} 
 
 	return true;
+}
+
+bool JagGeo::similarity( const JagFixString &inlstr, const JagFixString &inrstr, const Jstr &arg, double &dist )
+{
+	d("s30823 JagGeo::similarity inlstr=[%s] arg=[%s]\n", inlstr.c_str(), arg.c_str() );
+	d("s308093 JagGeo::similarity inrstr=[%s] arg=[%s]\n", inrstr.c_str(), arg.c_str() );
+    // inlstr="OJAG=0=test.vec1.v=VC=d 0:0:0:0 1.2 2.4 3.2 4.3 5.7 6.3 100 103.4"
+    // inrstr="CJAG=0=0=VC=d 0:0:0:0:0:0 1  2  3  4  4"
+
+	Jstr lstr;
+	int rc = 0;
+	if ( !strnchr( inlstr.c_str(), '=', 8 ) ) {
+		d("s5510 JagParser::convertConstantObjToJAG ...\n" );
+		rc = JagParser::convertConstantObjToJAG( inlstr, lstr );
+		if ( rc <= 0 ) return false;
+		d("s5512 JagParser::convertConstantObjToJAG lstr=[%s] rc=%d ...\n", lstr.c_str(), rc );
+	} else {
+		lstr = inlstr.c_str();
+	}
+
+	Jstr rstr;
+	if ( !strnchr( inrstr.c_str(), '=', 8 ) ) {
+		rc = JagParser::convertConstantObjToJAG( inrstr, rstr );
+		if ( rc <= 0 ) return false;
+	} else {
+		rstr = inrstr.c_str();
+	}
+
+	JagStrSplit sp1( lstr.c_str(), ' ', true );
+	if ( sp1.length() < 1 ) return 0;
+	JagStrSplit sp2( rstr.c_str(), ' ', true );
+	if ( sp2.length() < 1 ) return 0;
+
+	JagStrSplit co1( sp1[0], '=' );
+	if ( co1.length() < 4 ) return 0;
+
+	JagStrSplit co2( sp2[0], '=' );
+	if ( co2.length() < 4 ) return 0;
+
+	Jstr mark1 = co1[0]; // CJAG or OJAG
+	Jstr mark2 = co2[0];
+
+	Jstr colType1 = co1[3];
+	Jstr colType2 = co2[3];
+
+	//sp1.shift();
+	//sp2.shift();
+
+    //sp1.print(); // OJAG=0=test.vec1.v=VC=d 0:0:0:0 1.2 2.4 3.2 4.3 5.7 6.3 100 103.4
+    //sp2.print(); // CJAG=0=0=VC=d 0:0:0:0:0:0 1  2  3  4  4
+
+	d("s4872 colType1=[%s]\n", colType1.c_str() );
+	d("s4872 colType2=[%s]\n", colType2.c_str() );
+
+	if ( colType1 == JAG_C_COL_TYPE_VECTOR && colType1 == JAG_C_COL_TYPE_VECTOR ) {
+        dist = computeSimilarity( sp1, sp2, arg );
+		return true;
+	} else {
+        return false;
+	} 
+
+	return true;
+}
+
+double JagGeo::computeSimilarity( const JagStrSplit& sp1, const JagStrSplit& sp2, const Jstr& arg )
+{
+    if ( arg.caseEqual("cosine") ) {
+        return cosineSimilarity( sp1, sp2 );
+    } else {
+        return cosineSimilarity( sp1, sp2 );
+    }
+}
+
+double JagGeo::cosineSimilarity( const JagStrSplit& sp1, const JagStrSplit& sp2 )
+{
+    int len = ( sp1.size() < sp2.size() ) ? sp1.size() : sp2.size();
+    double cross = 0;
+    double A2 = 0, B2 = 0;
+    double  f;
+
+    for ( int i = 2; i < len; ++i ) {
+        cross += sp1[i].tof() * sp2[i].tof();
+
+        f = sp1[i].tof(); 
+        A2 += f * f;
+
+        f = sp2[i].tof();
+        B2 += f * f;
+    }
+
+    if ( fabs(A2) < DBL_EPSILON && fabs(B2) < DBL_EPSILON ) {
+        return 0;
+    }
+
+    f = cross / ( sqrt(A2) * sqrt(B2) );
+    dn("s222973 cosineSimilarity sim=%f", f );
+    return f;
 }
 
 		

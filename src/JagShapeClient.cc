@@ -415,6 +415,18 @@ JagLineString3D& JagLineString3D::appendFrom( const JagLineString3D& L2, bool re
 	return *this;
 }
 
+void JagVectorString::add( const JagPoint2D &p )
+{
+	JagPoint pp( d2s(p.x).c_str(), "0" );
+	pp.metrics = p.metrics;
+	point.append(pp);
+}
+
+void JagVectorString::add( double x )
+{
+	JagPoint pp( d2s(x).c_str(), "0" );
+	point.append(pp);
+}
 
 
 void JagLineString::add( const JagPoint2D &p )

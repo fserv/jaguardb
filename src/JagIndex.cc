@@ -637,7 +637,6 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 		JagParseAttribute jpa( _servobj, req.session->timediff, _servobj->servtimediff, req.session->dbname, _servobj->_cfg );
 
 		if ( parseParam->hasGroup ) {
-            // qwer123 4/13/2023
 	        char *gbvbuf = (char*)jagmalloc(gbvsendlen+1);
 	        memset(gbvbuf, 0, gbvsendlen+1);
 

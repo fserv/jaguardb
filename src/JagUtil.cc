@@ -535,7 +535,6 @@ bool formatOneCol( int tzdiff, int servtzdiff, char *outbuf, const char *inbuf,
                 long n = jagatol(inbuf);
                 Jstr b;
                 JagMath::base254FromLong( b, n, JAG_DINT_FIELD_LEN, JAG_B254_PREPEND_SIGN_ZERO_FRONT );
-                // qwer123
                 dn("u10029 b=[%s]", b.s() );
                 dn("u0029228 length=%d JAG_DINT_FIELD_LEN=%d", length, JAG_DINT_FIELD_LEN );
                 memcpy(outbuf+offset, b.s(), length);
@@ -3135,7 +3134,7 @@ int oneFileSender( JAGSOCK sock, const Jstr &inpath,  const Jstr &dbName, const 
             dn("u76520 jagopen inpath=[%s] ...", inpath.s() );
     		fd = jagopen( inpath.s(), O_RDONLY, S_IRWXU);
     		if ( fd < 0 ) { 
-                // qwer try other files in pdata/ndata
+                // try other files in pdata/ndata
                 rlen = -2; 
             }
     	} else { rlen = -3; }
@@ -4233,6 +4232,8 @@ Jstr makeGeoJson( const JagStrSplit &sp, const char *str )
 
 	if ( sp[3] == JAG_C_COL_TYPE_LINESTRING ) {
 		return makeJsonLineString("LineString", sp, str );
+	} else if ( sp[3] == JAG_C_COL_TYPE_VECTOR ) {
+		return makeJsonVector( "Vector", str );
 	} else if ( sp[3] == JAG_C_COL_TYPE_LINESTRING3D ) {
 		return makeJsonLineString3D( "LineString", sp, str );
 	} else if ( sp[3] == JAG_C_COL_TYPE_MULTIPOINT ) {
@@ -4299,6 +4300,68 @@ Jstr makeGeoJson( const JagStrSplit &sp, const char *str )
        //...
     }
 ****************/
+Jstr makeJsonVector( const Jstr &title, const char *str )
+{
+    dn("u23404003 makeJsonLineString str=[%s]", str );
+    // makeJsonLineString str=[2.0:2.0:77.0:88.0 33.0:44.0 55.0:66.0 8.0:9.0]
+    // makeJsonLineString str=[2.0:2.0:77.0:88.0 33.0 55.0 8.0]
+	const char *p = str;
+    while ( *p != ' ' && *p != '\0' ) ++p;
+	if ( *p == '\0' ) return "";
+
+	Jstr s;
+	rapidjson::StringBuffer bs;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(bs);
+	writer.StartObject();
+	writer.Key("type");
+	writer.String("Feature");
+
+	while ( isspace(*p) ) ++p; //  "x:y x:y x:y ..."
+	char *q = (char*)p;
+
+	writer.Key("data");
+	writer.StartObject();
+	    writer.Key("type");
+	    writer.String( title.c_str() );
+		writer.Key("coordinates");
+		writer.StartArray(); 
+        int num = 0;
+		while( *q != '\0' ) {
+			writer.StartArray(); 
+
+			while ( *q != ' ' && *q != ':' && *q != '\0' ) ++q;
+			if ( *q == '\0' ) {
+				writer.Double( jagatof(p) );
+				writer.EndArray(); 
+				break;
+			}
+
+			s = Jstr(p, q-p, q-p);
+			writer.Double( jagatof(s.c_str()) );
+			writer.EndArray(); 
+            ++num;
+
+			while (*q != ' ' && *q != '\0' ) ++q;
+			while (*q == ' ' ) ++q;
+			p = q;
+		}
+		writer.EndArray(); 
+	writer.EndObject();
+
+	writer.Key("properties");
+	writer.StartObject();
+	    writer.Key("points");
+	    writer.String( intToStr(num).c_str() );
+
+	    writer.Key("dimension");
+	    writer.String( "1" );
+	writer.EndObject();
+
+	writer.EndObject();
+
+	return (char*)bs.GetString();
+}
+
 Jstr makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *str )
 {
     dn("u23404003 makeJsonLineString str=[%s]", str );
@@ -4835,6 +4898,10 @@ Jstr makeJsonDefault( const JagStrSplit &sp, const char *str )
 
 int getDimension( const Jstr& colType )
 {
+	if ( colType == JAG_C_COL_TYPE_VECTOR || colType ==  JAG_C_COL_TYPE_DATA ) {
+        return 1;
+    }
+
 	if ( colType == JAG_C_COL_TYPE_POINT 
 		|| colType == JAG_C_COL_TYPE_LINE 
 		|| colType == JAG_C_COL_TYPE_LINESTRING
@@ -4878,10 +4945,15 @@ int getDimension( const Jstr& colType )
 Jstr getTypeStr( const Jstr& colType )
 {
 	Jstr t;
-	if ( colType == JAG_C_COL_TYPE_POINT ) {
+
+	if ( colType == JAG_C_COL_TYPE_DATA ) {
+		t = "Data";
+	} else if ( colType == JAG_C_COL_TYPE_POINT ) {
 		t = "Point";
 	} else if ( colType == JAG_C_COL_TYPE_LINE ) {
 		t = "Line";
+	} else if ( colType == JAG_C_COL_TYPE_VECTOR ) {
+		t = "Vector";
 	} else if ( colType == JAG_C_COL_TYPE_LINESTRING ) {
 		t = "LineString";
 	} else if ( colType == JAG_C_COL_TYPE_MULTILINESTRING ) {
@@ -4966,6 +5038,10 @@ Jstr getTypeStr( const Jstr& colType )
 
 int getPolyDimension( const Jstr& colType )
 {
+    if ( colType == JAG_C_COL_TYPE_VECTOR ) {
+        return 1;
+    }
+
 	if ( colType == JAG_C_COL_TYPE_LINESTRING
 	     || colType == JAG_C_COL_TYPE_MULTILINESTRING
 		 || colType == JAG_C_COL_TYPE_POLYGON
@@ -5223,6 +5299,8 @@ Jstr convertType2Short( const Jstr &geotypeLong )
 		return JAG_C_COL_TYPE_POLYGON;
 	} else if ( 0==strcasecmp(p, "polygon3d" ) ) {
 		return JAG_C_COL_TYPE_POLYGON3D;
+	} else if ( 0==strcasecmp(p, "vector" ) ) {
+		return JAG_C_COL_TYPE_VECTOR;
 	} else if ( 0==strcasecmp(p, "linestring" ) ) {
 		return JAG_C_COL_TYPE_LINESTRING;
 	} else if ( 0==strcasecmp(p, "linestring3d" ) ) {

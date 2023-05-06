@@ -19,7 +19,7 @@
 #ifndef _jag_def_h_
 #define _jag_def_h_
 
-#define JAG_VERSION			        "3.2.7"
+#define JAG_VERSION			        "3.2.8"
 #define JAG_BLOCK_SIZE				32
 #define JAG_ARJAG_FILE_HEAD  		0
 #define JAG_BID_FILE_HEADER_BYTES	64
@@ -243,6 +243,7 @@
 // geometry types
 // saved in schema  -- immutable
 #define JAG_DEFAULT_SRID            0
+#define JAG_C_COL_TYPE_DATA		    "DT"
 #define JAG_C_COL_TYPE_POINT		"PT"
 #define JAG_C_COL_TYPE_POINT3D		"PT3"
 #define JAG_C_COL_TYPE_MULTIPOINT	"MP"
@@ -250,8 +251,9 @@
 #define JAG_C_COL_TYPE_LINE		    "LN"
 #define JAG_C_COL_TYPE_LINE3D	    "LN3"
 #define JAG_C_COL_TYPE_LINESTRING   "LS"
+#define JAG_C_COL_TYPE_VECTOR       "VC"
 #define JAG_C_COL_TYPE_LINESTRING3D  "LS3"
-#define JAG_C_COL_TYPE_MULTILINESTRING   "ML"
+#define JAG_C_COL_TYPE_MULTILINESTRING    "ML"
 #define JAG_C_COL_TYPE_MULTILINESTRING3D  "ML3"
 #define JAG_C_COL_TYPE_POLYGON		"PL"
 #define JAG_C_COL_TYPE_POLYGON3D	"PL3"
@@ -543,6 +545,7 @@
 #define JAG_FUNC_YMAXPOINT   	   333  // ymaxpoint(geom) return point where y-coord is maximum on geom
 #define JAG_FUNC_ZMINPOINT   	   334  // zminpoint(geom) return point where z-coord is minimum on geom
 #define JAG_FUNC_ZMAXPOINT   	   335  // zmaxpoint(geom) return point where z-coord is maximum on geom
+#define JAG_FUNC_SIMILARITY		   337  // similarity between two vectors
 
 
 // string functions 
@@ -735,6 +738,7 @@
 #define JAG_MULTIPOINT_DIM 	2   // xy
 #define JAG_MULTIPOINT3D_DIM 	3   // xyz 
 #define JAG_CIRCLE_DIM      3   // x y a
+#define JAG_VECTOR_DIM 	    1   // x
 #define JAG_LINESTRING_DIM 	2   // x y
 #define JAG_LINESTRING3D_DIM 	3   // x y z
 #define JAG_MULTILINESTRING_DIM 	2   // x y

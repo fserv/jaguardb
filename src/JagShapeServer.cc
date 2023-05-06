@@ -1,6 +1,42 @@
 #include <JagGlobalDef.h>
 #include <JagGeom.h>
 
+// Depending on op, maybe only xmin,ymin  or xmax,ymax is found
+void JagVectorString::minmax( int op, double &xmin, double &xmax ) const
+{
+	xmin = JAG_LONG_MAX;
+	xmax = JAG_LONG_MIN;
+	double f;
+
+	for ( int i=0; i < point.size(); ++i ) {
+        f = jagatof(point[i].x);
+		if ( JAG_FUNC_XMINPOINT == op ) {
+			if ( f < xmin ) { xmin = f; }
+		} else if ( JAG_FUNC_XMAXPOINT == op ) {
+			if ( f > xmax ) { xmax = f;}
+		} else {
+			if ( f < xmin ) { xmin = f;}
+		}
+	}
+}
+
+void JagVectorString::toJAG( const Jstr &colType, bool hasHdr, Jstr &str ) const
+{
+	if ( point.size() < 1 ) { str=""; return; }
+
+	if ( hasHdr ) {
+		Jstr srids = "0";
+		Jstr mk = "OJAG=";
+
+        mk="CJAG=0"; 
+		str = mk + "=0=" + colType + "=d 0:0:0:0 ";
+	} 
+
+	for ( int i=0; i < point.size(); ++i ) {
+		str += Jstr(" ") + point[i].x;
+	}
+}
+
 double JagLineString::lineLength( bool removeLast, bool is3D, int srid )
 {
 	double sum = 0.0;
@@ -17,6 +53,7 @@ double JagLineString::lineLength( bool removeLast, bool is3D, int srid )
 	}
 	return sum;
 }
+
 
 void JagLineString::toJAG( const Jstr &colType, bool is3D, bool hasHdr, const Jstr &inbbox, int srid, Jstr &str ) const
 {

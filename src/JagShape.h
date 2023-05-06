@@ -630,6 +630,42 @@ class JagLineString3D
 		JagVector<JagPoint3D> point;
 };
 
+class JagVectorString
+{
+    public:
+		JagVectorString() {};
+		JagVectorString& operator=( const JagVectorString& L2 ) { point = L2.point; return *this; }
+		JagVectorString( const JagVectorString& L2 ) { point = L2.point; }
+		void init() { point.clean(); };
+		void clear() { point.clean(); };
+		jagint size() const { return point.size(); }
+		void add( double x );
+		void add( const JagPoint2D &p );
+		void print() const { point.print(); }
+
+        /***
+		void center2D( double &cx, double &cy, bool dropLast=false ) const;
+		void center3D( double &cx, double &cy, double &cz, bool dropLast=false ) const;
+		void bbox2D( double &xmin, double &ymin, double &xmax, double &ymax ) const;
+		void minmax2D( int op, double &xmin, double &ymin, double &xmax, double &ymax ) const;
+		void bbox3D( double &xmin, double &ymin, double &zmin, double &xmax, double &ymax, double &zmax ) const;
+		void minmax3D( int op, double &xmin, double &ymin, double &zmin, double &xmax, double &ymax, double &zmax ) const;
+        ***/
+		void minmax( int op, double &xmin, double &xmax ) const;
+
+		const JagPoint &operator[](int i ) const { return point[i]; }
+		//double lineLength( bool removeLast, bool is3D, int srid );
+		//void reverse();
+		void scale( double fx );
+		void translate( double dx );
+		void transscale( double dx, double fx );
+		// void scaleat(double x0, double y0, double z0, double fx, double fy, double fz, bool is3D);
+		void toJAG( const Jstr &colType, bool hasHdr, Jstr &str ) const;
+
+		// JagVector<double> point;
+		JagVector<JagPoint> point;
+};
+
 class JagLineString
 {
     public:

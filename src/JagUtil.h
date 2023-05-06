@@ -338,6 +338,7 @@ long long getXmitMsgLen( char *buf );
 void    makeSQLHeader( char *sqlhdr );
 
 Jstr    makeGeoJson( const JagStrSplit &sp, const char *str );
+Jstr    makeJsonVector( const Jstr &title, const char *str );
 Jstr    makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *str );
 Jstr    makeJsonLineString3D( const Jstr &title, const JagStrSplit &sp, const char *str );
 Jstr    makeJsonPolygon( const Jstr &title, const JagStrSplit &sp, const char *str, bool is3D );

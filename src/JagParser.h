@@ -54,12 +54,16 @@ class JagParser
 	static int   vectorShapeCoordinates( const Jstr &rcs );
 	static bool  isPolyType( const Jstr &rcs );
 	static Jstr getColumns( const char *str );
+	static int  checkVectorData( const char *p );
 	static int  checkLineStringData( const char *p );
 	static int  checkLineString3DData( const char *p );
 	static int  checkPolygonData( const char *p, bool mustClose );
 	static int  checkMultiPolygonData( const char *p, bool mustClose, bool is3D );
 	static int  checkPolygon3DData( const char *p, bool mustClose );
+	static int  addVectorData( JagVectorString &linestr, const char *p );
+	static int  addVectorData( JagVectorString &linestr, const JagStrSplit &sp );
 	static int  addLineStringData( JagLineString &linestr, const char *p );
+	static int  getVectorMinMax( char sep, const char *p, double &xmin, double &xmax );
 	static int  getLineStringMinMax( char sep, const char *p, double &xmin, double &ymin, double &xmax, double &ymax );
 	static int  addLineString3DData( JagLineString &linestr, const char *p );
 	static int  getLineString3DMinMax( char sep, const char *p, double &xmin, double &ymin, double &zmin, 

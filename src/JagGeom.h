@@ -1102,7 +1102,10 @@ class JagGeo
 	static Jstr makeJsonDefault( const JagStrSplit &sp, const char *str );
 	**/
 	static bool distance( const JagFixString &lstr, const JagFixString &rstr, const Jstr &arg, double &dist );
+	static bool similarity( const JagFixString &lstr, const JagFixString &rstr, const Jstr &arg, double &dist );
 
+    static double computeSimilarity( const JagStrSplit& sp1, const JagStrSplit& sp2, const Jstr& arg );
+	static double cosineSimilarity( const JagStrSplit& sp1, const JagStrSplit& sp2 );
 
 	////////////// distance //////////////////
 

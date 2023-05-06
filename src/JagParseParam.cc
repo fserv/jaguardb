@@ -968,6 +968,24 @@ int JagParseParam::addLineColumns( const CreateAttribute &pointcattr, bool is3D 
 	return 4;
 }
 
+int JagParseParam::addVectorColumns( const CreateAttribute &pointcattr )
+{
+	int iskey = false;
+	if ( pointcattr.spare[0] == JAG_C_COL_KEY ) {
+		iskey = true;
+	}
+
+	CreateAttribute cattr;
+	int offset = pointcattr.offset;
+
+	cattr.objName.colName = pointcattr.objName.colName + ":x";
+	fillDoubleSubData( cattr, offset, iskey, 0, true, false );
+
+ 	addMetrics( pointcattr, offset, iskey );
+
+	return 4;
+}
+
 int JagParseParam::addLineStringColumns( const CreateAttribute &pointcattr, bool is3D )
 {
 	int iskey = false;

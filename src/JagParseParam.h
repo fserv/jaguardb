@@ -375,6 +375,7 @@ class JagParseParam
 	int addBoxColumns( const CreateAttribute &cattr );
 	int addCylinderColumns( const CreateAttribute &cattr );
 	int addLineColumns( const CreateAttribute &cattr, bool is3D );
+	int addVectorColumns( const CreateAttribute &cattr );
 	int addLineStringColumns( const CreateAttribute &cattr, bool is3D );
 	int addPolygonColumns( const CreateAttribute &cattr, bool is3D );
 	int addTriangleColumns( const CreateAttribute &cattr, bool is3D );

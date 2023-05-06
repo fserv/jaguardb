@@ -186,13 +186,16 @@ class JagTable
 	int 	_removeIndexRecords( const char *buf );
 	int  	removeColFiles(const char *kvbuf );
 	bool 	isFileColumn( const Jstr &colname );
-	void 	formatPointsInLineString( int nmerics, JagLineString &line, char *tablekvbuf, const JagPolyPass &pass, 
+
+	void 	formatPointsInLineString( int nmetrics, const JagLineString &line, char *tablekvbuf, const JagPolyPass &pass, 
+								      JagVector<JagDBPair> &retpair, Jstr &errmg ) const;
+	void 	formatPointsInVector( int nmetrics, const JagVectorString &line, char *tablekvbuf, const JagPolyPass &pass, 
 								      JagVector<JagDBPair> &retpair, Jstr &errmg ) const;
 
 	void 	getColumnIndex( const Jstr &dbtab, const Jstr &colname, bool is3D,
-                         int &getx, int &gety, int &getz, int &getxmin, int &getymin, int &getzmin,
-                         int &getxmax, int &getymax, int &getzmax,
-                         int &getid, int &getcol, int &getm, int &getn, int &geti ) const;
+                            int &getx, int &gety, int &getz, int &getxmin, int &getymin, int &getzmin,
+                            int &getxmax, int &getymax, int &getzmax,
+                            int &getid, int &getcol, int &getm, int &getn, int &geti ) const;
 
 	int     findPairRollupOrInsert( JagDBPair &inspair, JagDBPair &getDBPair,
                                     char *tableoldbuf, char *tablenewbuf, int setindexnum, JagIndex *lpindex[] );
