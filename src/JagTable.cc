@@ -1212,7 +1212,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
                     // ppass.gety = gety; ppass.getz = getz;
 
                     if ( lsuuid.size() < 1 ) {
-                        lsuuid = _servobj->_jagUUID->getStringAt( _servobj->getHostCluster() );
+                        lsuuid = _servobj->_jagUUID->getGidStringAt( _servobj->getHostCluster() );
                     }
 
     				ppass.lsuuid = lsuuid;
@@ -1290,7 +1290,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
     				ppass.getx = getx; ppass.gety = gety; ppass.getz = getz;
 
                     if ( lsuuid.size() < 1 ) {
-                        lsuuid = _servobj->_jagUUID->getStringAt( _servobj->getHostCluster() );
+                        lsuuid = _servobj->_jagUUID->getGidStringAt( _servobj->getHostCluster() );
                     }
 
     				ppass.lsuuid = lsuuid;
@@ -1372,7 +1372,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
     
     				ppass.getx = getx; ppass.gety = gety; ppass.getz = getz;
                     if ( lsuuid.size() < 1 ) {
-                        lsuuid = _servobj->_jagUUID->getStringAt( _servobj->getHostCluster() );
+                        lsuuid = _servobj->_jagUUID->getGidStringAt( _servobj->getHostCluster() );
                     }
     				ppass.lsuuid = lsuuid;
     				ppass.dbtab = dbtab;
@@ -1451,7 +1451,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
     
     				ppass.getx = getx; ppass.gety = gety; ppass.getz = getz;
                     if ( lsuuid.size() < 1 ) {
-                        lsuuid = _servobj->_jagUUID->getStringAt( _servobj->getHostCluster() );
+                        lsuuid = _servobj->_jagUUID->getGidStringAt( _servobj->getHostCluster() );
                     }
     				ppass.lsuuid = lsuuid;
     				ppass.dbtab = dbtab;

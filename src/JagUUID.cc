@@ -53,7 +53,6 @@ JagUUID::JagUUID()
 Jstr JagUUID::getStringAt( int n )
 {
     Jstr clus;
-    //JagMath::toBase62(clus, nbuf, false);
     JagMath::base62FromULong(clus, (unsigned long)n, 2);
 
     dn("s203338 getStringAt n=%d clus=[%s]", n, clus.s() );
@@ -79,6 +78,28 @@ Jstr JagUUID::getStringAt( int n )
     ++ _seq;
 
     dn("ju1929 getStringAt n=%d _hostStr=%s _pidStr=%s ds=[%s]", n, _hostStr.c_str(), _pidStr.c_str(), ds );
+
+	return ds;
+}
+
+Jstr JagUUID::getGidStringAt( int n )
+{
+    Jstr clus;
+    JagMath::base62FromULong(clus, (unsigned long)n, 2);
+
+    dn("s203338 getStringAt n=%d clus=[%s]", n, clus.s() );
+
+	char ds[16];
+    jaguint nowMicro = JagTime::nowMicroSeconds(); // 16 
+    // 16->9 b62 
+    Jstr sMicro;
+    JagMath::base62FromULong(sMicro, nowMicro, 9 );
+
+	int rn = 2;
+	sprintf(ds, "%s%s@%s", sMicro.s(), AbaxString::randomValue(rn).c_str(), clus.s() );
+    // total 14 bytes
+
+    dn("ju1929 getShortStringAt n=%d _pidStr=%s ds=[%s]", n, ds );
 
 	return ds;
 }

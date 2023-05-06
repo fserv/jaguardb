@@ -265,7 +265,7 @@ int main(int argc, char *argv[] )
 	//testlaststr();
 	//testjaguarreader();
 	//testjaguarreader2();
-	// testUUID();
+	testUUID();
 	// testStrSplitWQuote();
 	// testAtomic( N );
 
@@ -287,7 +287,7 @@ int main(int argc, char *argv[] )
 	// test_compress();
 	// test_hashlock();
 	// test_size();
-	test_parse();
+	// test_parse();
 	// test_boundfile();
 	// test_localdiskhash( N );
 	// test_diskkeychecker( N );
@@ -341,8 +341,8 @@ int main(int argc, char *argv[] )
 	//test_safemap(N);
 
 	//test_numinstr();
-	test_base62( argv[1] );
-	test_base254( argv[1] );
+	//test_base62( argv[1] );
+	//test_base254( argv[1] );
 }
 
 
@@ -715,6 +715,23 @@ void testUUID()
     //sprintf(ds, "%s%s%s%s%s@%s", sMicro.s(), seqs.s(), AbaxString::randomValue(rn).c_str(), _hostStr.c_str(), _pidStr.c_str(), clus.s() );
 
     printf("n=%d sMicro=[%s] seqs=[%s] rn=%d randomValue=[%s] \n", n, sMicro.s(), seqs.s(), rn, AbaxString::randomValue(rn).c_str() );
+
+    char buf[32];
+    Jstr suid = uuid.getGidStringAt(13222);
+
+    sprintf(buf, "%llu", nowMicro);
+    printf("leng of nowMicroseconds [%s]=%ld\n", buf, strlen(buf) );
+    printf("short geoid=[%s] len=%ld\n", suid.s(), suid.size() );
+
+
+    struct timeval now;
+    gettimeofday( &now, NULL );
+
+    jaguint au = (jaguint)now.tv_usec + jaguint(now.tv_sec)*1000000;
+
+    sprintf(buf, "%llu", au);
+    printf("leng of future nowMicroseconds buf=[%s] =%ld\n", buf, strlen(buf) );
+
 
 }
 

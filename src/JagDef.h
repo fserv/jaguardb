@@ -309,6 +309,7 @@
 
 #define JAG_DATE_FIELD_LEN		        4
 
+#define JAG_GEOID_FIELD_LEN		        14
 #define JAG_UUID_FIELD_LEN		        32
 #define JAG_FILE_FIELD_LEN		        64
 #define JAG_REAL_FIELD_LEN              40

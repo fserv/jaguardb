@@ -1206,8 +1206,20 @@ create table vec1 ( key: a int, value: v vector, b char(4) );
 expect words "vec1 vector b";
 desc vec1;
 
+drop index if exists vec1_idx1 on vec1;
+create index vec1_idx1 on vec1( v );
+expect words "vec1_idx1 vec1";
+desc vec1_idx1;
+
+
 insert into vec1 values (10, vector(1.2, 2.4, 3.2, 4.3, 5.7, 6.3, 100, 103.4), 'west' );
-select * from vec1;
+insert into vec1 values (20, vector(1.8, 8.4, 2.2, 1.3, 9.7, 11.3, 10, 38.4), 'sth' );
+insert into vec1 values (30, vector(1.6, 4.2, 9.2, 4.3, 1.7, 15.3, 1, 13.4), 'w' );
+insert into vec1 values (40, vector(2.6, 1.2, 7.2, 3.3, 7.3, 5.3, 8, 2.4), 's' );
+select a, b, similarity(v, vector(1, 2, 3, 4, 5, 13, 1))  sim from vec1 order by sim desc;
+
+select a,  similarity(v, vector(1, 2, 3, 4, 5, 13, 1))  sim from test.vec1.vec1_idx1 order by sim desc;
+
 
 
 

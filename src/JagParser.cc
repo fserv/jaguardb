@@ -4989,7 +4989,7 @@ void JagParser::addBBoxGeomKeyColumns( CreateAttribute &cattr, int polyDim, bool
 
 
 	cattr.objName.colName = "geo:id";
-	_ptrParam->fillStringSubData( cattr, offset, 1, JAG_UUID_FIELD_LEN, 1, 0, 0 );
+	_ptrParam->fillStringSubData( cattr, offset, 1, JAG_GEOID_FIELD_LEN, 1, 0, 0 );
 
 	cattr.objName.colName = "geo:col";
 	_ptrParam->fillSmallIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
