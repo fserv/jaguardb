@@ -26,7 +26,7 @@ class JagUUID
   public:
   	JagUUID();
 	Jstr  getStringAt( int a);
-	Jstr  getGidStringAt( int a);
+	Jstr  getGidString();
 
   protected:
 	void 	_getHostStr();

@@ -53,53 +53,41 @@ JagUUID::JagUUID()
 Jstr JagUUID::getStringAt( int n )
 {
     Jstr clus;
-    JagMath::base62FromULong(clus, (unsigned long)n, 2);
+    JagMath::base62FromULong(clus, (unsigned long)n, 4);
 
     dn("s203338 getStringAt n=%d clus=[%s]", n, clus.s() );
 
 	int cnt = clus.size();
 
-    if ( _seq >= 10000000 ) _seq = 1;
-    // 7 --> 4
-
 	char ds[JAG_UUID_FIELD_LEN+1];
     jaguint nowMicro = JagTime::nowMicroSeconds(); // 16 digits
-    // 16->9 b62
+    // 16->9 b62 exactly
     Jstr sMicro;
     JagMath::base62FromULong(sMicro, nowMicro, 9 );
 
-    Jstr seqs;
-    JagMath::base62FromULong(seqs, _seq, 4 );
-
-	int rn = JAG_UUID_FIELD_LEN - 9 - 4 - 5 - 3 - 1 - cnt;
-	sprintf(ds, "%s%s%s%s%s@%s", sMicro.s(), seqs.s(), AbaxString::randomValue(rn).c_str(), _hostStr.c_str(), _pidStr.c_str(), clus.s() );
+	int rn = JAG_UUID_FIELD_LEN - 9 - 5 - 3 - 1 - cnt; // 32 - 22 = 10
+	sprintf(ds, "%s%s%s%s@%s", sMicro.s(), AbaxString::randomValue(rn).c_str(), _hostStr.c_str(), _pidStr.c_str(), clus.s() );
 
     //assert( strlen(ds) == JAG_UUID_FIELD_LEN );
-    ++ _seq;
 
     dn("ju1929 getStringAt n=%d _hostStr=%s _pidStr=%s ds=[%s]", n, _hostStr.c_str(), _pidStr.c_str(), ds );
 
 	return ds;
 }
 
-Jstr JagUUID::getGidStringAt( int n )
+Jstr JagUUID::getGidString()
 {
-    Jstr clus;
-    JagMath::base62FromULong(clus, (unsigned long)n, 2);
-
-    dn("s203338 getStringAt n=%d clus=[%s]", n, clus.s() );
-
 	char ds[16];
     jaguint nowMicro = JagTime::nowMicroSeconds(); // 16 
     // 16->9 b62 
     Jstr sMicro;
     JagMath::base62FromULong(sMicro, nowMicro, 9 );
 
-	int rn = 2;
-	sprintf(ds, "%s%s@%s", sMicro.s(), AbaxString::randomValue(rn).c_str(), clus.s() );
-    // total 14 bytes
+	int rn = 1;
+	sprintf(ds, "%s%s", sMicro.s(), AbaxString::randomValue(rn).c_str() );
+    // total 10 bytes JAG_GEOID_FIELD_LEN
 
-    dn("ju1929 getShortStringAt n=%d _pidStr=%s ds=[%s]", n, ds );
+    dn("ju1929 getGidString ds=[%s]", ds );
 
 	return ds;
 }

@@ -684,7 +684,7 @@ void testUUID()
 	Jstr getstr1 = uuid.getStringAt(1);
 	printf("get uuid string1 [%s] length=[%ld]\n", getstr1.c_str(), strlen(getstr1.c_str()));
 
-	Jstr getstr2 = uuid.getStringAt( 19282);
+	Jstr getstr2 = uuid.getStringAt( 99282);
 	printf("get uuid string2 [%s] length=[%ld]\n", getstr2.c_str(), strlen(getstr2.c_str()));
 
 	Jstr getstr3 = uuid.getStringAt( 1 );
@@ -694,33 +694,9 @@ void testUUID()
 
     int n = 2;
 
-    Jstr clus;
-    JagMath::base62FromULong(clus, n, 2);
-
-    int cnt = clus.size();
-
-    int _seq = 3;
-    if ( _seq >= 10000000 ) _seq = 1;
-    // 7 --> 4
-
-    jaguint nowMicro = JagTime::nowMicroSeconds(); // 16 digits
-    // 16->9 b62
-    Jstr sMicro;
-    JagMath::base62FromULong(sMicro, nowMicro, 9 );
-
-    Jstr seqs;
-    JagMath::base62FromULong(seqs, _seq, 4 );
-
-    int rn = JAG_UUID_FIELD_LEN - 9 - 4 - 5 - 3 - 1 - cnt;
-    //sprintf(ds, "%s%s%s%s%s@%s", sMicro.s(), seqs.s(), AbaxString::randomValue(rn).c_str(), _hostStr.c_str(), _pidStr.c_str(), clus.s() );
-
-    printf("n=%d sMicro=[%s] seqs=[%s] rn=%d randomValue=[%s] \n", n, sMicro.s(), seqs.s(), rn, AbaxString::randomValue(rn).c_str() );
-
     char buf[32];
-    Jstr suid = uuid.getGidStringAt(13222);
+    Jstr suid = uuid.getGidString();
 
-    sprintf(buf, "%llu", nowMicro);
-    printf("leng of nowMicroseconds [%s]=%ld\n", buf, strlen(buf) );
     printf("short geoid=[%s] len=%ld\n", suid.s(), suid.size() );
 
 

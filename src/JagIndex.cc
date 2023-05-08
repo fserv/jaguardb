@@ -449,6 +449,7 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 	}
 
 	if ( parseParam->hasWhere ) {
+        dn("si02838 hasWhere");
 		root = parseParam->whereVec[0].tree->getRoot();
 
 		rc = root->setWhereRange( maps, attrs, keylen, numKeys, 1, uniqueAndHasValueCol, minmax, treestr, typeMode, tabnum );
@@ -460,7 +461,9 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 		} else if ( rc < 0 ) {
 			errmsg = "E0843 Error header for select";
 			return -1;
-		}
+		} else {
+            dn("si120 got range of keys");
+        }
 	}
 	
 	// finalbuf, hasColumn len or KEYVALLEN if !hasColumn
@@ -503,6 +506,7 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 	
 	// point query, one record
 	if ( memcmp(minmax[0].minbuf, minmax[0].maxbuf, _KEYLEN) == 0 ) {
+        dn("si018 point query on index");
 		JagDBPair pair( minmax[0].minbuf, _KEYLEN );
 		if ( _darrFamily->get( pair ) ) {
 			const char *buffers[1];
@@ -605,7 +609,7 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 			free( buf );
 		}
 	} else { // range query
-        dn("s266301 select from index range query or select all");
+        dn("si90 select from index range query or select all");
 		jagint callCounts = -1, lastBytes = 0;
 		if ( JAG_INSERTSELECT_OP != parseParam->opcode ) {
 			if ( !jda ) jda = newObject<JagDataAggregate>();
