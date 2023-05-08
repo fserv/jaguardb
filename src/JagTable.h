@@ -192,7 +192,7 @@ class JagTable
 	void 	formatPointsInVector( int nmetrics, const JagVectorString &line, char *tablekvbuf, const JagPolyPass &pass, 
 								      JagVector<JagDBPair> &retpair, Jstr &errmg ) const;
 
-	void 	getColumnIndex( const Jstr &dbtab, const Jstr &colname, bool is3D,
+	void 	getColumnIndex( const Jstr &colType, const Jstr &dbtab, const Jstr &colname, bool is3D,
                             int &getx, int &gety, int &getz, int &getxmin, int &getymin, int &getzmin,
                             int &getxmax, int &getymax, int &getzmax,
                             int &getid, int &getcol, int &getm, int &getn, int &geti ) const;

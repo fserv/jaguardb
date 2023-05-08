@@ -217,7 +217,8 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
 	const auto &cv = *_tableRecord.columnVector;
     dn("s03938031 _tableRecord.columnVector.size=%d", cv.size() );
 	for ( int i = 0; i < cv.size(); ++i ) {
-		d("s1014 colvec i=%d name=[%s] type=[%s] issubcol=%d offset=%d len=%d\n", i, cv[i].name.s(), cv[i].type.s(), cv[i].issubcol, cv[i].offset, cv[i].length );
+		dn("s1014 colvec i=%d name=[%s] type=[%s] issubcol=%d offset=%d len=%d\n", 
+            i, cv[i].name.s(), cv[i].type.s(), cv[i].issubcol, cv[i].offset, cv[i].length );
 	}
 	d("\n" );
 
@@ -326,7 +327,12 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
                     #ifdef JAG_KEEP_MIN_MAX
 					appendOther( valueVec, JAG_POLY_HEADER_COLS_3D, 0 );  // bbox(6) + id col i = 9
                     #else
-					appendOther( valueVec, JAG_POLY_HEADER_COLS_NOMINMAX, 0 );  // bbox(6) + id col i = 9
+                    if ( 1 == parseParam->polyDim ) {
+                        dn("s109287  1 == parseParam->polyDim JAG_POLY_HEADER_COLS_VECTOR ");
+					    appendOther( valueVec, JAG_POLY_HEADER_COLS_VECTOR, 0 );  // id col = 2
+                    } else {
+					    appendOther( valueVec, JAG_POLY_HEADER_COLS_NOMINMAX, 0 );  // bbox(6) + id col i = 9
+                    }
                     #endif
 					//d("s6761 i=%d j=%d appendOther( valueVec, JAG_POLY_HEADER_COLS, 0 );\n", i, j);
 				}
@@ -1186,7 +1192,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
     			d("s258135 colType=[%s] colname=[%s]\n", colType.s(), colname.s() );
     			is3D = false;
 
-    			getColumnIndex( dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
+    			getColumnIndex( colType, dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
     								getxmax, getymax, getzmax, getid, getcol, getm, getn, geti );
     			d("s2234038 getColumnIndex is3D=%d getxmin=%d getx=%d gety=%d getz=%d\n", is3D, getxmin, getx, gety, getz );
     			//if ( getxmin >= 0 ) 
@@ -1244,7 +1250,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
                 xmax=JAG_LONG_MIN; ymax=JAG_LONG_MIN; zmax=JAG_LONG_MIN;
                 ***/
 
-    			getColumnIndex( dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
+    			getColumnIndex( colType, dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
     								getxmax, getymax, getzmax, getid, getcol, getm, getn, geti );
     			d("s2234038 getColumnIndex is3D=%d getxmin=%d getx=%d gety=%d getz=%d\n", is3D, getxmin, getx, gety, getz );
     			//if ( getxmin >= 0 ) 
@@ -1318,7 +1324,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
                 xmax=JAG_LONG_MIN; ymax=JAG_LONG_MIN; zmax=JAG_LONG_MIN;
                 ***/
 
-    			getColumnIndex( dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
+    			getColumnIndex( colType, dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
     								getxmax, getymax, getzmax, getid, getcol, getm, getn, geti );
     			//if ( getxmin >= 0 ) 
     			if ( getx >= 0 ) {
@@ -1407,7 +1413,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
                 xmax=JAG_LONG_MIN; ymax=JAG_LONG_MIN; zmax=JAG_LONG_MIN;
                 ***/
 
-    			getColumnIndex( dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
+    			getColumnIndex( colType, dbtab, colname, is3D, getx, gety, getz, getxmin, getymin, getzmin,
     								getxmax, getymax, getzmax, getid, getcol, getm, getn, geti );
     			//if ( getxmin >= 0 ) 
     			if ( getx >= 0 ) {
@@ -4174,7 +4180,7 @@ void JagTable::formatPointsInLineString( int nmetrics, const JagLineString &line
         #ifdef JAG_KEEP_MIN_MAX
 		point = "geo:xmin";
 		getpos = pass.getxmin;
-        dn("s1234003 colname=[%s] xmin=[%s] offset=%d len=%d", pass.colname.s(), doubleToStr(pass.xmin).s(), _schAttr[getpos].offset, _schAttr[getpos].length );
+        dn("s1234003 col=[%s] xmin=[%s] offset=%d len=%d", pass.colname.s(), doubleToStr(pass.xmin).s(), _schAttr[getpos].offset, _schAttr[getpos].length );
      	rc = formatOneCol( pass.tzdiff, pass.srvtmdiff, tablekvbuf, doubleToStr(pass.xmin).s(), errmsg, point.s(), 
 							_schAttr[getpos].offset, _schAttr[getpos].length, _schAttr[getpos].sig, 
 							_schAttr[getpos].type );
@@ -4365,6 +4371,7 @@ void JagTable::formatPointsInVector( int nmetrics, const JagVectorString &line, 
        						   _schAttr[getpos].length, _schAttr[getpos].sig, _schAttr[getpos].type );
 	    }
 
+        /**
 		if ( pass.getm >= 0 ) {
     		point = "geo:m"; sprintf(ibuf, "%d", pass.m+1 ); getpos = pass.getm;
        		rc = formatOneCol( pass.tzdiff, pass.srvtmdiff, tablekvbuf, ibuf, errmsg, point.s(), _schAttr[getpos].offset, 
@@ -4385,6 +4392,16 @@ void JagTable::formatPointsInVector( int nmetrics, const JagVectorString &line, 
        		rc = formatOneCol( pass.tzdiff, pass.srvtmdiff, tablekvbuf, ibuf, errmsg, point.s(), _schAttr[getpos].offset, 
        							_schAttr[getpos].length, _schAttr[getpos].sig, _schAttr[getpos].type );
 		}
+        ***/
+
+		if ( pass.geti >= 0 ) {
+    		point = "geo:i";
+			sprintf(ibuf, "%09d", j+1 );
+			//d("s5034 geti=%d ibuf=[%s]\n", pass.geti, ibuf );
+    		getpos = pass.geti;
+       		rc = formatOneCol( pass.tzdiff, pass.srvtmdiff, tablekvbuf, ibuf, errmsg, point.s(), _schAttr[getpos].offset, 
+       							_schAttr[getpos].length, _schAttr[getpos].sig, _schAttr[getpos].type );
+        }
         
         dn("s359001 pass.getx=%d", pass.getx );
        	if ( pass.getx >= 0 ) {
@@ -4459,7 +4476,7 @@ void JagTable::formatPointsInVector( int nmetrics, const JagVectorString &line, 
 
 }
 
-void JagTable::getColumnIndex( const Jstr &dbtab, const Jstr &colname, bool is3D,
+void JagTable::getColumnIndex( const Jstr &colType, const Jstr &dbtab, const Jstr &colname, bool is3D,
 								int &getx, int &gety, int &getz, int &getxmin, int &getymin, int &getzmin,
 								int &getxmax, int &getymax, int &getzmax,
 								int &getid, int &getcol, int &getm, int &getn, int &geti ) const
@@ -4502,23 +4519,37 @@ void JagTable::getColumnIndex( const Jstr &dbtab, const Jstr &colname, bool is3D
 	dbcolumn = dbtab + ".geo:id";
 	if ( _tablemap->getValue(dbcolumn, getpos) ) { getid = getpos; }
 
-	dbcolumn = dbtab + ".geo:m";
-	if ( _tablemap->getValue(dbcolumn, getpos) ) { getm = getpos; }
+   	dbcolumn = dbtab + ".geo:col";
+   	if ( _tablemap->getValue(dbcolumn, getpos) ) { getcol = getpos; }
 
-	dbcolumn = dbtab + ".geo:n";
-	if ( _tablemap->getValue(dbcolumn, getpos) ) { getn = getpos; }
+    if ( colType != JAG_C_COL_TYPE_VECTOR ) {
+    	dbcolumn = dbtab + ".geo:m";
+    	if ( _tablemap->getValue(dbcolumn, getpos) ) { getm = getpos; }
+    
+    	dbcolumn = dbtab + ".geo:n";
+    	if ( _tablemap->getValue(dbcolumn, getpos) ) { getn = getpos; }
+    
+        /***
+    	dbcolumn = dbtab + ".geo:col";
+    	if ( _tablemap->getValue(dbcolumn, getpos) ) { getcol = getpos; }
+        **/
+    
+    	dbcolumn = dbtab + ".geo:i";
+    	if ( _tablemap->getValue(dbcolumn, getpos) ) { geti = getpos; }
+    
+        dbcolumn = dbtab + "." + pointy;
+        if ( _tablemap->getValue(dbcolumn, getpos) ) { gety = getpos; }
 
-	dbcolumn = dbtab + ".geo:col";
-	if ( _tablemap->getValue(dbcolumn, getpos) ) { getcol = getpos; }
-
-	dbcolumn = dbtab + ".geo:i";
-	if ( _tablemap->getValue(dbcolumn, getpos) ) { geti = getpos; }
+    } else {
+        // vector add i-th point
+    
+    	dbcolumn = dbtab + ".geo:i";
+    	if ( _tablemap->getValue(dbcolumn, getpos) ) { geti = getpos; }
+    }
 
 	dbcolumn = dbtab + "." + pointx;
 	if ( _tablemap->getValue(dbcolumn, getpos) ) { getx = getpos; }
 
-	dbcolumn = dbtab + "." + pointy;
-	if ( _tablemap->getValue(dbcolumn, getpos) ) { gety = getpos; }
 
 	if ( is3D ) {
 	    Jstr pointz = colname + ":z";

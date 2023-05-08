@@ -3295,7 +3295,7 @@ int JagParser::setCreateVector( short setType )
 				firstCol = 0;
 				int dim = getPolyDimension( cattr.type );
 				//d("s2033 getPolyDimension cattr.type=[%s] dim=%d\n", cattr.type.c_str(), dim );
-				if ( dim >= 2 ) {
+				if ( dim >= 1 ) {
 					CreateAttribute save = cattr;
 					int offset;
 					//d("s2208 before addBBoxGeomKeyColumns  _ptrParam->keyLength=%d\n",  _ptrParam->keyLength );
@@ -4994,14 +4994,21 @@ void JagParser::addBBoxGeomKeyColumns( CreateAttribute &cattr, int polyDim, bool
 	cattr.objName.colName = "geo:col";
 	_ptrParam->fillSmallIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
 
-	cattr.objName.colName = "geo:m";  // m-th polygon in multipolygon  starts from 1
-	_ptrParam->fillIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
+    if ( polyDim > 1 ) {
+    	cattr.objName.colName = "geo:m";  // m-th polygon in multipolygon  starts from 1
+    	_ptrParam->fillIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
+    
+    	cattr.objName.colName = "geo:n";  // n-th ring in a polygon or n-th linestring in multilinestring
+    	_ptrParam->fillIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
+    
+        /**
+    	cattr.objName.colName = "geo:i";  // i-th point in a linestring
+    	_ptrParam->fillIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
+        **/
+    }
 
-	cattr.objName.colName = "geo:n";  // n-th ring in a polygon or n-th linestring in multilinestring
-	_ptrParam->fillIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
-
-	cattr.objName.colName = "geo:i";  // i-th point in a linestring
-	_ptrParam->fillIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
+    cattr.objName.colName = "geo:i";  // i-th point in a linestring
+    _ptrParam->fillIntSubData( cattr, offset, 1, 1, 0, 0 );  // must be part of key and mute
 
 	//d("s5034 end of addbboundbox cols _ptrParam->keyLength=%d cattr.offset=%d offset=%d\n", _ptrParam->keyLength, cattr.offset, offset );
 }

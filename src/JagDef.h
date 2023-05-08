@@ -766,6 +766,7 @@
 #define JAG_TRIANGLE3D_DIM	9   // x1y1z1 x2y2z2  x3y3z3
 
 #define JAG_POLY_HEADER_COLS_NOMINMAX  5   // geo:id geo:col geo:m geo:n geo:i 
+#define JAG_POLY_HEADER_COLS_VECTOR    3   // geo:id geo:col geo:i
 #define JAG_POLY_HEADER_COLS_2D  9   // geo:xmin geo:ymin          geo:xmax geo:ymax          geo:id geo:col geo:m geo:n geo:i 
 #define JAG_POLY_HEADER_COLS_3D 11   // geo:xmin geo:ymin geo:zmin geo:xmax geo:ymax geo:zmax geo:id geo:col geo:m geo:n geo:i 
 
@@ -862,7 +863,7 @@
 
 // Buffer queue size == single simpfile size
 #define JAG_SIMPFILE_LIMIT_BYTES  (128*1024*1024)
-// debug #define JAG_SIMPFILE_LIMIT_BYTES   (1*1)
+//#define JAG_SIMPFILE_LIMIT_BYTES   (1*1)
 
 #define JAG_WALLOG_TRIM_RATIO 0.2
 

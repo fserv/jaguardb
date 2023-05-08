@@ -601,6 +601,7 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 	JagStrSplit psp(polyColumns, '|', true);
 
 	int numCols = psp.length();
+
 	int offsetx[numCols];
 	int collenx[numCols];
 
@@ -623,6 +624,7 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 	for ( int k=0; k < numCols; ++k ) {
 		fullname[k] = db + "." + tab + "." + psp[k];
 		if ( ! maps[_tabnum]->getValue( fullname[k], acqpos) ) { 
+            dn("s33309 k=%d fullname=%s maps cannot find", k, fullname[k].s() );
 			return; 
 		}
 
@@ -689,14 +691,14 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 	    }
         uuidCol = BBUUIDLEN-1;
     } else {
-	        for ( int bi = 0; bi < BBUUIDLEN-2; ++bi ) {
-		        bbox[bi].col = acqpos;
-		        bbox[bi].offset = attrs[_tabnum][acqpos].offset;
-		        bbox[bi].len = attrs[_tabnum][acqpos].length;
-		        ++acqpos;
-                dn("s344001 bbox i=%d col=%d offset=%d len=%d", bi, bbox[bi].col, bbox[bi].offset, bbox[bi].len );
-	        }
-            uuidCol = BBUUIDLEN-3;
+        for ( int bi = 0; bi < BBUUIDLEN-2; ++bi ) {
+	        bbox[bi].col = acqpos;
+	        bbox[bi].offset = attrs[_tabnum][acqpos].offset;
+	        bbox[bi].len = attrs[_tabnum][acqpos].length;
+	        ++acqpos;
+               dn("s344001 bbox i=%d col=%d offset=%d len=%d", bi, bbox[bi].col, bbox[bi].offset, bbox[bi].len );
+        }
+        uuidCol = BBUUIDLEN-3;
     }
     #else
     // if not JAG_KEEP_MIN_MAX
@@ -803,9 +805,10 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
         dumpmem( buffers[_tabnum]+offsety[k], colleny[k] );
         ***/
 
-        dn("s339001 col-k=%d xval=[%s]  yval=[%s]", k, xval.s(), yval.s() );
+         dn("s339501 dim=%d", dim ); 
 
         if ( dim >= 2 ) {
+            dn("s339001 col-k=%d xval=[%s]  yval=[%s]", k, xval.s(), yval.s() );
     	    if ( xval.isNotNull() && yval.isNotNull() ) {
 			    hasValue = 1;
 			    str[k] += Jstr(" ") + xval + ":" + yval;
@@ -867,19 +870,27 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 	if ( maps[_tabnum]->getValue( nm, acqpos) ) {
 		geocoloffset =  attrs[_tabnum][acqpos].offset;
 		geocollen =  attrs[_tabnum][acqpos].length;
-	} else { return; }
+	} else { 
+        dn("s23810 mals getvale :col false return");
+        return; 
+    }
 
-	nm = db + "." + tab + ".geo:m";
-	if ( maps[_tabnum]->getValue( nm, acqpos) ) {
-		geomoffset =  attrs[_tabnum][acqpos].offset;
-		geomlen =  attrs[_tabnum][acqpos].length;
-	} else { return; }
+    dn("s2022801 dim=%d", dim );
 
-	nm = db + "." + tab + ".geo:n";
-	if ( maps[_tabnum]->getValue( nm, acqpos) ) {
-		geonoffset =  attrs[_tabnum][acqpos].offset;
-		geonlen =  attrs[_tabnum][acqpos].length;
-	} else { return; }
+    if ( dim > 1 ) {
+    	nm = db + "." + tab + ".geo:m";
+    	if ( maps[_tabnum]->getValue( nm, acqpos) ) {
+    		geomoffset =  attrs[_tabnum][acqpos].offset;
+    		geomlen =  attrs[_tabnum][acqpos].length;
+    	} else { return; }
+    
+    	nm = db + "." + tab + ".geo:n";
+    	if ( maps[_tabnum]->getValue( nm, acqpos) ) {
+    		geonoffset =  attrs[_tabnum][acqpos].offset;
+    		geonlen =  attrs[_tabnum][acqpos].length;
+    	} else { return; }
+    
+    }
 
 
 	char *kvbuf = (char*)jagmalloc(ntr->KEYVALLEN+1);
@@ -903,19 +914,25 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 		if ( 0 == strncmp(kvbuf+bbox[uuidCol].offset, uuid.c_str(), uuid.size() ) ) {
 
 			//gf = Jstr(kvbuf+geocoloffset, geocollen ); 
+
             JagMath::fromBase254Len(gf, kvbuf+geocoloffset, geocollen );
 			gf.trimNull();
 			newcol = jagatoi( gf.s() );
 
-			//gf = Jstr( kvbuf+geomoffset, geomlen ); 
-            JagMath::fromBase254Len(gf, kvbuf+geomoffset, geomlen );
-			gf.trimNull();
-			newm = jagatoi( gf.s() );
+            if ( dim > 1 ) {
+    			//gf = Jstr( kvbuf+geomoffset, geomlen ); 
+                JagMath::fromBase254Len(gf, kvbuf+geomoffset, geomlen );
+    			gf.trimNull();
+    			newm = jagatoi( gf.s() );
+    
+    			//gf = Jstr( kvbuf+geonoffset, geonlen ); 
+                JagMath::fromBase254Len(gf, kvbuf+geonoffset, geonlen );
+    			gf.trimNull();
+    			newn = jagatoi( gf.s() );
+            } else {
+                newm = newn = 0;
+            }
 
-			//gf = Jstr( kvbuf+geonoffset, geonlen ); 
-            JagMath::fromBase254Len(gf, kvbuf+geonoffset, geonlen );
-			gf.trimNull();
-			newn = jagatoi( gf.s() );
 
 			if ( lastcol >=0 && newcol != lastcol ) {
 				lastcol = newcol;
@@ -955,6 +972,8 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
                     }
                 }
 
+                dn("s11108 k=%d emptyField=%d", k, emptyField );
+
     			if ( ! emptyField ) {
                     JagMath::fromBase254Len( v1, kvbuf+offsetx[k], collenx[k] );
                     v1.trim0();
@@ -976,6 +995,7 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 					    xyzbuf = Jstr(" ") + v1 + ":" + v2;
                     } else {
 					    xyzbuf = Jstr(" ") + v1;
+                        dn("s2022938 zyxbuf=[%s]", xyzbuf.s() );
                     }
 
 					if ( is3D ) {
@@ -986,15 +1006,16 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 
                     emptyField = true;
                     if ( dim >=2 ) {
-					    if (  v1.isNotNull() && v2.isNotNull() ) {
+					    if ( v1.isNotNull() && v2.isNotNull() ) {
                             emptyField = false;
                         }
                     } else {
-					    if (  v1.isNotNull() ) {
+					    if ( v1.isNotNull() ) {
                             emptyField = false;
                         }
                     }
 
+                    dn("s110297 k=%d emptyField=%d", k, emptyField );
 					if (  ! emptyField  ) {
 					    if ( sep ) { 
 						    str[k] += " ";
@@ -1036,6 +1057,7 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 			rc = _builder->_pparam->_rowHash->addKeyValue( fullname[k], str[k] );
             dn("s23073748 _rowHash->addKeyValue k=%d fullname=[%s]    str=[%s]",  k, fullname[k].s(), str[k].s() );
 		} else {
+            dn("s333038 str[k=%d].size()=%ld numAdded[k]=%d no addKeyValue", k, str[k].size(), numAdded[k] );
 		}
 	}
 
