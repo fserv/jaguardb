@@ -1222,4 +1222,15 @@ select a,  similarity(v, vector(1, 2, 3, 4, 5, 13, 1))  sim from test.vec1.vec1_
 
 
 
+drop table if exists p1;
+create table p1 (key: a int, value: b int);
+create index pidx1 on p1(b);
+
+insert into p1 values (100, 1);
+insert into p1 values (200, 1);
+
+expect rows 1;
+select * from test.p1.pidx1;
+
+
 quit;

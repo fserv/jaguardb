@@ -163,6 +163,10 @@ int JagSimpFile::getMaxKeyBuf( char *buf ) const
 	jagint rc = 0;
 	jagint localOffset = _length - _KVLEN ;  
     // position to get record
+    dn("sim8389 _length=%ld _KVLEN=%d  localOffset=%ld", _length, _KVLEN, localOffset );
+    if ( localOffset < 0 ) {
+        return -101;
+    }
 
 	while ( true ) {
 		rc = JagSimpFile::pread( buf, localOffset, _KLEN );

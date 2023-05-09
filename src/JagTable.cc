@@ -2964,6 +2964,7 @@ void *JagTable::parallelSelectStatic( void * ptr )
 	JagParseParam   *parseParam = pass->parseParam;
 
 	if ( ptab ) {
+        dn("t222048 select table");
 		numCols[0] = ptab->_numCols;
 		numKeys[0] = ptab->_numKeys;
 		maps[0] = ptab->_tablemap;
@@ -2971,6 +2972,7 @@ void *JagTable::parallelSelectStatic( void * ptr )
 		keylen[0] = ptab->_KEYLEN;
 		minmax[0].setbuflen( keylen[0] );
 	} else {
+        dn("t222088 select index");
 		numCols[0] = pindex->_numCols;
 		numKeys[0] = pindex->_numKeys;
 		maps[0] = pindex->_indexmap;
@@ -3136,11 +3138,11 @@ void *JagTable::parallelSelectStatic( void * ptr )
 				rc = ntr->getNext( buf );  // read a new row
                 if ( rc ) {
 				    d("s31366 ntr->getNext( buf ) buf=[%s] rc=%d\n", buf, rc );
-                    /**
+
                     dn("s0811350 dump read buf: keylen=%d KLEN=%d KVLEN=%d", keylen[0], ntr->KEYLEN, ntr->KEYVALLEN );
-                    dumpmem( buf, keylen[0]);
-                    dumpmem( buf, ntr->KEYVALLEN);
-                    **/
+                    //dumpmem( buf, keylen[0]);
+                    //dumpmem( buf, ntr->KEYVALLEN);
+
                 } else {
 				    d("s31368 ntr->getNext( buf ) buf=[] rc=%d\n", rc );
                 }

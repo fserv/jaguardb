@@ -337,6 +337,8 @@ void    getXmitSQLHdr( const char *buf, char *sqlhdr );
 long long getXmitMsgLen( char *buf );
 void    makeSQLHeader( char *sqlhdr );
 
+const char *skipBBox(const char *str);
+
 Jstr    makeGeoJson( const JagStrSplit &sp, const char *str );
 Jstr    makeJsonVector( const Jstr &title, const char *str );
 Jstr    makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *str );

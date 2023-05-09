@@ -1803,11 +1803,13 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 	createTemp.objName.dbName = parseParam->objectVec[1].dbName;
 	createTemp.objName.tableName = "";
 	createTemp.objName.indexName = parseParam->objectVec[1].indexName;
-
     
 	// map for each column
+	const JagVector<JagColumn> &cv = *(trecord->columnVector);
+
 	for ( int i = 0; i < trecord->columnVector->size(); ++i ) {
-		schmap.addKeyValue((*(trecord->columnVector))[i].name.c_str(), i);
+		schmap.addKeyValue( cv[i].name.c_str(), i);
+        dn("s3900222 schmap add [%s] ==> %d", cv[i].name.c_str(), i );
 	}
 	
 	// get key part of create index
@@ -1815,7 +1817,52 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 	createTemp.spare[2] = JAG_ASC;
 	bool hrc;
 
-	const JagVector<JagColumn> &cv = *(trecord->columnVector);
+    int polyDim = 0;
+
+    // if first column in index is polyDim >= 1 , then prepend geo:id geo:cl ,... geo:id columns
+    int i = 0;
+	getpos = schmap.getValue(parseParam->valueVec[i].objName.colName.c_str(), hrc );
+	if ( hrc ) {
+        polyDim = getPolyDimension( cv[getpos].type );
+        dn("s220239 polyDim=%d", polyDim );
+
+        if ( polyDim >= 1 ) {
+            //int isMute = 1;
+            int offset = 0;
+		    createTemp.offset = 0;
+
+            createTemp.objName.colName = "geo:id";
+            parseParam->fillStringSubData( createTemp, offset, 1, JAG_GEOID_FIELD_LEN, 1, 0, 0 );
+            // offset updated
+		    keylen += JAG_GEOID_FIELD_LEN;
+            dn("s345018 geo:id createTemp.length=%d  keylen=%d", createTemp.length, keylen );
+
+            createTemp.objName.colName = "geo:col";
+            parseParam->fillSmallIntSubData( createTemp, offset, 1, 1, 0, 0 );  // must be part of key and mute
+		    keylen += JAG_DSMALLINT_FIELD_LEN ;
+            dn("s345018 geo:col createTemp.length=%d  keylen=%d", createTemp.length, keylen );
+        
+            if ( polyDim > 1 ) {
+                createTemp.objName.colName = "geo:m";  // m-th polygon in multipolygon  starts from 1
+                parseParam->fillIntSubData( createTemp, offset, 1, 1, 0, 0 );  // must be part of key and mute
+		        keylen += JAG_DINT_FIELD_LEN;
+                dn("s345018 geo:m createTemp.length=%d  keylen=%d", createTemp.length, keylen );
+        
+                createTemp.objName.colName = "geo:n";  // n-th ring in a polygon or n-th linestring in multilinestring
+                parseParam->fillIntSubData( createTemp, offset, 1, 1, 0, 0 );  // must be part of key and mute
+		        keylen += JAG_DINT_FIELD_LEN;
+                dn("s345018 geo:n createTemp.length=%d  keylen=%d", createTemp.length, keylen );
+            }
+        
+            createTemp.objName.colName = "geo:i";  // i-th point in a linestring
+            parseParam->fillIntSubData( createTemp, offset, 1, 1, 0, 0 );  // must be part of key and mute
+		    keylen += JAG_DINT_FIELD_LEN;
+            dn("s345018 geo:i createTemp.length=%d  keylen=%d", createTemp.length, keylen );
+
+            dn("s12208 added geo fields");
+
+        } 
+	}
 
 	for ( int i = 0; i < parseParam->limit; ++i ) {
 		// save for checking duplicate keys
@@ -1823,6 +1870,7 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 
 		getpos = schmap.getValue(parseParam->valueVec[i].objName.colName.c_str(), hrc );
 		if ( ! hrc ) {
+            dn("s298611001 skip i=%d [%s]", i, parseParam->valueVec[i].objName.colName.c_str() );
 			continue;
 		}
 
@@ -1835,7 +1883,11 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 		createTemp.srid = cv[getpos].srid;
 		createTemp.metrics = cv[getpos].metrics;
 
-		createTemp.spare[1] = cv[getpos].spare[1];
+        // user specified key in creating an index
+        dn("s2009281 createTemp.objName.colName=[%s] offset=%d len=%d", createTemp.objName.colName.s(), createTemp.offset, createTemp.length );
+        // if linestring, add geo:id geo:col geo:i
+		
+        createTemp.spare[1] = cv[getpos].spare[1];
 		createTemp.spare[4] = cv[getpos].spare[4]; // default datetime value patterns
 		createTemp.spare[5] = cv[getpos].spare[5]; // mute
 		createTemp.spare[6] = cv[getpos].spare[6]; // subcol
@@ -1852,6 +1904,7 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 	}
 
 	// add existing keys in table, following specified index-keys in above
+    /***
 	for (int i = 0; i < cv.size(); i++) {
 		if ( cv[i].iskey && !checkmap.keyExist(cv[i].name.c_str() ) ) {
 			createTemp.objName.colName = cv[i].name.c_str();
@@ -1876,8 +1929,12 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 			createTemp.defValues = defvalStr.c_str();
 			keylen += createTemp.length;
 			parseParam->createAttrVec.append( createTemp );
+
+            dn("s4500019 createTemp.objName.colName=[%s]", createTemp.objName.colName.s() );
 		}
 	}
+    ***/
+
 	parseParam->keyLength = keylen;
 	
 	// get value part of create index. Index can attach value columns.  "on tab1(key: v1, v4, k3, value: v8, v10, v12 )"
@@ -1885,6 +1942,7 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 	for ( int i = parseParam->limit; i < parseParam->valueVec.size(); ++i ) {
 		getpos = schmap.getValue(parseParam->valueVec[i].objName.colName.c_str(), hrc);
 		if ( ! hrc ) {
+            dn("s3450011 i=%d skip [%s]", i, parseParam->valueVec[i].objName.colName.c_str() );
 			continue;
 		}
 
@@ -1911,6 +1969,8 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 		keylen += createTemp.length;
 		vallen += createTemp.length;
 		parseParam->createAttrVec.append( createTemp );
+
+        dn("s5911220 parseParam->createAttrVec.append colname=[%s]", createTemp.objName.colName.s() );
 	}
 
 	parseParam->valueLength = vallen;
@@ -1918,7 +1978,9 @@ int JagDBServer::createIndexSchema( const JagRequest &req,
 		JAG_BLURT jaguar_mutex_lock ( &g_dbschemamutex ); JAG_OVER
 	}
 
+    dn("s366001 indexschema->insert( parseParam )");
     int rc = indexschema->insert( parseParam, false );
+
 	if ( lockSchema ) {
 		jaguar_mutex_unlock ( &g_dbschemamutex );
 	}

@@ -26,6 +26,7 @@
 #include <JagDiskArrayClient.h>
 #include <JagDBConnector.h>
 #include <JagParser.h>
+#include <JagMath.h>
 
 JagIndex::JagIndex( int replicType, const JagDBServer *servobj, const Jstr &wholePathName, 
 					const JagSchemaRecord &trecord, 
@@ -226,8 +227,9 @@ bool JagIndex::bufChangeT2I( char *indexbuf, char *tablebuf )
     dn("s220080 bufChangeT2I(): index _numCols=%d", _numCols );
 
     dn("s222208 tablebuf=NOTNULL indexbuf=NULL  tablebuf ==> indexbuf  _numCols=%d", _numCols );
+
 	for ( int i = 0; i < _numCols; ++i ) {
-        dn("s50022402 i=%d index.colname=[%s] _schAttr[i].offset=%d  _indtotabOffset[i]=%d _schAttr[i].length=%d", 
+        dn("s50022402 i=%d index.colname=[%s] indx:_schAttr[i].offset=%d  tab:_indtotabOffset[i]=%d   same:_schAttr[i].length=%d", 
             i, _schAttr[i].colname.s(), _schAttr[i].offset, _indtotabOffset[i], _schAttr[i].length );
 
         if ( _schAttr[i].length > 0 ) {
@@ -241,10 +243,19 @@ bool JagIndex::bufChangeT2I( char *indexbuf, char *tablebuf )
 		    memcpy(indexbuf+_schAttr[i].offset, tablebuf+_indtotabOffset[i], _schAttr[i].length);		
 
             d("s322028 dumpmem %s tablebuf column: ", _schAttr[i].colname.s() );
-            //dumpmem(tablebuf+_indtotabOffset[i], _schAttr[i].length);
+            dumpmem(tablebuf+_indtotabOffset[i], _schAttr[i].length);
 
             d("s322029 dumpmem %s indexbuf column: ", _schAttr[i].colname.s() );
-            //dumpmem(indexbuf+_schAttr[i].offset, _schAttr[i].length);
+            dumpmem(indexbuf+_schAttr[i].offset, _schAttr[i].length);
+
+            // deug only
+            if ( strstr(_schAttr[i].colname.s(), "geo:" ) ) {
+                Jstr norm;
+                JagMath::fromBase254Len(norm, indexbuf+_schAttr[i].offset, _schAttr[i].length);
+                dn("si18801 geo [%s] value=[%s]", _schAttr[i].colname.s(), norm.s() );
+                ////// debug end
+            }
+
         }
 	}
 
@@ -275,11 +286,10 @@ int JagIndex::insertIndexFromTable( const char *tablebuf, bool tabHasFlushed )
     dn("s22220736 bufChangeT2I rc=%d", rc );
 
     dn("s9873010 in insertIndexFromTable(): after bufChangeT2I rc=%d indexbuf=[%s]", rc, indexbuf );
-    /**
-    dn("i2220 insertIndexFromTable() dump _tableName=[%s]  _indexName=[%s]  indexbuf:", _tableName.s(), _indexName.s() );
-    dumpmem( indexbuf, _KEYLEN );
-    dumpmem( indexbuf, _KEYVALLEN );
-    **/
+
+    dn("i2220 insertIndexFromTable() dump _tableName=[%s]  _indexName=[%s]  indexbuf: _KEYLEN=%d", _tableName.s(), _indexName.s(), _KEYLEN );
+    //dumpmem( indexbuf, _KEYLEN );
+    //dumpmem( indexbuf, _KEYVALLEN );
 
 	if ( !rc || *indexbuf == '\0' ) {
 		if ( indexbuf ) free( indexbuf );
@@ -455,6 +465,7 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 		rc = root->setWhereRange( maps, attrs, keylen, numKeys, 1, uniqueAndHasValueCol, minmax, treestr, typeMode, tabnum );
 
 		if ( 0 == rc ) {
+            dn("si1890 openscan");
 			memset( minmax[0].minbuf, 0, keylen[0]+1 );
 			memset( minmax[0].maxbuf, 255, keylen[0] );
 			(minmax[0].maxbuf)[keylen[0]] = '\0';
@@ -462,7 +473,7 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 			errmsg = "E0843 Error header for select";
 			return -1;
 		} else {
-            dn("si120 got range of keys");
+            dn("si120 got range of keys pointquery");
         }
 	}
 	
@@ -535,7 +546,10 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 				// key only
 				MultiDbNaturalFormatExchange( (char**)buffers, 1, numKeys, attrs ); // db format -> natural format
 
-				if ( parseParam->opcode == JAG_GETFILE_OP ) { setGetFileAttributes( hdir, parseParam, (char**)buffers ); }
+				if ( parseParam->opcode == JAG_GETFILE_OP ) { 
+                    setGetFileAttributes( hdir, parseParam, (char**)buffers ); 
+                }
+
 				JagTable::nonAggregateFinalbuf(NULL, maps, attrs, &req, buffers, parseParam, finalbuf, finalsendlen, 
 												jda, _dbobj, cnt, nowherecnt, NULL, true );
 
@@ -572,7 +586,10 @@ jagint JagIndex::select( JagDataAggregate *&jda, const char *cmd, const JagReque
 				MultiDbNaturalFormatExchange( (char**)buffers, 1, numKeys, attrs ); // db format -> natural format
 
 				if ( root->checkFuncValid( NULL, maps, attrs, buffers, strres, typeMode, treetype, treelength, needInit, 0, 0 ) > 0 ) {
-					if ( parseParam->opcode == JAG_GETFILE_OP ) { setGetFileAttributes( hdir, parseParam, (char**)buffers ); }
+					if ( parseParam->opcode == JAG_GETFILE_OP ) { 
+                        setGetFileAttributes( hdir, parseParam, (char**)buffers ); 
+                    }
+
 					JagTable::nonAggregateFinalbuf( NULL, maps, attrs, &req, buffers, parseParam, finalbuf, finalsendlen, jda, 
 												    _dbobj, cnt, nowherecnt, NULL, true );
 

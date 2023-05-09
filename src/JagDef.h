@@ -862,8 +862,8 @@
 #define JAG_SOCK_TOTAL_HDR_LEN      (JAG_SOCK_SQL_HDR_LEN+JAG_SOCK_MSG_HDR_LEN)
 
 // Buffer queue size == single simpfile size
-#define JAG_SIMPFILE_LIMIT_BYTES  (128*1024*1024)
-//#define JAG_SIMPFILE_LIMIT_BYTES   (1*1)
+//#define JAG_SIMPFILE_LIMIT_BYTES  (128*1024*1024)
+#define JAG_SIMPFILE_LIMIT_BYTES   (1*1)
 
 #define JAG_WALLOG_TRIM_RATIO 0.2
 

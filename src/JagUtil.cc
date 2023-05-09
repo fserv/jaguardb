@@ -3834,7 +3834,7 @@ char *thirdTokenStart( const char *str, char sep )
 	if ( *p == '\0' ) return NULL;
 	while ( *p == sep ) ++p;  // p is at m
 
-	while ( *p != sep && *p != '\0' ) ++p; // p is at pos after c
+	while ( *p != sep && *p != '\0' ) ++p; // p is at pos after f
 	if ( *p == '\0' ) return NULL;
 	while ( *p == sep ) ++p;  // p is at n
 
@@ -4302,12 +4302,11 @@ Jstr makeGeoJson( const JagStrSplit &sp, const char *str )
 ****************/
 Jstr makeJsonVector( const Jstr &title, const char *str )
 {
-    dn("u23404003 makeJsonLineString str=[%s]", str );
+    dn("u23404025 makeJsonLineString str=[%s]", str );
     // makeJsonLineString str=[2.0:2.0:77.0:88.0 33.0:44.0 55.0:66.0 8.0:9.0]
     // makeJsonLineString str=[2.0:2.0:77.0:88.0 33.0 55.0 8.0]
-	const char *p = str;
-    while ( *p != ' ' && *p != '\0' ) ++p;
-	if ( *p == '\0' ) return "";
+	const char *p = skipBBox( str );
+	if ( p == NULL ) return "";
 
 	Jstr s;
 	rapidjson::StringBuffer bs;
@@ -4366,9 +4365,10 @@ Jstr makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *s
 {
     dn("u23404003 makeJsonLineString str=[%s]", str );
     // makeJsonLineString str=[2.0:2.0:77.0:88.0 33.0:44.0 55.0:66.0 8.0:9.0]
-	const char *p = str;
-    while ( *p != ' ' && *p != '\0' ) ++p;
-	if ( *p == '\0' ) return "";
+    // makeJsonLineString str=[33.0:44.0 55.0:66.0 8.0:9.0]
+
+	const char *p = skipBBox( str );
+	if ( p == NULL ) return "";
 
 	Jstr s;
 	rapidjson::StringBuffer bs;
@@ -4404,14 +4404,20 @@ Jstr makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *s
 	}
     ***/
 
+    dn("u22271 p=[%s]", p );
+
 	while ( isspace(*p) ) ++p; //  "x:y x:y x:y ..."
 	char *q = (char*)p;
 
+    dn("u22281 p=[%s]", p );
+
 	writer.Key("geometry");
 	writer.StartObject();
+
 	    writer.Key("type");
 	    writer.String( title.c_str() );
 		writer.Key("coordinates");
+
 		writer.StartArray(); 
 		while( *q != '\0' ) {
 			writer.StartArray(); 
@@ -4420,6 +4426,7 @@ Jstr makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *s
 				writer.EndArray(); 
 				break;
 			}
+
 			s = Jstr(p, q-p, q-p);
 			dn("u0123941 s=[%s]", s.s() );
 			writer.Double( jagatof(s.c_str()) );
@@ -4430,6 +4437,7 @@ Jstr makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *s
 			if ( *q == '\0' ) {
 				writer.Double( jagatof(p) );
 				writer.EndArray(); 
+                dn("u8712220 break here");
 				break;
 			}
 
@@ -4461,9 +4469,8 @@ Jstr makeJsonLineString( const Jstr &title, const JagStrSplit &sp, const char *s
 
 Jstr makeJsonLineString3D( const Jstr &title, const JagStrSplit &sp, const char *str )
 {
-	const char *p = str;
-    while ( *p != ' ' && *p != '\0' ) ++p;
-	if ( *p == '\0' ) return "";
+	const char *p = skipBBox( str );
+	if ( p == NULL ) return "";
 
 	Jstr s;
 	rapidjson::StringBuffer bs;
@@ -4564,10 +4571,8 @@ Jstr makeJsonLineString3D( const Jstr &title, const JagStrSplit &sp, const char 
 Jstr makeJsonPolygon( const Jstr &title,  const JagStrSplit &sp, const char *str, bool is3D )
 {
 	//d("s7081 makeJsonPolygon str=[%s] is3D=%d", str, is3D );
-
-	const char *p = str;
-    while ( *p != ' ' && *p != '\0' ) ++p;
-	if ( *p == '\0' ) return "";
+	const char *p = skipBBox( str );
+	if ( p == NULL ) return "";
 
 	rapidjson::StringBuffer bs;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(bs);
@@ -4719,9 +4724,8 @@ Jstr makeJsonPolygon( const Jstr &title,  const JagStrSplit &sp, const char *str
 ***********************************************************************************/
 Jstr makeJsonMultiPolygon( const Jstr &title,  const JagStrSplit &sp, const char *str, bool is3D )
 {
-	const char *p = str;
-    while ( *p != ' ' && *p != '\0' ) ++p;
-	if ( *p == '\0' ) return "";
+	const char *p = skipBBox( str );
+	if ( p == NULL ) return "";
 
 	rapidjson::StringBuffer bs;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(bs);
@@ -5577,3 +5581,21 @@ int leadZeros( const char *str )
     }
     return cnt;
 }
+
+const char *skipBBox(const char *str)
+{
+	const char *p = str;
+    int ncolon = 0;
+    while ( *p != ' ' && *p != '\0' ) {
+        ++p;
+        if ( *p == ':' ) {
+            ++ncolon;
+        }
+    }
+
+    if ( *p == '\0' ) return NULL;;
+    if ( ncolon < 3 ) { p = str; }
+    return p;
+}
+
+

@@ -887,7 +887,9 @@ void JagParseParam::fillStringSubData( CreateAttribute &cattr, int &offset, int 
 	if ( isRollup ) { cattr.spare[7] = JAG_ROLL_UP; }
 
 	this->createAttrVec.append( cattr );
+
 	cattr.init();
+
 	offset += len;
 }
 
