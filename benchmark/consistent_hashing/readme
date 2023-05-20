@@ -7,3 +7,7 @@ Each node should have its own file myip.txt having its own IP address.
 -- reset.sh stop all servers and cleans up the data in LevelDB
 -- cpprog.h  copies the fresh server program to all nodes
 -- test.sh the main driver scrip to perform the processes of scaling and adding data
+
+Test logs:
+ myserv.log.10K -- myserv.log.80K
+
