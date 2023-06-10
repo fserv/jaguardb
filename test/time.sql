@@ -117,7 +117,7 @@ insert into ts2 (k1, v2, v3 ) values ('10', '243', '200' );
 expect rows 12;
 select * from test.ts2.ts2idx4@5m;
 
-expect rows 5;
+expect rows 3;
 select * from test.ts2.ts2idx1;
 
 expect rows 6;

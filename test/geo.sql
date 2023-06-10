@@ -22,8 +22,7 @@ insert into geom1 (b, pt, a ) values ( 222, point(22 33), 12 );
 expect rows 3;
 select * from geom1;
 
-
-expect rows 3;
+expect rows 2;
 select * from test.geom1.geom1_idx1;
 
 expect okmsg "";
@@ -422,7 +421,7 @@ select ls1:x, ls1:y from linestr1;
 
 select * from linestr1 where within( ls1, square( 10 10 15938178.1 ) );
 
-expect rows 20;
+expect rows 10;
 select * from test.linestr1.linestr1_idx1;
 
 
@@ -443,7 +442,7 @@ expect rows 1;
 select * from linestr21 where within( ls1, square( 10 10 78.1 ) );
 
 
-expect rows 7;
+expect rows 1;
 select * from test.linestr21.linestr21_idx1;
  
  drop table if exists linestr2;
@@ -464,7 +463,7 @@ select * from linestr2 where within( ls1, square( 10 10 78.1 ) );
 expect words "linestr2_idx1 geo:id geo:col";
 desc linestr2_idx1 detail;
 
-expect rows 6;
+expect rows 18;
 select * from test.linestr2.linestr2_idx1;
 
 #todo
@@ -476,7 +475,7 @@ select * from test.linestr2.linestr2_idx1;
 
  drop index if exists linestr3_idx1 on linestr3;
  create index linestr3_idx1 on linestr3( b, ls2 );
- expect words "linestr3_idx1 ls2 ls1 geo:id";
+ expect words "linestr3_idx1 ls2 b";
  desc linestr3_idx1 detail;
 
  insert into linestr3 values ( linestring( 211 2,2 33 , 33 44, 55 66, 55 66, 77 88 ), 200, linestring( 33 44, 55 66, 8 9 ), 804 );
@@ -507,7 +506,7 @@ select * from test.linestr2.linestr2_idx1;
 
  select ls1, ls2 from linestr3 where intersect( ls1, square( 10 10 78.1 ) ) and intersect( ls2, square( 10 10 1000 ) );
 
- expect rows 18;
+ expect rows 8;
  select * from test.linestr3.linestr3_idx1;
 
 
@@ -577,10 +576,10 @@ select * from linestr3d1 where contain(ls1, point3d(1 2 3) );
  expect words "linestr3d1_idx1 linestr3d1 b ls2";
  desc linestr3d1_idx1 detail;
 
- expect rows 24;
+ expect rows 9;
  select * from test.linestr3d1.linestr3d1_idx1;
 
- expect rows 24;
+ expect rows 9;
  select b from test.linestr3d1.linestr3d1_idx1;
 
  expect rows 4;

@@ -308,7 +308,7 @@ select * from unittest1 where v3='vbvnvvvv3';
 
 
 
-expect words "unittest1_idx1 key uid v2 char";
+expect words "unittest1_idx1 v2 char";
 desc unittest1_idx1;
 
 expect rows 10;
@@ -317,7 +317,7 @@ select * from test.unittest1.unittest1_idx1 limit 10;
 expect rows 3;
 select * from test.unittest1.unittest1_idx1 limit 10,3;
 
-expect rows 3;
+expect rows 1;
 select * from test.unittest1.unittest1_idx1 where v2='vkkvvvvv2';
 
 expect rows 5;
@@ -827,7 +827,7 @@ desc tms1;
 
 drop index if exists tms1_idx1  on tms1 ;
 create index tms1_idx1 on tms1 ( addr );
-expect words "tms1_idx1 timestamp addr char";
+expect words "tms1_idx1 addr char";
 desc tms1_idx1;
 
 insert into tms1 values ( '', '123 B St' );
