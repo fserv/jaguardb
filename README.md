@@ -3,11 +3,11 @@
 
 **AI and IoT Data**
 
-JaguarDB is extremely scalable, best suited for AI and Internet of Things (IoT) which handles large volumes of
-identity data, knowledge information, events data, location data, and time series data.
-JaguarDB can scale out horizontally 1 million times faster than any distributed systems that use
+JaguarDB is extremely scalable, best suited for Artificial Intelligence and Internet of Things (IoT) which can handle
+massive amounts of vector data, identity data, knowledge information, events data, location data, and time series data.
+JaguarDB can scale out horizontally 10000 to 1 million times faster than any distributed systems that use
 consistent-hashing algorithm. JaguarDB scales a large database system in seconds without 
-causing interruptions to your database system.  Imagine you will have million trillions of data elements, 
+interrupting your database system.  Imagine you will have million trillions of data elements, 
 JaguarDB is perfect for your IT system.
 
 **Instant Scaling**

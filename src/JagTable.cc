@@ -3038,6 +3038,8 @@ void *JagTable::parallelSelectStatic( void * ptr )
 
 	if ( ptab ) darrfam = ptab->_darrFamily;
 	else darrfam = pindex->_darrFamily;
+
+    dn("t22038111 parseParam->hasOrder=%d", parseParam->hasOrder );
 	
 	if ( parseParam->hasOrder && !parseParam->orderVec[0].isAsc ) {
 		// order by col1 desc  descending
@@ -3116,6 +3118,11 @@ void *JagTable::parallelSelectStatic( void * ptr )
 		// no order or order by asc
 		//d("s8302 no order range select pass->spos=%d  pass->epos=%d\n", pass->spos, pass->epos );
         dn("s817272 select has no order by pass->useInsertBuffer=%d", pass->useInsertBuffer);
+        dn("s02881 minbuf: ");
+        //dumpmem( pass->minbuf, keylen[0] );
+        dn("s02881 maxbuf: ");
+        //dumpmem( pass->maxbuf, keylen[0] );
+        dn("s02883 spos=%ld  epos=%ld memlimit=%ld", pass->spos, pass->epos, pass->memlimit );
 
 		JagMergeReader *ntr = NULL;
 
@@ -3241,9 +3248,11 @@ void *JagTable::parallelSelectStatic( void * ptr )
 															     pass->parseParam, pass->gmdarr, sendbuf );
 						if ( 0 == rc ) break;
 					} else { // no group by
-						if ( hasAggregate ) { // has aggregate functions
+						if ( hasAggregate ) { 
+                            // has aggregate functions
 							JagTable::aggregateDataFormat( ntr, maps, attrs, pass->req, buffers, pass->parseParam, !hasFirst );
-						} else { // non aggregate functions
+						} else { 
+                            // non aggregate functions
 							//d("s0296 JagTable::nonAggregateFinalbuf recordcnt=%d ...\n", (int)*(pass->recordcnt) );
                             dn("tab0913001 no agg read");
 
@@ -3309,22 +3318,19 @@ void *JagTable::parallelSelectStatic( void * ptr )
 							}
 
 							if ( parseParam->hasLimit && *(pass->recordcnt) >= pass->actlimit ) {
+                                dn("s2223901 hasLimit recordcnt=%ld >= actlimit=%ld break", (jagint)(*(pass->recordcnt)), pass->actlimit );
 								break;
 							}
 						}
 					}
 					hasFirst = true;
 				}
-			}
-		}
+			} // while
 
-		if ( ntr ) {
 			d("s08484 delete ntr\n");
 			delete ntr;
 			ntr = NULL;
 		}
-
-        dn("s6263637 deleted ntr");
 	}
 
 	free( sendbuf );

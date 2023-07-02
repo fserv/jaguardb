@@ -692,7 +692,7 @@ void testUUID()
 
     /////////////////
 
-    int n = 2;
+    //int n = 2;
 
     char buf[32];
     Jstr suid = uuid.getGidString();

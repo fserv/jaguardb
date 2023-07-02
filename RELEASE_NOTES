@@ -1,4 +1,12 @@
 
+JaguarDB 3.2.8 07/01/2023
+------------------------------------------------------------------
+. added test_go.sh
+. aded test_nodejs.sh
+. added test_python3.sh
+. added test_cpp.sh
+. fixed JaguarJDBCTest.java and added create asctable for tests
+
 JaguarDB 3.2.7 05/04/2023
 ------------------------------------------------------------------
 . Fix the bug on server side on waiting for schema change at new nodes

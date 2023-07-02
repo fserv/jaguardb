@@ -32,4 +32,5 @@ g++ -shared $OPT -o jaguarpy3.so -Wall -fPIC  \
   IndirectPythonInterface.obj cxx_exceptions.obj \
   -L$HOME/commit/java -lJaguarClient 
 
+/bin/cp -f jaguarpy3.so jaguarpy.so
 /bin/cp -f jaguarpy3.so $HOME/jaguar/lib/jaguarpy.so

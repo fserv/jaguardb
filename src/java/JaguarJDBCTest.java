@@ -115,6 +115,25 @@ public class JaguarJDBCTest
 			System.out.println( "uid: " + key + " m1: " + m1 + " addr: " + addr  );
 		}
 
+        q = "create table if not exists asctable ( key: id int, value: phone int )";
+        statement.executeUpdate( q );
+        System.out.println( q );
+
+        q = "insert into asctable values ( 0, 4 )";
+        statement.executeUpdate( q );
+        q = "insert into asctable values ( 1, 16 )";
+        statement.executeUpdate( q );
+        q = "insert into asctable values ( 2, 163 )";
+        statement.executeUpdate( q );
+        q = "insert into asctable values ( 13, 0 )";
+        statement.executeUpdate( q );
+        q = "insert into asctable values ( 20, 126 )";
+        statement.executeUpdate( q );
+        q = "insert into asctable values ( 31, 146 )";
+        statement.executeUpdate( q );
+        q = "insert into asctable values ( 45, 75 )";
+        statement.executeUpdate( q );
+
 		q = "select * from asctable where id <= 2;";
 		System.out.println( q );
 		rs = statement.executeQuery( q );
@@ -127,13 +146,11 @@ public class JaguarJDBCTest
 		}
 
 
-		System.out.println( "select id, count(1) as cnt, sum(phone) as sum from asctable where id < 2; ...");
-		rs = statement.executeQuery("select id, count(1) as cnt, sum(phone) as sum from asctable where id < 9; ");
+		System.out.println( "select  sum(phone) as sum from asctable where id < 2; ...");
+		rs = statement.executeQuery("select  sum(phone) as sum from asctable where id < 9; ");
 		while(rs.next()) {
-			key = rs.getString("id");
-			m1 = rs.getString("cnt");
 			addr = rs.getString("sum");
-			System.out.println( "id: " + key + " cnt: " + m1 + " sum: " + addr  );
+			System.out.println( " sum: " + addr  );
 		}
 
 		System.out.println( "update asctable set phone=111 where id < 10;");
@@ -207,17 +224,15 @@ public class JaguarJDBCTest
 		}
 
 
-		q = "select id, count(1) as cnt, sum(phone) as sum from asctable where id < 2; ";
+		q = "select sum(phone) as sum from asctable where id < 2; ";
 		System.out.println( q );
 		System.out.println( "*************************************" );
 		ps = connection.prepareStatement( q );
 		// rs = ps.executeQuery(q);
 		rs = ps.executeQuery();
 		while(rs.next()) {
-			key = rs.getString("id");
-			m1 = rs.getString("cnt");
 			addr = rs.getString("sum");
-			System.out.println( "id: " + key + " cnt: " + m1 + " sum: " + addr  );
+			System.out.println( " sum: " + addr  );
 		}
 
 		q = "update asctable set phone=111 where id < 10;";
