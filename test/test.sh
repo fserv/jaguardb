@@ -17,3 +17,10 @@ echo "Test geo.sql ..."
 ./jagdb -v < geo.sql > output/geo.out
 date
 
+
+echo "FAIL: "
+grep FAIL output/unit.out output/time.out output/geo.out
+
+echo "PASS: "
+grep PASS output/unit.out output/time.out output/geo.out | wc -l
+

@@ -6296,6 +6296,7 @@ int JagDBServer::doInsert( JagRequest &req, JagParseParam &parseParam,
 
         dn("s40028501 JAG_FINSERT_OP");
 		cnt = ptab->finsert( req, &parseParam, reterr );
+        dn("s40028501 JAG_FINSERT_OP finsert done");
 
 		++ numInserts;
 		if ( 1 == cnt ) {
@@ -8064,7 +8065,7 @@ void JagDBServer::unpackSchemaInfo( const char *mesg, const JagRequest &req )
 		session.replicType = 1;
 		dropAllTablesAndIndex( req2, _prevtableschema );
 		JagFileMgr::rmdir( dirpath, false );
-		Jstr cmd = Jstr("cp -rf ") + _cfg->getJDBDataHOME( JAG_MAIN ) + "/* " + dirpath;
+		Jstr cmd = Jstr("/bin/cp -rf ") + _cfg->getJDBDataHOME( JAG_MAIN ) + "/* " + dirpath;
 		system( cmd.c_str() );
 		jd(JAG_LOG_LOW, "s6307 [%s]\n", cmd.c_str() );
 	}
@@ -8075,7 +8076,7 @@ void JagDBServer::unpackSchemaInfo( const char *mesg, const JagRequest &req )
 		session.replicType = 2;
 		dropAllTablesAndIndex( req2, _nexttableschema );
 		JagFileMgr::rmdir( dirpath, false );
-		Jstr cmd = Jstr("cp -rf ") + _cfg->getJDBDataHOME( JAG_MAIN ) + "/* " + dirpath;
+		Jstr cmd = Jstr("/bin/cp -rf ") + _cfg->getJDBDataHOME( JAG_MAIN ) + "/* " + dirpath;
 		system( cmd.c_str() );
 		jd(JAG_LOG_LOW, "s6308 [%s]\n", cmd.c_str() );
 	}

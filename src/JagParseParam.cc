@@ -48,6 +48,7 @@ void JagParseParam::initCtor()
 	tabidxpos = NULL;
 	endtabidxpos = NULL;
 	hasCountAll = false;
+	hasCount1 = false;
 	_selectStar = false;
 	cmd = 0;
 	detail = false;

@@ -31,6 +31,7 @@ void i(const char * format, ...);
 void in(const char * format, ...);
 void d(const char * format, ...);
 void dn(const char * format, ...);
+void dnlock(const char * format, ...);
 void dnl(const char *m = "");
 void log(bool line, const char * format, va_list args);
 void jd(int level, const char *fmt, ... );

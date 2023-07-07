@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <float.h>
+#include <omp.h>
 
 #include <JagCGAL.h>
 
@@ -249,6 +250,7 @@ void test_spsc_queue( int n );
 void test_numinstr();
 void test_base62( char *ss );
 void test_base254( char *ss );
+void test_faiss( );
 
 int main(int argc, char *argv[] )
 {
@@ -265,7 +267,7 @@ int main(int argc, char *argv[] )
 	//testlaststr();
 	//testjaguarreader();
 	//testjaguarreader2();
-	testUUID();
+	//testUUID();
 	// testStrSplitWQuote();
 	// testAtomic( N );
 
@@ -343,6 +345,7 @@ int main(int argc, char *argv[] )
 	//test_numinstr();
 	//test_base62( argv[1] );
 	//test_base254( argv[1] );
+    test_faiss();
 }
 
 
@@ -5714,5 +5717,175 @@ void test_base254( char *str )
 
     dumpmem(b254_1.s(), b254_1.size() );
     dumpmem(b254_2.s(), b254_2.size() );
+
+}
+
+#include <faiss/IndexFlat.h>
+#include <faiss/IndexIVFFlat.h>
+#include <faiss/index_io.h>
+#include <faiss/invlists/OnDiskInvertedLists.h>
+#include <faiss/utils/random.h>
+
+struct Tempfilename {
+    //static pthread_mutex_t mutex;
+
+    std::string filename = "/tmp/faiss_tmp_XXXXXX";
+
+    Tempfilename() {
+        //pthread_mutex_lock(&mutex);
+        int fd = mkstemp(&filename[0]);
+        close(fd);
+        //pthread_mutex_unlock(&mutex);
+    }
+
+    ~Tempfilename() {
+        if (access(filename.c_str(), F_OK)) {
+            unlink(filename.c_str());
+        }
+    }
+
+    const char* c_str() {
+        return filename.c_str();
+    }
+};
+
+
+void test_faiss( )
+{
+    //////////////////////////////////////////////////////////////
+    Tempfilename filename;
+
+    int nlist = 100;
+    int code_size = 32;
+    int nadd = 1000000;
+    //int nadd = 10000;
+    std::unordered_map<int, int> listnos_map;
+
+    faiss::OnDiskInvertedLists ivf(nlist, code_size, filename.c_str());
+    printf("Open [%s] inv file\n",  filename.c_str() );
+
+    {
+        std::vector<uint8_t> code_vec(32);
+        std::mt19937 rng;
+        std::uniform_real_distribution<> distrib;
+
+        for (int i = 0; i < nadd; i++) {
+            double d = distrib(rng);
+            int list_no = int(nlist * d * d); // skewed distribution
+
+            int* ar = (int*)code_vec.data();
+            ar[0] = i;
+            ar[1] = list_no;
+
+            ivf.add_entry(list_no, i, code_vec.data());
+            listnos_map[i] = list_no;
+        }
+    }
+
+    printf("ivf.add_entry nadd=%d done\n", nadd );
+
+    int ntot = 0;
+    for (int i = 0; i < nlist; i++) {
+        int lst_size = ivf.list_size(i);
+
+        const faiss::idx_t* ids = ivf.get_ids(i);
+        const uint8_t* codes = ivf.get_codes(i);
+
+
+        for (int j = 0; j < lst_size; j++) {
+            faiss::idx_t id = ids[j];
+            const int* ar = (const int*)&codes[code_size * j];
+            if ( ar[0] != id ) {
+                abort();
+            }
+
+            if ( ar[1] != i ) {
+                abort();
+            }
+
+            if ( listnos_map[id] != i ) {
+                abort();
+            }
+
+            ntot++;
+        }
+    }
+
+    printf("ivf.get_ids nlist=%d ntot=%d done\n", nlist, ntot );
+
+    if ( ntot != nadd ) {
+        abort();
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////
+    int d = 8;
+    int  nq = 200, nb = 1500, k = 10;
+    nlist = 30;
+    faiss::IndexFlatL2 quantizer(d);
+    {
+        std::vector<float> x(d * nlist);
+        faiss::float_rand(x.data(), d * nlist, 12345);
+        quantizer.add(nlist, x.data());
+    }
+
+    std::vector<float> xb(d * nb); // 8 * 1500 = 16000
+    faiss::float_rand(xb.data(), d * nb, 23456);
+
+    // index
+    faiss::IndexIVFFlat index(&quantizer, d, nlist);
+
+    index.add(nb, xb.data());
+
+    std::vector<float> xq(d * nb);
+    faiss::float_rand(xq.data(), d * nq, 34567);
+
+    std::vector<float> ref_D(nq * k);
+    std::vector<faiss::idx_t> ref_I(nq * k);
+
+    index.search(nq, xq.data(), k, ref_D.data(), ref_I.data());
+
+    Tempfilename filename1, filename2;
+
+    // test add + search
+    {
+        faiss::IndexIVFFlat index2(&quantizer, d, nlist);
+
+        faiss::OnDiskInvertedLists ivf( index.nlist, index.code_size, filename1.c_str());
+        printf("OnDiskInvertedLists [%s]\n", filename1.c_str() );
+
+        index2.replace_invlists(&ivf);
+
+        index2.add(nb, xb.data());
+
+        std::vector<float> new_D(nq * k);
+        std::vector<faiss::idx_t> new_I(nq * k);
+
+        index2.search(nq, xq.data(), k, new_D.data(), new_I.data());
+
+        //EXPECT_EQ(ref_D, new_D);
+        //EXPECT_EQ(ref_I, new_I);
+
+        write_index(&index2, filename2.c_str());
+        printf("write_index [%s] done\n", filename2.c_str() );
+    }
+
+    // test io
+    {
+        printf("read_index [%s] ...\n", filename2.c_str() );
+
+        // index3
+        faiss::Index* index3 = faiss::read_index(filename2.c_str());
+
+        std::vector<float> new_D(nq * k);
+        std::vector<faiss::idx_t> new_I(nq * k);
+
+        index3->search(nq, xq.data(), k, new_D.data(), new_I.data());
+
+        //EXPECT_EQ(ref_D, new_D);
+        //EXPECT_EQ(ref_I, new_I);
+
+        delete index3;
+    }
 
 }

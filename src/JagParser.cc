@@ -1768,6 +1768,13 @@ int JagParser::setSelectColumn()
 			_ptrParam->selColVec[i].name = r;
 		}
 
+        dn("p292002 i=%d asName=[%s] name=[%s]", i, _ptrParam->selColVec[i].asName.s(), _ptrParam->selColVec[i].name.s() );
+        if ( strstr(_ptrParam->selColVec[i].name.s(), "count(1)" ) ) {
+            _ptrParam->hasCount1 = true;
+            dn("p330009 _ptrParam->hasCount1 true");
+        }
+
+
 		if ( 0==strncasecmp(_ptrParam->selColVec[i].name.c_str(), "all(", 4) ) {
 			Jstr nm = _ptrParam->objectVec[0].dbName + "." + _ptrParam->objectVec[0].tableName 
 	                    + "." + trimChar(_ptrParam->selColVec[i].name.substr( '(', ')' ), ' ');

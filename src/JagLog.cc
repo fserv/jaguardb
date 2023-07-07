@@ -90,6 +90,18 @@ void dn(const char * format, ...)
 	#endif
 }
 
+void dnlock(const char * format, ...)
+{
+	#ifdef DEBUG_PRINT
+	#ifdef DEBUG_LOCK
+    va_list args;
+    va_start(args, format);
+    log(true, format, args);
+    va_end(args);
+	#endif
+	#endif
+}
+
 void dnl(const char *m)
 {
 	#ifdef DEBUG_PRINT

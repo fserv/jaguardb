@@ -158,7 +158,7 @@ void JagServerObjectLock::cleanupObjects()
 
 void JagServerObjectLock::rebuildObjects()
 {
-    dn("lock35008 rebuildObjects() ...");
+    dnlock("lock35008 rebuildObjects() ...");
 	cleanupObjects();
 	initObjects();
 }
@@ -232,19 +232,19 @@ int JagServerObjectLock::writeLockSchema( int replicType )
 
 	if ( replicType < 0 ) {
 		repstr = "0";
-        dn("lock028281 writeLockSchema  writeLock 0" );
+        dnlock("lock028281 writeLockSchema  writeLock 0" );
  		JAG_BLURT _hashLock->writeLock( repstr ); JAG_OVER
 
 		repstr = "1";
-        dn("lock028281 writeLockSchema  writeLock 1" );
+        dnlock("lock028281 writeLockSchema  writeLock 1" );
  		JAG_BLURT _hashLock->writeLock( repstr ); JAG_OVER
 
 		repstr = "2";
-        dn("lock028281 writeLockSchema  writeLock 2" );
+        dnlock("lock028281 writeLockSchema  writeLock 2" );
  		JAG_BLURT _hashLock->writeLock( repstr ); JAG_OVER
 	} else {
 		repstr = intToStr( replicType );
-        dn("lock028288 writeLockSchema  writeLock %d", replicType );
+        dnlock("lock028288 writeLockSchema  writeLock %d", replicType );
  		JAG_BLURT _hashLock->writeLock( repstr ); JAG_OVER
 	}
 	return 1;
@@ -337,20 +337,20 @@ int JagServerObjectLock::writeLockDatabase( jagint opcode, const Jstr &dbName, i
 
 	JAG_BLURT _hashLock->readLock( repstr ); JAG_OVER
 
-    dn("lock0100129 writeLock %s ...", lockdbrep.s() );
+    dnlock("lock0100129 writeLock %s ...", lockdbrep.s() );
 	JAG_BLURT _hashLock->writeLock( lockdbrep ); JAG_OVER
-    dn("lock0100129 writeLock %s done", lockdbrep.s() );
+    dnlock("lock0100129 writeLock %s done", lockdbrep.s() );
 
 	if ( JAG_CREATEDB_OP == opcode ) {
 		if ( dbmap->keyExist( dbName ) ) {
 			_hashLock->writeUnlock( lockdbrep );
-            dn("lock30012 writeUnlock %s", lockdbrep.s() );
+            dnlock("lock30012 writeUnlock %s", lockdbrep.s() );
 			_hashLock->readUnlock( repstr );
 			return 30;
 		} else {
 			if ( !dbmap->addKeyValue( dbName, bfr ) ) {
 				_hashLock->writeUnlock( lockdbrep );
-                dn("lock30112 writeUnlock %s", lockdbrep.s() );
+                dnlock("lock30112 writeUnlock %s", lockdbrep.s() );
 				_hashLock->readUnlock( repstr );
 				return -30;
 			}
@@ -358,7 +358,7 @@ int JagServerObjectLock::writeLockDatabase( jagint opcode, const Jstr &dbName, i
 	} else {
 		if ( !dbmap->keyExist( dbName ) ) {
 			_hashLock->writeUnlock( lockdbrep );
-            dn("lock30115 writeUnlock %s", lockdbrep.s() );
+            dnlock("lock30115 writeUnlock %s", lockdbrep.s() );
 			_hashLock->readUnlock( repstr );
 			return -40;
 		} else {
@@ -387,18 +387,18 @@ int JagServerObjectLock::writeUnlockDatabase( jagint opcode, const Jstr &dbName,
 	if ( JAG_DROPDB_OP == opcode ) {
 		if ( !dbmap->removeKey( dbName ) ) {
 			_hashLock->writeUnlock( lockdbrep );
-            dn("lock30118 writeUnlock %s", lockdbrep.s() );
+            dnlock("lock30118 writeUnlock %s", lockdbrep.s() );
 			_hashLock->readUnlock( repstr );
 			return -10;
 		} else {
 			_hashLock->writeUnlock( lockdbrep );
-            dn("lock30119 writeUnlock %s", lockdbrep.s() );
+            dnlock("lock30119 writeUnlock %s", lockdbrep.s() );
 			_hashLock->readUnlock( repstr );	
 			return 10;
 		}
 	} else {
 		_hashLock->writeUnlock( lockdbrep );
-        dn("lock30149 writeUnlock %s", lockdbrep.s() );
+        dnlock("lock30149 writeUnlock %s", lockdbrep.s() );
 		_hashLock->readUnlock( repstr );
 		return -100;
 	}
@@ -417,7 +417,7 @@ JagTable *JagServerObjectLock::readLockTable( jagint opcode, const Jstr &dbName,
 
 	JagHashMap<AbaxString, AbaxBuffer> *dbmap = NULL, *tabmap = NULL;
 
-    dn("s445998 enter readLockTable lockSelfLevelOnly=%drepstr=[%s] lockdbrep=[%s] dbtab=[%s] lockdbtabrep=[%s]", 
+    dnlock("s445998 enter readLockTable lockSelfLevelOnly=%drepstr=[%s] lockdbrep=[%s] dbtab=[%s] lockdbtabrep=[%s]", 
         lockSelfLevelOnly, repstr.s(), lockdbrep.s(), dbtab.s(), lockdbtabrep.s() );
 
 	if ( 0 == replicType ) {
@@ -434,7 +434,7 @@ JagTable *JagServerObjectLock::readLockTable( jagint opcode, const Jstr &dbName,
 		return NULL;
 	}
 
-    dn("s24803 readLockTable replicType=%d tabmap=%p", replicType, tabmap );
+    dnlock("s24803 readLockTable replicType=%d tabmap=%p", replicType, tabmap );
 
     /***
 	if ( !dbmap->keyExist( dbName ) ) {
@@ -450,18 +450,18 @@ JagTable *JagServerObjectLock::readLockTable( jagint opcode, const Jstr &dbName,
 
 
 	if ( !lockSelfLevelOnly ) {
-        dn("lock10020 readLock repstr=%s ...", repstr.s() );
+        dnlock("lock10020 readLock repstr=%s ...", repstr.s() );
 		JAG_BLURT _hashLock->readLock( repstr ); JAG_OVER
-        dn("lock10020 readLock repstr=%s done", repstr.s() );
+        dnlock("lock10020 readLock repstr=%s done", repstr.s() );
 
-        dn("lock10023 readLock lockdbrep=%s ...", lockdbrep.s() );
+        dnlock("lock10023 readLock lockdbrep=%s ...", lockdbrep.s() );
 		JAG_BLURT _hashLock->readLock( lockdbrep ); JAG_OVER
-        dn("lock10023 readLock lockdbrep=%s done", lockdbrep.s() );
+        dnlock("lock10023 readLock lockdbrep=%s done", lockdbrep.s() );
 	}
 
-    dn("lock30012 readLock lockdbtabrep=%s ...", lockdbtabrep.s() );
+    dnlock("lock30012 readLock lockdbtabrep=%s ...", lockdbtabrep.s() );
 	JAG_BLURT _hashLock->readLock( lockdbtabrep ); JAG_OVER
-    dn("lock30012 readLock lockdbtabrep=%s done", lockdbtabrep.s() );
+    dnlock("lock30012 readLock lockdbtabrep=%s done", lockdbtabrep.s() );
 
 	if ( !dbmap->keyExist( dbName ) || !tabmap->keyExist( lockdbtabrep ) ) {
 		_hashLock->readUnlock( lockdbtabrep );
@@ -485,7 +485,7 @@ JagTable *JagServerObjectLock::readLockTable( jagint opcode, const Jstr &dbName,
 	}
 
 	JagTable *ptab = (JagTable*) bfr.addr();
-    dn("s35001812 readLockTable() retrieved ptab=%p for dbtab=[%s] replicType=%d", ptab, dbtab.s(), replicType );
+    dnlock("s35001812 readLockTable() retrieved ptab=%p for dbtab=[%s] replicType=%d", ptab, dbtab.s(), replicType );
 	rc = 0;
 	return ptab;
 }
@@ -499,14 +499,14 @@ int JagServerObjectLock::readUnlockTable( jagint opcode, const Jstr &dbName,
 	AbaxString lockdbtabrep = dbtab + "." + repstr;
 
 	_hashLock->readUnlock( lockdbtabrep );
-    dn("lock312301 readUnlock lockdbtabrep=%s", lockdbtabrep.s() );
+    dnlock("lock312301 readUnlock lockdbtabrep=%s", lockdbtabrep.s() );
 
 	if ( !lockSelfLevelOnly ) {
 		_hashLock->readUnlock( lockdbrep );
-        dn("lock31305 readUnlock lockdb=%s", lockdbrep.s() );
+        dnlock("lock31305 readUnlock lockdb=%s", lockdbrep.s() );
 
 		_hashLock->readUnlock( repstr );
-        dn("lock31306 readUnlock repstr=%s", repstr.s() );
+        dnlock("lock31306 readUnlock repstr=%s", repstr.s() );
 
 	}
 
@@ -524,7 +524,7 @@ JagTable *JagServerObjectLock::writeLockTable( jagint opcode, const Jstr &dbName
 
 	JagHashMap<AbaxString, AbaxBuffer> *dbmap = NULL, *tabmap = NULL;
 
-    dn("s445996 enter writeLockTable lockSelfLevelOnly=%d repstr=[%s] lockdbrep=[%s] dbtab=[%s] lockdbtabrep=[%s]", 
+    dnlock("s445996 enter writeLockTable lockSelfLevelOnly=%d repstr=[%s] lockdbrep=[%s] dbtab=[%s] lockdbtabrep=[%s]", 
         lockSelfLevelOnly, repstr.s(), lockdbrep.s(), dbtab.s(), lockdbtabrep.s() );
 
 	if ( 0 == replicType ) {
@@ -537,51 +537,51 @@ JagTable *JagServerObjectLock::writeLockTable( jagint opcode, const Jstr &dbName
 		dbmap = _nextdatabases;
 		tabmap = _nexttables;
 	} else {
-		dn("s4409039 writeLockTable() replicType=%d not known, return NULL", replicType);
+		dnlock("s4409039 writeLockTable() replicType=%d not known, return NULL", replicType);
 		rc = -10;
 		return NULL;
 	}
 
-    dn("s24801 writeLockTable replicType=%d tabmap=%p", replicType, tabmap );
+    dnlock("s24801 writeLockTable replicType=%d tabmap=%p", replicType, tabmap );
 
 	if ( !lockSelfLevelOnly ) {
 
-        dn("s24801 writeLockTable readLock repstr=%s ...", repstr.s() );
+        dnlock("s24801 writeLockTable readLock repstr=%s ...", repstr.s() );
 		JAG_BLURT _hashLock->readLock( repstr ); JAG_OVER
-        dn("s24801 writeLockTable readLock repstr=%s done ...", repstr.s() );
+        dnlock("s24801 writeLockTable readLock repstr=%s done ...", repstr.s() );
 
-        dn("s24802 writeLockTable readLock lockdbrep=%s ...", lockdbrep.s() );
+        dnlock("s24802 writeLockTable readLock lockdbrep=%s ...", lockdbrep.s() );
 		JAG_BLURT _hashLock->readLock( lockdbrep ); JAG_OVER
-        dn("s24802 writeLockTable readLock lockdbrep=%s done", lockdbrep.s() );
+        dnlock("s24802 writeLockTable readLock lockdbrep=%s done", lockdbrep.s() );
 	}
 
-    dn("lock011128 writeLock lockdbtabrep=%s", lockdbtabrep.s() );
+    dnlock("lock011128 writeLock lockdbtabrep=%s", lockdbtabrep.s() );
 	JAG_BLURT _hashLock->writeLock( lockdbtabrep ); JAG_OVER	
-    dn("lock011128 writeLock lockdbtabrep=%s done", lockdbtabrep.s() );
+    dnlock("lock011128 writeLock lockdbtabrep=%s done", lockdbtabrep.s() );
 
 	if ( JAG_CREATETABLE_OP == opcode || JAG_CREATECHAIN_OP == opcode || JAG_CREATEMEMTABLE_OP == opcode ) {
 		if ( !dbmap->keyExist( dbName ) ) {
 
 			_hashLock->writeUnlock( lockdbtabrep );
-            dn("lock002218 writeUnlock %s", lockdbtabrep.s() );
+            dnlock("lock002218 writeUnlock %s", lockdbtabrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
-			dn("s4508039 writeLockTable() replicType=%d, return NULL dbmap has no key [%s]", replicType, dbName.s() );
+			dnlock("s4508039 writeLockTable() replicType=%d, return NULL dbmap has no key [%s]", replicType, dbName.s() );
 			rc = -20;
 			return NULL;
 		} else if ( dbmap->keyExist(dbName) && tabmap->keyExist( lockdbtabrep ) ) {
 
 			_hashLock->writeUnlock( lockdbtabrep );
-            dn("lock002418 writeUnlock %s", lockdbtabrep.s() );
+            dnlock("lock002418 writeUnlock %s", lockdbtabrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
-			dn("s4528539 replicType=%d, return NULL  dbmap has dbName=[%s] and tabmap has [%s]", replicType, dbName.s(), lockdbtabrep.s() );
+			dnlock("s4528539 replicType=%d, return NULL  dbmap has dbName=[%s] and tabmap has [%s]", replicType, dbName.s(), lockdbtabrep.s() );
 			rc = -22;
 			return NULL;
 		} else {
@@ -589,47 +589,47 @@ JagTable *JagServerObjectLock::writeLockTable( jagint opcode, const Jstr &dbName
 			if ( ! record ) {
 
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("lock002518 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("lock002518 writeUnlock %s", lockdbtabrep.s() );
 
 				if ( !lockSelfLevelOnly ) {
 					_hashLock->readUnlock( lockdbrep );
 					_hashLock->readUnlock( repstr );
 				}
-				dn("s4508434 replicType=%d, no schema dbtab=[%s], return NULL", replicType, dbtab.s() );
+				dnlock("s4508434 replicType=%d, no schema dbtab=[%s], return NULL", replicType, dbtab.s() );
 				rc = -30;
 				return NULL;
 			}
 
 			JagTable *ptab = new JagTable( replicType, _servobj, dbName.c_str(), tableName.c_str(), *record );
-            dn("lock02192 writeLockTable() replicType=%d dbName=[%s] tableName=[%s] new ptab=%p", replicType, dbName.c_str(), tableName.c_str(), ptab );
+            dnlock("lock02192 writeLockTable() replicType=%d dbName=[%s] tableName=[%s] new ptab=%p", replicType, dbName.c_str(), tableName.c_str(), ptab );
 			AbaxBuffer bfr = (void*) ptab;
 			if ( !tabmap->addKeyValue( lockdbtabrep, bfr ) ) {
 				delete ptab;
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("lock003518 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("lock003518 writeUnlock %s", lockdbtabrep.s() );
 
 				if ( !lockSelfLevelOnly ) {
 					_hashLock->readUnlock( lockdbrep );
 					_hashLock->readUnlock( repstr );
 				}
-				dn("s4302434 replicType=%d, addKeyValue error, lockdbtabrep=[%s], return NULL", replicType, lockdbtabrep.s() );
+				dnlock("s4302434 replicType=%d, addKeyValue error, lockdbtabrep=[%s], return NULL", replicType, lockdbtabrep.s() );
 				rc = -40;
 				return NULL;
 			}
-            dn("s33340 writeLockTable() created ptab=%p and added to tabmap for lockdbtabrep=[%s]", ptab, lockdbtabrep.s() );
+            dnlock("s33340 writeLockTable() created ptab=%p and added to tabmap for lockdbtabrep=[%s]", ptab, lockdbtabrep.s() );
 			return ptab;
 		}
 	} else {
 		if ( !dbmap->keyExist( dbName ) || !tabmap->keyExist( lockdbtabrep ) ) {
 
 			_hashLock->writeUnlock( lockdbtabrep );
-            dn("lock013518 writeUnlock %s", lockdbtabrep.s() );
+            dnlock("lock013518 writeUnlock %s", lockdbtabrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
-			dn("s4302480 replicType=%d, dbName=[%s] dbtab=[%s] keynotexist, return NULL", replicType, dbName.s(), dbtab.s() );
+			dnlock("s4302480 replicType=%d, dbName=[%s] dbtab=[%s] keynotexist, return NULL", replicType, dbName.s(), dbtab.s() );
 			rc = -50;
 			return NULL;
 		}
@@ -638,7 +638,7 @@ JagTable *JagServerObjectLock::writeLockTable( jagint opcode, const Jstr &dbName
 		if ( ! tabmap->getValue( lockdbtabrep, bfr ) ) {
 
 			_hashLock->writeUnlock( lockdbtabrep );
-            dn("lock043518 writeUnlock %s", lockdbtabrep.s() );
+            dnlock("lock043518 writeUnlock %s", lockdbtabrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->readUnlock( lockdbrep );
@@ -649,7 +649,7 @@ JagTable *JagServerObjectLock::writeLockTable( jagint opcode, const Jstr &dbName
 		}		
 
 		JagTable *ptab = (JagTable*) bfr.addr();
-        dn("lock02195 writeLockTable() replicType=%d dbName=[%s] tableName=[%s] retrieved ptab=%p for lockdbtabrep=[%s]", 
+        dnlock("lock02195 writeLockTable() replicType=%d dbName=[%s] tableName=[%s] retrieved ptab=%p for lockdbtabrep=[%s]", 
             replicType, dbName.c_str(), tableName.c_str(), ptab, lockdbtabrep.s() );
 		rc = 0;
 		return ptab;
@@ -676,7 +676,7 @@ int JagServerObjectLock::writeUnlockTable( jagint opcode, const Jstr &dbName, co
 		dbmap = _nextdatabases;
 		tabmap = _nexttables;
 	} else {
-        dn("s20073 return -1");
+        dnlock("s20073 return -1");
 		return -1;
 	}
 	
@@ -684,7 +684,7 @@ int JagServerObjectLock::writeUnlockTable( jagint opcode, const Jstr &dbName, co
 		bool rc = tabmap->removeKey( lockdbtabrep );
 
 		_hashLock->writeUnlock( lockdbtabrep );
-        dn("lock112213 writeUnlock lockdbtabrep=%s", lockdbtabrep.s() );
+        dnlock("lock112213 writeUnlock lockdbtabrep=%s", lockdbtabrep.s() );
 
 		if ( !lockSelfLevelOnly ) {
 			_hashLock->readUnlock( lockdbrep );
@@ -699,14 +699,14 @@ int JagServerObjectLock::writeUnlockTable( jagint opcode, const Jstr &dbName, co
 	} else {
 
 		_hashLock->writeUnlock( lockdbtabrep );
-        dn("lock112280 writeUnlock lockdbtabrep=%s", lockdbtabrep.s() );
+        dnlock("lock112280 writeUnlock lockdbtabrep=%s", lockdbtabrep.s() );
 
 		if ( !lockSelfLevelOnly ) {
 
-            dn("lock112230 readUnlock lockdbrep=%s", lockdbrep.s() );
+            dnlock("lock112230 readUnlock lockdbrep=%s", lockdbrep.s() );
 			_hashLock->readUnlock( lockdbrep );
 
-            dn("lock112232 readUnlock repstr=%s", repstr.s() );
+            dnlock("lock112232 readUnlock repstr=%s", repstr.s() );
 			_hashLock->readUnlock( repstr );
 		}
 
@@ -723,7 +723,7 @@ JagTable *JagServerObjectLock::getTable( jagint opcode, const Jstr &dbName, cons
 	AbaxString dbtab = dbName + "." + tableName;
 	AbaxString lockdbtabrep = dbtab + "." + repstr;
 
-    dn("s1122029 getTable lockdbtabrep=[%s]", lockdbtabrep.s() );
+    dnlock("s1122029 getTable lockdbtabrep=[%s]", lockdbtabrep.s() );
 
 	JagHashMap<AbaxString, AbaxBuffer> *dbmap = NULL, *tabmap = NULL;
 
@@ -754,7 +754,7 @@ JagTable *JagServerObjectLock::getTable( jagint opcode, const Jstr &dbName, cons
 
 			JagTable *ptab = new JagTable( replicType, _servobj, dbName.s(), tableName.s(), *record );
 			AbaxBuffer bfr = (void*) ptab;
-            dn("s29393 getTable() make new ptab=%p for lockdbtabrep=[%s]", ptab, lockdbtabrep.s() );
+            dnlock("s29393 getTable() make new ptab=%p for lockdbtabrep=[%s]", ptab, lockdbtabrep.s() );
 			if ( !tabmap->addKeyValue( lockdbtabrep, bfr ) ) {
 				delete ptab;
 				return NULL;
@@ -765,7 +765,7 @@ JagTable *JagServerObjectLock::getTable( jagint opcode, const Jstr &dbName, cons
 	}
 
 	JagTable *ptab = (JagTable*) bfr.addr();
-    dn("s939393 getTable()  got ptab=%p for lockdbtabrep=[%s]", ptab, lockdbtabrep.s() );
+    dnlock("s939393 getTable()  got ptab=%p for lockdbtabrep=[%s]", ptab, lockdbtabrep.s() );
 	return ptab;
 }
 
@@ -807,7 +807,7 @@ JagTable *JagServerObjectLock
 		if ( !tabmap->addKeyValue( lockdbtabrep, bfr ) ) {
 			delete ptab;
 			_hashLock->writeUnlock( lockdbtabrep );
-            dn("lock3222019 writeUnlock %s", lockdbtabrep.s() );
+            dnlock("lock3222019 writeUnlock %s", lockdbtabrep.s() );
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
@@ -818,7 +818,7 @@ JagTable *JagServerObjectLock
 		}
 	} else {
 		_hashLock->writeUnlock( lockdbtabrep );
-        dn("lock3222813 writeUnlock %s", lockdbtabrep.s() );
+        dnlock("lock3222813 writeUnlock %s", lockdbtabrep.s() );
 
 		if ( !lockSelfLevelOnly ) {
 			_hashLock->readUnlock( lockdbrep );
@@ -851,7 +851,7 @@ JagIndex *JagServerObjectLock::readLockIndex( jagint opcode, const Jstr &dbName,
 		}
 
 		tableName = tname.c_str();
-        dn("lock0002938 got tableName=[%s]", tableName.s() );
+        dnlock("lock0002938 got tableName=[%s]", tableName.s() );
 	}
 
 	JagHashMap<AbaxString, AbaxBuffer> *dbmap = NULL, *tabmap = NULL, *idxmap = NULL;
@@ -887,15 +887,15 @@ JagIndex *JagServerObjectLock::readLockIndex( jagint opcode, const Jstr &dbName,
 		JAG_BLURT _hashLock->readLock( lockdbtabrep ); JAG_OVER
 	}
 
-    dn("lock3440012 readLock %s ...", lockdbidxrep.s() );
+    dnlock("lock3440012 readLock %s ...", lockdbidxrep.s() );
 	JAG_BLURT _hashLock->readLock( lockdbidxrep ); JAG_OVER
-    dn("lock3440012 readLock %s done", lockdbidxrep.s() );
+    dnlock("lock3440012 readLock %s done", lockdbidxrep.s() );
 
 	if ( !dbmap->keyExist( dbName ) || !tabmap->keyExist( lockdbtabrep ) ||
 		!_idxtableNames->keyExist( lockdbidxrep ) || !idxmap->keyExist( lockdbidxrep ) ) {
 
 		_hashLock->readUnlock( lockdbidxrep );
-        dn("lock000148 readUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+        dnlock("lock000148 readUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 		if ( !lockSelfLevelOnly ) {
 			_hashLock->readUnlock( lockdbtabrep );
@@ -910,7 +910,7 @@ JagIndex *JagServerObjectLock::readLockIndex( jagint opcode, const Jstr &dbName,
 	if ( !idxmap->getValue( lockdbidxrep, bfr ) ) {
 
 		_hashLock->readUnlock( lockdbidxrep );
-        dn("lock000151 readUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+        dnlock("lock000151 readUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 		if ( !lockSelfLevelOnly ) {
 			_hashLock->readUnlock( lockdbtabrep );
@@ -939,7 +939,7 @@ int JagServerObjectLock::readUnlockIndex( jagint opcode, const Jstr &dbName, con
 	AbaxString lockdbidxrep = dbName + "." + indexName + "." + repstr;
 
 	_hashLock->readUnlock( lockdbidxrep );
-    dn("lock000153 readUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+    dnlock("lock000153 readUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 	if ( !lockSelfLevelOnly ) {
 		_hashLock->readUnlock( lockdbtabrep );
@@ -967,7 +967,7 @@ JagIndex *JagServerObjectLock
 
 	AbaxString lockdbidxrep = dbName + "." + indexName + "." + repstr;
 
-    dn("lock2020291 writeLockIndex lockSelfLevelOnly=%d lockdbidxrep=%s", lockSelfLevelOnly, lockdbidxrep.s() );
+    dnlock("lock2020291 writeLockIndex lockSelfLevelOnly=%d lockdbidxrep=%s", lockSelfLevelOnly, lockdbidxrep.s() );
 
 	JagHashMap<AbaxString, AbaxBuffer> *dbmap = NULL, *tabmap = NULL, *idxmap = NULL;
 
@@ -1003,25 +1003,25 @@ JagIndex *JagServerObjectLock
 	} else {
 		if ( !dbmap->keyExist( dbName ) ) {
 			rc = -20;
-			dn("SL0020 dbName=[%s] notfound in dbmap", dbName.s() );
+			dnlock("SL0020 dbName=[%s] notfound in dbmap", dbName.s() );
 			return NULL;
 		}
 
 		if ( !tabmap->keyExist( lockdbtabrep ) ) {
 			rc = -21;
-			dn("SL0021 dbtab=[%s] notfound in tabmap", lockdbtabrep.s() );
+			dnlock("SL0021 dbtab=[%s] notfound in tabmap", lockdbtabrep.s() );
 			return NULL;
 		}
 
 		if ( !_idxtableNames->keyExist( lockdbidxrep ) ) {
 			rc = -22;
-			dn("SL0022 dbidxrep=[%s] notfound in _idxtableNames", lockdbidxrep.s() );
+			dnlock("SL0022 dbidxrep=[%s] notfound in _idxtableNames", lockdbidxrep.s() );
 			return NULL;
 		}
 
 		if (  !idxmap->keyExist( lockdbidxrep ) ) {
 			rc = -23;
-			dn("SL0023 dbidx=[%s] notfound in idxmap", lockdbidxrep.s() );
+			dnlock("SL0023 dbidx=[%s] notfound in idxmap", lockdbidxrep.s() );
 			return NULL;
 		}
 	}
@@ -1032,14 +1032,14 @@ JagIndex *JagServerObjectLock
 		JAG_BLURT _hashLock->readLock( repstr ); JAG_OVER
 		JAG_BLURT _hashLock->readLock( lockdbrep ); JAG_OVER
 
-        dn("lock320010 writeLock %s ...", lockdbtabrep.s() );
+        dnlock("lock320010 writeLock %s ...", lockdbtabrep.s() );
 		JAG_BLURT _hashLock->writeLock( lockdbtabrep ); JAG_OVER
-        dn("lock320010 writeLock %s done", lockdbtabrep.s() );
+        dnlock("lock320010 writeLock %s done", lockdbtabrep.s() );
 	}
 
-    dn("lock3030881 writeLock lockdbidxrep=%s ...", lockdbidxrep.s() );
+    dnlock("lock3030881 writeLock lockdbidxrep=%s ...", lockdbidxrep.s() );
 	JAG_BLURT _hashLock->writeLock( lockdbidxrep ); JAG_OVER
-    dn("lock3030881 writeLock lockdbidxrep=%s done", lockdbidxrep.s() );
+    dnlock("lock3030881 writeLock lockdbidxrep=%s done", lockdbidxrep.s() );
 
 	if ( JAG_CREATEINDEX_OP == opcode ) {
 		if (    ! dbmap->keyExist( dbName ) 
@@ -1047,11 +1047,11 @@ JagIndex *JagServerObjectLock
              || _idxtableNames->keyExist( lockdbidxrep ) ) {
 
 			_hashLock->writeUnlock( lockdbidxrep );
-            dn("lock00163 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+            dnlock("lock00163 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("m3330198 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("m3330198 writeUnlock %s", lockdbtabrep.s() );
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
@@ -1062,11 +1062,11 @@ JagIndex *JagServerObjectLock
                     && idxmap->keyExist( lockdbidxrep ) ) {
 
 			_hashLock->writeUnlock( lockdbidxrep );
-            dn("lock00165 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+            dnlock("lock00165 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("lock22271 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("lock22271 writeUnlock %s", lockdbtabrep.s() );
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
@@ -1077,17 +1077,17 @@ JagIndex *JagServerObjectLock
 			Jstr path;
 			const JagSchemaRecord *trecord, *irecord;
 			irecord = ischema->getOneIndexAttr( dbName, indexName, path );
-            dn("s020288 ischema->getOneIndexAttr dbName=[%s] indexName=[%s] path=[%s]", dbName.s(), indexName.s(), path.s() );
+            dnlock("s020288 ischema->getOneIndexAttr dbName=[%s] indexName=[%s] path=[%s]", dbName.s(), indexName.s(), path.s() );
 
 			trecord = tschema->getAttr( path );
 			if ( ! irecord || ! trecord ) {
 
 				_hashLock->writeUnlock( lockdbidxrep );
-                dn("lock00012 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+                dnlock("lock00012 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 				if ( !lockSelfLevelOnly ) {
 					_hashLock->writeUnlock( lockdbtabrep );
-                    dn("lock3444081 writeUnlock %s", lockdbtabrep.s() );
+                    dnlock("lock3444081 writeUnlock %s", lockdbtabrep.s() );
 					_hashLock->readUnlock( lockdbrep );
 					_hashLock->readUnlock( repstr );
 				}
@@ -1096,7 +1096,7 @@ JagIndex *JagServerObjectLock
 			}
 
 			path += Jstr(".") + indexName;
-            dn("s0282811 path=[%s]  new JagIndex()", path.s() );
+            dnlock("s0282811 path=[%s]  new JagIndex()", path.s() );
 
 			JagIndex *pindex = new JagIndex( replicType, _servobj, path, *trecord, *irecord );
 			AbaxBuffer bfr = (void*) pindex;
@@ -1105,11 +1105,11 @@ JagIndex *JagServerObjectLock
 				delete pindex;
 
 				_hashLock->writeUnlock( lockdbidxrep );
-                dn("lock000141 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+                dnlock("lock000141 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 				if ( !lockSelfLevelOnly ) {
 					_hashLock->writeUnlock( lockdbtabrep );
-                    dn("lock2222091 writeUnlock %s", lockdbtabrep.s() );
+                    dnlock("lock2222091 writeUnlock %s", lockdbtabrep.s() );
 					_hashLock->readUnlock( lockdbrep );
 					_hashLock->readUnlock( repstr );
 				}
@@ -1121,32 +1121,32 @@ JagIndex *JagServerObjectLock
 				delete pindex;
 
 				_hashLock->writeUnlock( lockdbidxrep );
-                dn("lock000143 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+                dnlock("lock000143 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 				if ( !lockSelfLevelOnly ) {
 					_hashLock->writeUnlock( lockdbtabrep );
-                    dn("lock22091003 writeUnlock %s", lockdbtabrep.s() );
+                    dnlock("lock22091003 writeUnlock %s", lockdbtabrep.s() );
 					_hashLock->readUnlock( lockdbrep );
 					_hashLock->readUnlock( repstr );
 				}
 				rc = -60;
 				return NULL;
 			}
-			dn("SL003451 return pindex=%p", pindex );
+			dnlock("SL003451 return pindex=%p", pindex );
 			return pindex;
 		}
 	} else {
-        dn("lock01122  not create index");
+        dnlock("lock01122  not create index");
 		// not create index
 		if ( !dbmap->keyExist( dbName ) || !tabmap->keyExist( lockdbtabrep ) || 
 			!_idxtableNames->keyExist(lockdbidxrep) || !idxmap->keyExist( lockdbidxrep ) ) {
 
 			_hashLock->writeUnlock( lockdbidxrep );
-            dn("lock000144 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+            dnlock("lock000144 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("m3333018 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("m3333018 writeUnlock %s", lockdbtabrep.s() );
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
@@ -1158,11 +1158,11 @@ JagIndex *JagServerObjectLock
 		if ( !idxmap->getValue( lockdbidxrep, bfr ) ) {
 
 			_hashLock->writeUnlock( lockdbidxrep );
-            dn("lock000146 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
+            dnlock("lock000146 writeUnlock lockdbidxrep=%s", lockdbidxrep.s() );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("lock202810087 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("lock202810087 writeUnlock %s", lockdbtabrep.s() );
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
@@ -1170,14 +1170,14 @@ JagIndex *JagServerObjectLock
 			return NULL;
 		}
 		
-		dn("SL0288112 _idxtableNames->keyExist(lockdbidxrep=%s)=%d", lockdbidxrep.s(), _idxtableNames->keyExist(lockdbidxrep) ); 
+		dnlock("SL0288112 _idxtableNames->keyExist(lockdbidxrep=%s)=%d", lockdbidxrep.s(), _idxtableNames->keyExist(lockdbidxrep) ); 
 		JagIndex *pindex = (JagIndex*) bfr.addr();
-		dn("SL003452 return pindex=%p", pindex );
+		dnlock("SL003452 return pindex=%p", pindex );
 		rc = 0;
 		return pindex;
 	}
 
-    dn("lock0822299 end writeLockIndex() ");
+    dnlock("lock0822299 end writeLockIndex() ");
     return NULL;
 }  // end of writeLockIndex()
 
@@ -1246,12 +1246,12 @@ int JagServerObjectLock::writeUnlockIndex( jagint opcode, const Jstr &dbName, co
 	if ( JAG_DROPINDEX_OP == opcode ) {
 		if ( !idxmap->removeKey( lockdbidxrep ) ) {
 
-            dn("lock877015 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
+            dnlock("lock877015 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
 			_hashLock->writeUnlock( lockdbidxrep );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("lock400238 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("lock400238 writeUnlock %s", lockdbtabrep.s() );
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
@@ -1259,24 +1259,24 @@ int JagServerObjectLock::writeUnlockIndex( jagint opcode, const Jstr &dbName, co
 		} else {
 			if ( !_idxtableNames->removeKey( lockdbidxrep ) ) {
 
-                dn("lock837015 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
+                dnlock("lock837015 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
 				_hashLock->writeUnlock( lockdbidxrep );
 
 				if ( !lockSelfLevelOnly ) {
 					_hashLock->writeUnlock( lockdbtabrep );
-                    dn("lock400138 writeUnlock %s", lockdbtabrep.s() );
+                    dnlock("lock400138 writeUnlock %s", lockdbtabrep.s() );
 					_hashLock->readUnlock( lockdbrep );
 					_hashLock->readUnlock( repstr );
 				}
 				return -20;
 			}
 
-            dn("lock897115 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
+            dnlock("lock897115 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
 			_hashLock->writeUnlock( lockdbidxrep );
 
 			if ( !lockSelfLevelOnly ) {
 				_hashLock->writeUnlock( lockdbtabrep );
-                dn("lock400128 writeUnlock %s", lockdbtabrep.s() );
+                dnlock("lock400128 writeUnlock %s", lockdbtabrep.s() );
 				_hashLock->readUnlock( lockdbrep );
 				_hashLock->readUnlock( repstr );
 			}
@@ -1284,12 +1284,12 @@ int JagServerObjectLock::writeUnlockIndex( jagint opcode, const Jstr &dbName, co
 		}
 	} else {
 
-        dn("lock095115 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
+        dnlock("lock095115 writeUnlockIndex lockdbidxrep=%s", lockdbidxrep.s() );
 		_hashLock->writeUnlock( lockdbidxrep );
 
 		if ( !lockSelfLevelOnly ) {
 			_hashLock->writeUnlock( lockdbtabrep );
-            dn("lock400028 writeUnlock %s", lockdbtabrep.s() );
+            dnlock("lock400028 writeUnlock %s", lockdbtabrep.s() );
 			_hashLock->readUnlock( lockdbrep );
 			_hashLock->readUnlock( repstr );
 		}

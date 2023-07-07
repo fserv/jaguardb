@@ -886,18 +886,26 @@ expect rows 3;
 select a, sum(b) sm from nokey group by a order by sm desc;
 
 expect  value sm 113;
-select sum(b) sm from nokey;
+select count(1) cnt, sum(b) sm from nokey;
 
 expect  value sm 44;
-select sum(b) sm from nokey where a=11;
+select count(1) cnt, sum(b) sm, count(1) cnt2 from nokey where a=11;
 
 select sum(b) sm from nokey where a=11 group by a;
+select sum(b) sm, count(1) cnt from nokey where a=11 group by a;
+select a, sum(b) sm, count(1) cnt from nokey where a=11 group by a;
 
 expect  value sm 47;
 select sum(b) sm from nokey where a=18 group by a;
 
 expect rows 3;
 select b, sum(a) from nokey group by b;
+
+expect rows 3;
+select a, sum(a) sm, count(1) cnt from nokey group by a;
+
+expect rows 3;
+select b, count(1) cnt, sum(a) sm from nokey group by b;
 
 expect rows 3;
 select b, sum(a) sm from nokey group by b order by sm desc;

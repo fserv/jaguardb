@@ -1668,7 +1668,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
 		retpair.append( JagDBPair( tablekvbuf, _KEYLEN, tablekvbuf+_KEYLEN, _VALLEN, true ) );
 		/**
 		d("s4106 no hasDoneAppend  tablekvbuf:\n" );
-		dumpmem( tablekvbuf, KEYLEN+VALLEN);
+		//dumpmem( tablekvbuf, KEYLEN+VALLEN);
 		**/
 		//d("s30066 parsed pair:\n"); // 
 		//retpair[retpair.size() - 1].print();
@@ -1782,12 +1782,12 @@ int JagTable::finsert( const JagRequest &req, JagParseParam *parseParam, Jstr &e
     					if ( _schAttr[i].isFILE ) {
 							Jstr fpath = _darrFamily->_sfilepath + "/" + hdir;
     						JagFileMgr::makedirPath( fpath );
-							d("s52004 oneFileReceiver [%s]\n", fpath.s() );
+							d("s52004 oneFileReceiver [%s] ... \n", fpath.s() );
 
     						//rc = oneFileReceiver( req.session->sock, fpath );
     						rc = oneFileReceiver( req.session->sock, _darrFamily->_sfilepath, hdir, true );
                             // error: rc < 0;  OK:  1
-                            dn("s2025301 oneFileReceiver fpath=[%s] rc=%d", fpath.s(), rc );
+                            dn("s2025301 oneFileReceiver done fpath=[%s] rc=%d", fpath.s(), rc );
     					}
     				}
 				}

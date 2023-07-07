@@ -1,0 +1,7 @@
+
+wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/cd17b7fe-500e-4305-a89b-bd5b42bfd9f8/l_onemkl_p_2023.1.0.46342_offline.sh
+
+sudo bash l_onemkl_p_2023.1.0.46342_offline.sh
+
+target:
+/opt/intel/oneapi/mkl/latest/lib/intel64

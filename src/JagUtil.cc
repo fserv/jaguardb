@@ -3229,7 +3229,7 @@ int oneFileReceiver( JAGSOCK sock, const Jstr &filesPath, const Jstr &hashDir, b
 
 	jagint rlen = 0;
 
-	dn("u38830001 in oneFileReceiver()...");
+	dn("u38830001 in oneFileReceiver() outpath=[%s]...", outpath.s() );
 
 	while ( 1 ) {
     	rlen = recvMessage( sock, hdr, newbuf ); 
@@ -3238,6 +3238,7 @@ int oneFileReceiver( JAGSOCK sock, const Jstr &filesPath, const Jstr &hashDir, b
 		}
 
 		if ( rlen < 0 ) {
+            dn("u0088 rlen<0 return 0");
 			return 0;
 		}
 
@@ -3251,6 +3252,7 @@ int oneFileReceiver( JAGSOCK sock, const Jstr &filesPath, const Jstr &hashDir, b
     		return -1;
     	} 
 
+        dn("u500819 break here");
 		break; // got _onefile command
 	}
 
@@ -3266,6 +3268,7 @@ int oneFileReceiver( JAGSOCK sock, const Jstr &filesPath, const Jstr &hashDir, b
 	if ( filename == JAG_FAKE_FILE ) {
         // fake file name
     	if ( newbuf ) free(newbuf );
+        dn("u8002338 filename == JAG_FAKE_FILE return -3");
 		return -3;
 	}
 
@@ -3319,6 +3322,7 @@ int oneFileReceiver( JAGSOCK sock, const Jstr &filesPath, const Jstr &hashDir, b
     ****/
 
     jagint totlen = readSockAndSave( sock, recvpath, fsize );
+    dn("c202293 readSockAndSave recvpath=[%s] totlen=%ld", recvpath.s(), totlen );
     if ( totlen == fsize ) {
         return 1;
     } else {
@@ -3352,6 +3356,7 @@ jagint readSockAndSave( int sock, const Jstr &recvpath, jagint fsize )
 		rlen = recvRawData( sock, mbuf, recvlen );
 		if ( rlen < recvlen ) {
 			rlen = -1;
+            dn("u36600 rlen=%ld < recvle=%ld break", rlen, recvlen );
 			break;
 		}
 

@@ -408,6 +408,7 @@ class JagParseParam
 	bool hasExist;
 	bool hasForce;
 	bool hasColumn;
+	bool hasCount1;
 	bool hasWhere;
 	bool hasGroup;
 	bool hasHaving;

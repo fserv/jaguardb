@@ -1,0 +1,19 @@
+
+https://github.com/xianyi/OpenBLAS
+
+wget https://github.com/xianyi/OpenBLAS/releases/download/v0.3.23/OpenBLAS-0.3.23.tar.gz
+
+tar zxf OpenBLAS-0.3.23.tar.gz
+
+cd OpenBLAS-0.3.23
+
+mkdir -p install build
+
+pd=`pwd -P`
+
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=$pd/install
+
+make -j10
+make install
+

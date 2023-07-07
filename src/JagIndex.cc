@@ -243,10 +243,10 @@ bool JagIndex::bufChangeT2I( char *indexbuf, char *tablebuf )
 		    memcpy(indexbuf+_schAttr[i].offset, tablebuf+_indtotabOffset[i], _schAttr[i].length);		
 
             d("s322028 dumpmem %s tablebuf column: ", _schAttr[i].colname.s() );
-            dumpmem(tablebuf+_indtotabOffset[i], _schAttr[i].length);
+            //dumpmem(tablebuf+_indtotabOffset[i], _schAttr[i].length);
 
             d("s322029 dumpmem %s indexbuf column: ", _schAttr[i].colname.s() );
-            dumpmem(indexbuf+_schAttr[i].offset, _schAttr[i].length);
+            //dumpmem(indexbuf+_schAttr[i].offset, _schAttr[i].length);
 
             // deug only
             if ( strstr(_schAttr[i].colname.s(), "geo:" ) ) {

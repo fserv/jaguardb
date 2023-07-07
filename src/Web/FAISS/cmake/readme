@@ -1,0 +1,4 @@
+wget https://github.com/Kitware/CMake/releases/download/v3.26.4/cmake-3.26.4.tar.gz
+
+configure and make cmake-3.26.4
+

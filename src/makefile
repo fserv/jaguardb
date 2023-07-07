@@ -13,8 +13,8 @@ GCC=gcc
 GPP=g++
 CPP=$(GPP)  -pg
 CPP=$(GPP)  -O3 -g
-CPP=$(GPP) 
 CPP=$(GPP)  -ggdb  -O0
+CPP=$(GPP) 
 CPP=$(GPP) -g
 CPP=$(GPP) -O3
 
@@ -32,12 +32,16 @@ MPFR_LIB=Web/MPFR/mpfr-4.2.0_install/lib
 
 GEOGRAPH_LIB=Web/GeographicLib-1.49/lib
 
+FAISS=Web/FAISS/faiss-1.7.4/install
+OPENBLAS=Web/FAISS/openblas/OpenBLAS-0.3.23/install
+
 BASICFLAGS=-I. -IWeb/GeographicLib-1.49/include  \
 		  -IWeb/Tencent/rapidjson/include -IWeb/TomCrypt/include \
 		  -IWeb/Snappy -IWeb/UTF -I$(BOOST_INC) \
 		  -IWeb/Google/Btree/include \
 		  -I$(CGAL_INC) -I$(GMP_INC) -I$(MPFR_INC) \
 		  -IWeb/ConcaveHull \
+          -I$(FAISS)/include \
 	      -D_REENTRANT -std=c++14 -Wno-register -Wunused-variable \
           -Wno-unused-result \
 		  -DTFM_DESC  $(USER_DEFINE)
@@ -45,14 +49,18 @@ BASICFLAGS=-I. -IWeb/GeographicLib-1.49/include  \
 CCFLAGS_STATIC=$(BASICFLAGS)  -static-libgcc -static-libstdc++ -static  
 CCFLAGS=$(CCFLAGS_STATIC)
 
-STDCPPLIB=/lib/gcc/x86_64-linux-gnu/11/libstdc++.a
-THREADLIB=/lib/x86_64-linux-gnu/libpthread.a
+STDCPPLIB=/usr/lib/gcc/x86_64-linux-gnu/11/libstdc++.a
+THREADLIB=/usr/lib/x86_64-linux-gnu/libpthread.a
+OMPLIB=/usr/lib/gcc/x86_64-linux-gnu/11/libgomp.a
 
 STDLIBS_STATIC =  $(GEOGRAPH_LIB)/libGeographic.a  \
 				  $(BOOST_LIB)/libboost_system.a \
 				  $(BOOST_LIB)/libboost_thread.a \
 				  $(BOOST_LIB)/libboost_system.a \
 				  $(GMP_LIB)/libgmp.a \
+				  $(FAISS)/lib/libfaiss.a \
+				  $(OPENBLAS)/lib/libopenblas.a \
+				  $(OMPLIB) \
 				  $(STDCPPLIB) $(THREADLIB)
 
 STDLIBS=$(STDLIBS_STATIC)

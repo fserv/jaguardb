@@ -1,4 +1,11 @@
 
+
+JaguarDB 3.2.9 07/07/2023
+------------------------------------------------------------------
+. removed debug info
+. added faiss library
+. fixed select count(1) cnt, sum(col1) sm from tab1;
+
 JaguarDB 3.2.8 07/01/2023
 ------------------------------------------------------------------
 . added test_go.sh

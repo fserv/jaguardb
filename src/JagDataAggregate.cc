@@ -214,6 +214,7 @@ int JagDataAggregate::writeit( int hosti, const char *buf, jagint len,
 {
 	d("s202930 writeit hosti=[%d] buf=[%s] len=%d noUnlock=%d membytes=%d _keepFile=%d\n", 
 			 hosti, buf, len, noUnlock, membytes, _keepFile );
+    //dumpmem(buf, len);
 
     /***
     dn("s70900023 writeit dumpmem:");

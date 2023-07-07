@@ -258,9 +258,11 @@ int StringElementNode::getAggregateParts( Jstr &parts, int &nodenum )
 {
 	if ( _name.length() ) parts = _name;
 	else parts = _value.c_str();
+
 	_nodenum = nodenum++;
 	return 1;
 }
+
 int StringElementNode::setAggregateValue( int nodenum, const char *buf, int length, const Jstr &type ) 
 { 
 	return 1;
@@ -1451,12 +1453,20 @@ Jstr BinaryOpNode::binaryOpStr( short binaryOp )
 	else if ( binaryOp == JAG_FUNC_MINIMUMBOUNDINGCIRCLE ) str = "minimumboundingcircle";
 	else if ( binaryOp == JAG_FUNC_MINIMUMBOUNDINGSPHERE ) str = "minimumboundingsphere";
 	else if ( binaryOp == JAG_FUNC_KNN ) str = "knn";
+	else if ( binaryOp == JAG_FUNC_SUM ) str = "sum";
+	else if ( binaryOp == JAG_FUNC_COUNT ) str = "count";
+	else if ( binaryOp == JAG_FUNC_AVG ) str = "avg";
+	else if ( binaryOp == JAG_FUNC_STDDEV ) str = "stddev";
+	else if ( binaryOp == JAG_FUNC_MIN ) str = "min";
+	else if ( binaryOp == JAG_FUNC_MAX ) str = "max";
+	else if ( binaryOp == JAG_FUNC_FIRST ) str = "first";
+	else if ( binaryOp == JAG_FUNC_LAST ) str = "last";
 	return str;
 }
 
 
 int BinaryOpNode::setFuncAttribute( const JagHashStrInt *maps[], const JagSchemaAttribute *attrs[], 
-	int &constMode, int &typeMode, bool &isAggregate, Jstr &type, int &collen, int &siglen )
+	                                int &constMode, int &typeMode, bool &isAggregate, Jstr &type, int &collen, int &siglen )
 {
     dn("s3450021 BinaryOpNode::setFuncAttribute ");
 	if ( !_left && !_right ) {
@@ -1660,9 +1670,13 @@ int BinaryOpNode
 				    JagVector<int> &selColSetAggParts, JagHashMap<AbaxInt, AbaxInt> &selColToselParts, int &nodenum, int treenum )
 {	
 	if ( isAggregateOp( _binaryOp ) ) {
+
 		Jstr parts, parts2;
 		_left->getAggregateParts( parts, nodenum );
-		_nodenum = nodenum++;		
+		_nodenum = nodenum++;
+
+        dn("par10029 isAggregateOp _nodenum=%d", _nodenum);
+
 		if ( _binaryOp == JAG_FUNC_MIN ) {
 			parts = Jstr("min(") + parts + ")";
 		} else if ( _binaryOp == JAG_FUNC_MAX ) {
@@ -1683,21 +1697,26 @@ int BinaryOpNode
 		}
 		
 		if ( parts2.length() > 0 ) {
+            // avg
 			selectParts.append( parts2 );
 			selectPartsOpcode.append( JAG_FUNC_AVG );
 			selColSetAggParts.append( _nodenum );
 			selColToselParts.setValue( selectParts.length()-1, treenum, true );
 		}
+
 		selectParts.append( parts );
 		selectPartsOpcode.append( _binaryOp );
-		selColSetAggParts.append( _nodenum );
+		selColSetAggParts.append( _nodenum );  // stddev and prepended avg have same nodenum
 		selColToselParts.setValue( selectParts.length()-1, treenum, true );
+        dn("par339910 selColSetAggParts.append _nodenum=%d", _nodenum );
 	} else {
+        dn("par22209");
 		if ( _left ) _left->getFuncAggregate( selectParts, selectPartsOpcode, selColSetAggParts, 
-			selColToselParts, nodenum, treenum );
+			                                  selColToselParts, nodenum, treenum );
 		if ( _right ) _right->getFuncAggregate( selectParts, selectPartsOpcode, selColSetAggParts, 
-			selColToselParts, nodenum, treenum );
+			                                    selColToselParts, nodenum, treenum );
 		_nodenum = nodenum++;
+        dn("par33014 left and right,  _nodenum=%d", _nodenum );
 		
 	}
 	return 1;
@@ -1709,8 +1728,11 @@ int BinaryOpNode::getAggregateParts( Jstr &parts, int &nodenum )
 	Jstr lparts, rparts;
 	if ( _left ) _left->getAggregateParts( lparts, nodenum );
 	if ( _right ) _right->getAggregateParts( rparts, nodenum );
+
 	formatAggregateParts( parts, lparts, rparts );
+
 	_nodenum = nodenum++;
+
 	return 1;
 }
 
@@ -1718,7 +1740,7 @@ int BinaryOpNode::getAggregateParts( Jstr &parts, int &nodenum )
 int BinaryOpNode::setAggregateValue( int nodenum, const char *buf, int length, const Jstr &type )
 {
     dn("s82920110 setAggregateValue buf=[%s] type=[%s] optype=%s ", buf, type.s(), binaryOpStr(_binaryOp).s() );
-    dn("s2233865 nodenum=%d  _nodenum=%d", nodenum, _nodenum );
+    dn("s2233865 nodenum=%d  _nodenum=%d length=%d", nodenum, _nodenum, length );
 
 	if ( _left ) _left->setAggregateValue( nodenum, buf, length, type );
 	if ( _right ) _right->setAggregateValue( nodenum, buf, length, type );
@@ -1737,14 +1759,21 @@ int BinaryOpNode::setAggregateValue( int nodenum, const char *buf, int length, c
             }
             dn("s8827202 _opString buf=[%s]", _opString.s() );
 		} else {
-            dn("c5400288 not JAG_FUNC_AVG/JAG_FUNC_SUM/JAG_FUNC_STDDEV");
+            dn("par5400288 not JAG_FUNC_AVG/JAG_FUNC_SUM/JAG_FUNC_STDDEV");
             Jstr norm;
             JagMath::fromBase254Len(norm, buf, length);
             _opString = norm;
 			//_opString = JagFixString( buf, length );
+            dn("s266301 _binaryOp=%d(%s) dumpmem buf:", _binaryOp, binaryOpStr(_binaryOp).s() );
+            //dumpmem(buf, length);
+            dn("s200118 norm=[%s]", norm.s() );
 		}
 	} else {
-        dn("s33395003 nodenum=%d != _nodenum=%d", nodenum, _nodenum);
+        dn("s33395003 !!!!!!!! nodenum=%d != _nodenum=%d", nodenum, _nodenum);
+        // 7/6/2023 ignores nodenum
+        Jstr norm;
+        JagMath::fromBase254Len(norm, buf, length);
+        _opString = norm;
     }
 	return 1;
 }
@@ -6223,6 +6252,7 @@ bool BinaryOpNode::isAggregateOp( short op )
         op == JAG_FUNC_SUM || op == JAG_FUNC_STDDEV || op == JAG_FUNC_FIRST || op == JAG_FUNC_LAST ) {
         return true;
     }
+
     return false;
 }
 
@@ -6233,6 +6263,7 @@ bool BinaryOpNode::isMathOp( short op )
 		JAG_NUM_DIV == op || JAG_NUM_REM == op || JAG_NUM_POW == op) {
 		return true;
 	}
+
 	return false;
 }
 

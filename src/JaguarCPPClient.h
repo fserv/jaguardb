@@ -247,7 +247,7 @@ class JaguarCPPClient
 							   JagVector<Jstr> *filevec=NULL );
 	int reformOriginalAggQuery( const JagSchemaRecord &aggrec, const JagVector<int> &selectPartsOpcode, 
 							const JagVector<int> &selColSetAggParts, const JagHashMap<AbaxInt, AbaxInt> &selColToselParts, 
-							const char *aggbuf, char *finalbuf, JagParseParam &pParam );
+							const char *aggbuf, int aggbuflen, char *finalbuf, JagParseParam &pParam );
 	int processDataSortArray( const JagParseParam &pParam, const Jstr &selcnt, const Jstr &selhdr, 
 								const JagFixString &aggstr );
 	int processOrderByQuery( const JagParseParam &pParam );
