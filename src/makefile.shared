@@ -7,6 +7,16 @@ else
 	USER_DEFINE=-DDEBUG_PRINT -DDEBUG_STACK1 -DDEBUG_TABLE1 -DDEBUG_LATENCY1
 endif
 
+GPP=g++
+CPP=$(GPP)  -pg -DJAG_DEBUGCHECK
+CPP=$(GPP)  -g3 -DJAG_DEBUGCHECK
+CPP=$(GPP)  -O3 -g -DJAG_DEBUGCHECK
+CPP=$(GPP)  -O3 -DJAG_DEBUGCHECK
+CPP=$(GPP)  -ggdb
+CPP=$(GPP) 
+CPP=$(GPP)  -O3 -g
+CPP=$(GPP)  -O3
+
 
 BOOST_INC=Web/Boost/boost_1_81_0_install/include
 BOOST_LIB=Web/Boost/boost_1_81_0_install/lib
@@ -47,17 +57,6 @@ JAVAINC=$(JAVA_HOME)/../include
 DRIZZLE=Web/DrizzleJDBC
 DRIZZLEINC=$(DRIZZLE)/src/main/java
 
-GCC=gcc
-GPP=g++
-    
-CPP=$(GPP)  -pg -DJAG_DEBUGCHECK
-CPP=$(GPP)  -g3 -DJAG_DEBUGCHECK
-CPP=$(GPP)  -O3 -g -DJAG_DEBUGCHECK
-CPP=$(GPP)  -O3 -DJAG_DEBUGCHECK
-CPP=$(GPP)  -ggdb
-CPP=$(GPP) 
-CPP=$(GPP)  -O3 -g
-CPP=$(GPP)  -O3
 
 #### makefile.obj has $(OBJS)
 include makefile.obj
