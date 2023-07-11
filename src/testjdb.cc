@@ -21,7 +21,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include <iostream>
 #include <sstream>
 #include <sys/time.h>
@@ -345,7 +345,7 @@ int main(int argc, char *argv[] )
 	//test_numinstr();
 	//test_base62( argv[1] );
 	//test_base254( argv[1] );
-    test_faiss();
+    //test_faiss();
 }
 
 
@@ -5750,6 +5750,7 @@ struct Tempfilename {
 };
 
 
+#if 0
 void test_faiss( )
 {
     //////////////////////////////////////////////////////////////
@@ -5889,3 +5890,5 @@ void test_faiss( )
     }
 
 }
+#endif
+

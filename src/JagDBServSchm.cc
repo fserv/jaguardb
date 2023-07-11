@@ -391,7 +391,7 @@ int JagDBServer::changeDBPrepare( JagRequest &req, JagParseParam &parseParam, ja
 	int rc = -20;
 
 	lockrc = _objectLock->readLockDatabase( parseParam.opcode, parseParam.dbName, req.session->replicType );
-	if ( 0 == strcmp( parseParam.dbName.c_str(), "test" ) || 0 == jagaccess( sysdir.c_str(), X_OK ) ) {
+	if ( 0 == jagstrcmp( parseParam.dbName.c_str(), "test" ) || 0 == jagaccess( sysdir.c_str(), X_OK ) ) {
 		if ( lockrc ) {
 			req.session->spCommandReject = 0;
 			rc = 0;

@@ -486,7 +486,7 @@ int JagNet::getNetStat( jaguint & reads, jaguint &writes )
     reads = writes = 0;
     DWORD dwRetval;
     MIB_IPSTATS *pStats;
-    pStats = (MIB_IPSTATS *) malloc(sizeof (MIB_IPSTATS));
+    pStats = (MIB_IPSTATS *) jagmalloc(sizeof (MIB_IPSTATS));
     if (pStats == NULL) {
         return 0;
     }

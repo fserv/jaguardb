@@ -550,7 +550,7 @@ void StringElementNode::getPolyData( const Jstr &polyType, JagMergeReaderBase *n
     dn("s340082 ncols=%d polyColumns=[%s]", ncols, polyColumns.s() );
 
 	for ( int i=0; i < ncols; ++i ) {
-		if ( 0==strcmp(attrs[_tabnum][i].colname.c_str(), "geo:id") ) {
+		if ( 0==jagstrcmp(attrs[_tabnum][i].colname.c_str(), "geo:id") ) {
 			uuidcol = i;
 			offsetuuid = attrs[_tabnum][i].offset;
 			collenuuid = attrs[_tabnum][i].length;
@@ -912,8 +912,7 @@ void StringElementNode::savePolyData( const Jstr &polyType, JagMergeReaderBase *
 
 	while ( ntr->getNext(kvbuf) ) {
 
-		//if ( 0 == strncmp(kvbuf+bbox[BBUUIDLEN-1].offset, uuid.c_str(), uuid.size() ) )
-		if ( 0 == strncmp(kvbuf+bbox[uuidCol].offset, uuid.c_str(), uuid.size() ) ) {
+		if ( 0 == jagstrncmp(kvbuf+bbox[uuidCol].offset, uuid.c_str(), uuid.size() ) ) {
 
 			//gf = Jstr(kvbuf+geocoloffset, geocollen ); 
 
@@ -2393,7 +2392,7 @@ int BinaryOpNode::_doWhereCalc( const JagHashStrInt *maps[], const JagSchemaAttr
 				return 0; 
 			} else if ( 1 == cmode && jagatoll(lstr.c_str()) != jagatoll(rstr.c_str()) ) {
 				return 0; 
-			} else if ( strcmp(lstr.c_str(), rstr.c_str()) != 0 ) {
+			} else if ( jagstrcmp(lstr.c_str(), rstr.c_str()) != 0 ) {
 				return 0; 
 			}
 
@@ -2406,7 +2405,7 @@ int BinaryOpNode::_doWhereCalc( const JagHashStrInt *maps[], const JagSchemaAttr
 		if ( 0 == coltype ) {
 			if ( 2 == cmode && jagstrtold(lstr.c_str()) == jagstrtold(rstr.c_str()) ) return 0; 
 			else if ( 1 == cmode && jagatoll(lstr.c_str()) == jagatoll(rstr.c_str()) ) return 0; 
-			else if ( strcmp(lstr.c_str(), rstr.c_str()) == 0 ) return 0; 
+			else if ( jagstrcmp(lstr.c_str(), rstr.c_str()) == 0 ) return 0; 
 			str = "1";
 			return 1;
 		}
@@ -2435,7 +2434,7 @@ int BinaryOpNode::_doWhereCalc( const JagHashStrInt *maps[], const JagSchemaAttr
 					return 0; 
 				} else if ( 1 == cmode && jagatoll(lstr.c_str()) >= jagatoll(rstr.c_str()) ) {
 					return 0; 
-				} else if ( strcmp(lstr.c_str(), rstr.c_str()) >= 0 ) {
+				} else if ( jagstrcmp(lstr.c_str(), rstr.c_str()) >= 0 ) {
 					return 0; 
 				}
 			} else if ( _binaryOp == JAG_FUNC_LESSEQUAL ) {
@@ -2444,7 +2443,7 @@ int BinaryOpNode::_doWhereCalc( const JagHashStrInt *maps[], const JagSchemaAttr
 					return 0; 
 				} else if ( 1 == cmode && jagatoll(lstr.c_str()) > jagatoll(rstr.c_str()) ) {
 					return 0; 
-				} else if ( strcmp(lstr.c_str(), rstr.c_str()) > 0 ) {
+				} else if ( jagstrcmp(lstr.c_str(), rstr.c_str()) > 0 ) {
 					return 0; 
 				}
 			} else {
@@ -2469,12 +2468,12 @@ int BinaryOpNode::_doWhereCalc( const JagHashStrInt *maps[], const JagSchemaAttr
                 dn("s822902 cmode=%d lstr=[%s] JAG_FUNC_GREATERTHAN rstr=[%s]", cmode, lstr.s(), rstr.s() );
 				if ( 2 == cmode && jagstrtold(lstr.c_str()) <= jagstrtold(rstr.c_str() ) ) return 0; 
 				else if ( 1 == cmode && jagatoll(lstr.c_str()) <= jagatoll(rstr.c_str()) ) return 0; 
-				else if ( strcmp(lstr.c_str(), rstr.c_str()) <= 0 ) return 0; 
+				else if ( jagstrcmp(lstr.c_str(), rstr.c_str()) <= 0 ) return 0; 
 			} else if ( _binaryOp == JAG_FUNC_GREATEREQUAL ) {
                 dn("s822932 cmode=%d lstr=[%s] JAG_FUNC_GREATEREQUAL rstr=[%s]", cmode, lstr.s(), rstr.s() );
 				if ( 2 == cmode && jagstrtold(lstr.c_str()) < jagstrtold(rstr.c_str() ) ) return 0; 
 				else if ( 1 == cmode && jagatoll(lstr.c_str()) < jagatoll(rstr.c_str()) ) return 0; 
-				else if ( strcmp(lstr.c_str(), rstr.c_str()) < 0 ) return 0; 
+				else if ( jagstrcmp(lstr.c_str(), rstr.c_str()) < 0 ) return 0; 
 			}
 			str = "1";
 			return 1;
@@ -2521,7 +2520,7 @@ int BinaryOpNode::_doWhereCalc( const JagHashStrInt *maps[], const JagSchemaAttr
 		} else {
 			if ( 2 == cmode && jagstrtold(lstr.c_str()) != jagstrtold(rstr.c_str() ) ) return 0; 
 			else if ( 1 == cmode && jagatoll(lstr.c_str()) != jagatoll(rstr.c_str()) ) return 0; 
-			else if ( strcmp(lstr.c_str(), rstr.c_str()) != 0 ) return 0; 
+			else if ( jagstrcmp(lstr.c_str(), rstr.c_str()) != 0 ) return 0; 
 			str = "1";
 			return 1;
 		}
@@ -2901,7 +2900,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
 	if ( ltmode > rtmode ) cmode = ltmode;
 	else cmode = rtmode;
 
-	if ( _right && rstr.size()>0 && 0 != strncmp(rstr.c_str(), JAG_CJAG, JAG_CJAG_LEN) ) {
+	if ( _right && rstr.size()>0 && 0 != jagstrncmp(rstr.c_str(), JAG_CJAG, JAG_CJAG_LEN) ) {
         dn("s5660928");
 	    Jstr errmsg;
 		if ( isDateTime(ltype) && 0 == rtype.size() && !strchr(lstr.c_str(), '-') ) {
@@ -3157,7 +3156,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
 			while (*pright == '0' ) ++pright;
 		}
 
-		if ((0 == cmode && strcmp(pleft, pright ) == 0) || 
+		if ((0 == cmode && jagstrcmp(pleft, pright ) == 0) || 
 			(1 == cmode && jagatoll(pleft) == jagatoll(pright) ) ||
 			(2 == cmode && jagstrtold( pleft, NULL) == jagstrtold(pright, NULL))) {
 			lstr = "1";
@@ -3173,7 +3172,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
 			while (*pleft == '0' ) ++pleft;
 			while (*pright == '0' ) ++pright;
 		}
-		if ((0 == cmode && strcmp(pleft, pright) != 0) ||
+		if ((0 == cmode && jagstrcmp(pleft, pright) != 0) ||
 			(1 == cmode && jagatoll(pleft) != jagatoll(pright )) ||
 			(2 == cmode && jagstrtold(pleft, NULL) != jagstrtold(pright, NULL))) {
 			lstr = "1";
@@ -3192,7 +3191,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
 
         dn("s234008 JAG_FUNC_LESSTHAN cmode=%d pleft=%s  pright=%s", cmode, pleft, pright);
 
-		if ((0 == cmode && strcmp(pleft, pright) < 0) ||
+		if ((0 == cmode && jagstrcmp(pleft, pright) < 0) ||
 			(1 == cmode && jagatoll( pleft ) < jagatoll( pright )) ||
 			(2 == cmode && jagstrtold(pleft, NULL) < jagstrtold( pright, NULL))) {
             dn("s32208 1");
@@ -3211,7 +3210,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
 
         dn("s234058 JAG_FUNC_LESSEQUAL cmode=%d", cmode);
 
-		if ((0 == cmode && strcmp(pleft,pright) <= 0) ||
+		if ((0 == cmode && jagstrcmp(pleft,pright) <= 0) ||
 			(1 == cmode && jagatoll(pleft) <= jagatoll(pright)) ||
 			(2 == cmode && jagstrtold(pleft, NULL) <= jagstrtold(pright, NULL))) {
 			lstr = "1";
@@ -3229,7 +3228,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
 		}
         dn("s214058 JAG_FUNC_GREATERTHAN cmode=%d", cmode );
 
-		if ((0 == cmode && strcmp(pleft,pright)  > 0) ||
+		if ((0 == cmode && jagstrcmp(pleft,pright)  > 0) ||
 			(1 == cmode && jagatoll(pleft) > jagatoll(pright)) ||
 			(2 == cmode && jagstrtold(pleft, NULL) > jagstrtold(pright, NULL))) {
 			lstr = "1";
@@ -3253,7 +3252,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
         **/
         // end debug
 
-		if ((0 == cmode && strcmp(pleft, pright ) >= 0) ||
+		if ((0 == cmode && jagstrcmp(pleft, pright ) >= 0) ||
 			(1 == cmode && jagatoll(pleft) >= jagatoll(pright)) ||
 			(2 == cmode && jagstrtold(pleft, NULL) >= jagstrtold(pright, NULL))) {
 			lstr = "1";
@@ -3273,7 +3272,7 @@ int BinaryOpNode::_doCalculation( JagFixString &lstr, JagFixString &rstr,
 		char *pfirst = (char*)rstr.c_str();
 		char *plast = strrchr( (char*)rstr.c_str(), '%');
 		if ( rtype.size() > 0 || !plast ) {
-			if ( strcmp(lstr.c_str(), rstr.c_str()) == 0 ) {
+			if ( jagstrcmp(lstr.c_str(), rstr.c_str()) == 0 ) {
 				lstr = "1";
 				return 1;
 			} else {

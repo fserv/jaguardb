@@ -33,7 +33,8 @@ class JagHashMap
 
     public: 
 
-        JagHashMap( bool doLock = false,  int length=16 );
+        //JagHashMap( bool doLock = false,  int length=16 );
+        JagHashMap( bool doLock = true,  int length=16 );
         ~JagHashMap();
 		JagHashMap& operator=( const JagHashMap &map );
 

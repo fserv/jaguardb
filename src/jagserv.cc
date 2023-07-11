@@ -18,7 +18,15 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <JagServer.h>
+
+static void sigsegv_handler(int sig, siginfo_t *si, void *unused)
+{
+    printf("Got SIGSEGV\n");
+}
+
+
 int main(int argc, char**argv)
 {
 	char *p = getenv("FROM_SHELL");
@@ -27,6 +35,16 @@ int main(int argc, char**argv)
 		printf("jaguar server must be started with jaguarstart program\n");
 		exit(51);
 	}
+
+    /////////////////////////////////////////
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_sigaction = sigsegv_handler;
+    if (sigaction(SIGSEGV, &sa, NULL) == -1) {
+        printf("error setting up SIGSEGV handler\n");
+        exit(10);
+    }
 
 	JagServer *serv = new JagServer();
 	if ( serv ) {

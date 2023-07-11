@@ -63,14 +63,14 @@ int JagMinMax::setbuflen ( const int klen )
 	} else {
 	}
 
-	minbuf = (char*)malloc(klen+1);
+	minbuf = (char*)jagmalloc(klen+1);
 	memset(minbuf, 0, klen+1);
 
 	if ( ! pointTo ) {
 		if ( maxbuf ) { free( maxbuf ); }
 	}
 
-	maxbuf = (char*)malloc(klen+1);
+	maxbuf = (char*)jagmalloc(klen+1);
 	memset(maxbuf, 255, klen);
 
 	maxbuf[klen] = '\0';

@@ -82,22 +82,6 @@ JagSingleBuffWriter::~JagSingleBuffWriter()
 	}
 }
 
-/***
-void JagSingleBuffWriter::resetKVLEN( int newkvlen )
-{
-	KVLEN = newkvlen;
-	SUPERBLOCKLEN = SUPERBLOCK * KVLEN;
-	if ( _superbuf ) {
-		free( _superbuf );
-	}
-	_superbuf = (char*) malloc( SUPERBLOCKLEN );
-    _lastSuperBlock = -1;
-    _relpos = -1;
-	
-	memset( _superbuf, 0, SUPERBLOCKLEN );
-}
-***/
-
 // pos is not absolute position, it is index, increamented one by one. position is pos*KVLEN
 void JagSingleBuffWriter::writeit( jagint pos, const char *keyvalbuf, jagint KVLEN )
 {

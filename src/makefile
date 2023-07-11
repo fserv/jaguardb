@@ -14,7 +14,7 @@ CPP=$(GPP)  -pg
 CPP=$(GPP)  -O3 -g
 CPP=$(GPP)  -ggdb  -O0
 CPP=$(GPP) 
-CPP=$(GPP) -g
+CPP=$(GPP) -g -DMALLOC_DEBUG 
 CPP=$(GPP) -O3
 
 
@@ -34,16 +34,20 @@ GEOGRAPH_LIB=Web/GeographicLib-1.49/lib
 FAISS=Web/FAISS/faiss-1.7.4/install
 OPENBLAS=Web/FAISS/openblas/OpenBLAS-0.3.23/install
 
+JEMALLOC=Web/JEMALLOC/install
+
 BASICFLAGS=-I. -IWeb/GeographicLib-1.49/include  \
 		  -IWeb/Tencent/rapidjson/include -IWeb/TomCrypt/include \
 		  -IWeb/Snappy -IWeb/UTF -I$(BOOST_INC) \
 		  -IWeb/Google/Btree/include \
 		  -I$(CGAL_INC) -I$(GMP_INC) -I$(MPFR_INC) \
+          -I$(JEMALLOC)/include/jemalloc \
 		  -IWeb/ConcaveHull \
-          -I$(FAISS)/include \
 	      -D_REENTRANT -std=c++14 -Wno-register -Wunused-variable \
           -Wno-unused-result \
 		  -DTFM_DESC  $(USER_DEFINE)
+          
+          #-I$(FAISS)/include \
 
 CCFLAGS_STATIC=$(BASICFLAGS)  -static-libgcc -static-libstdc++ -static  
 CCFLAGS=$(CCFLAGS_STATIC)
@@ -51,16 +55,20 @@ CCFLAGS=$(CCFLAGS_STATIC)
 STDCPPLIB=/usr/lib/gcc/x86_64-linux-gnu/11/libstdc++.a
 THREADLIB=/usr/lib/x86_64-linux-gnu/libpthread.a
 OMPLIB=/usr/lib/gcc/x86_64-linux-gnu/11/libgomp.a
+JEMALLOCLIB=$(JEMALLOC)/lib/libjemalloc.a
+
+FAISS_LIBS=$(FAISS)/lib/libfaiss.a $(OPENBLAS)/lib/libopenblas.a $(OMPLIB)
 
 STDLIBS_STATIC =  $(GEOGRAPH_LIB)/libGeographic.a  \
 				  $(BOOST_LIB)/libboost_system.a \
 				  $(BOOST_LIB)/libboost_thread.a \
 				  $(BOOST_LIB)/libboost_system.a \
 				  $(GMP_LIB)/libgmp.a \
-				  $(FAISS)/lib/libfaiss.a \
-				  $(OPENBLAS)/lib/libopenblas.a \
-				  $(OMPLIB) \
+                  $(JEMALLOCLIB) \
 				  $(STDCPPLIB) $(THREADLIB)
+
+				  #$(FAISS_LIBS)
+
 
 STDLIBS=$(STDLIBS_STATIC)
 

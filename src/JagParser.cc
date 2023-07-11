@@ -1775,7 +1775,7 @@ int JagParser::setSelectColumn()
         }
 
 
-		if ( 0==strncasecmp(_ptrParam->selColVec[i].name.c_str(), "all(", 4) ) {
+		if ( 0==jagstrncasecmp(_ptrParam->selColVec[i].name.c_str(), "all(", 4) ) {
 			Jstr nm = _ptrParam->objectVec[0].dbName + "." + _ptrParam->objectVec[0].tableName 
 	                    + "." + trimChar(_ptrParam->selColVec[i].name.substr( '(', ')' ), ' ');
 			_ptrParam->selAllColVec.append( nm );
@@ -3131,8 +3131,8 @@ int JagParser::setCreateVector( short setType )
 	if ( _split.length() == 4 ) {
 		// "if not exists db.tab"
 		if ( _ptrParam->opcode != JAG_CREATETABLE_OP ) return -2933;
-		if ( strcasecmp(_split[0].c_str(), "if") == 0 && strcasecmp(_split[1].c_str(), "not") == 0 &&
-			 strncasecmp(_split[2].c_str(), "exists", 5 ) == 0 ) {
+		if ( jagstrcasecmp(_split[0].c_str(), "if") == 0 && jagstrcasecmp(_split[1].c_str(), "not") == 0 &&
+			 jagstrncasecmp(_split[2].c_str(), "exists", 5 ) == 0 ) {
 			_ptrParam->hasExist = 1;
 			// move tabidxpos over to tablename
 			_ptrParam->tabidxpos = strcasestr( _ptrParam->tabidxpos, "exists" );
@@ -3667,7 +3667,7 @@ int JagParser::setOneCreateColumnAttribute( CreateAttribute &cattr )
 
 	//d("s0982 args.length()=%d\n", args.length() );
 	if ( args.length()>= 1 ) {
-		if ( args.length()>=2 && strcasecmp(args[1].c_str(), "default"  ) == 0 ) {
+		if ( args.length()>=2 && jagstrcasecmp(args[1].c_str(), "default"  ) == 0 ) {
 			if ( cattr.type == JAG_C_COL_TYPE_STR && 
 				(JAG_C_COL_TYPE_UUID[0] == cattr.spare[1] || JAG_C_COL_TYPE_FILE[0] == cattr.spare[1]) ) {
 				// column of UUID/FILE type does not accept default value
@@ -3676,10 +3676,10 @@ int JagParser::setOneCreateColumnAttribute( CreateAttribute &cattr )
 
 			if ( args.length()>= 3 ) {
 					if ( isDateAndTime(cattr.type) || cattr.type == JAG_C_COL_TYPE_DATE ) {
-					if ( strcasecmp( args[2].c_str(), "current_timestamp") == 0 ) {
-						if ( args.length()>= 4 && strcasecmp( args[3].c_str(), "on") == 0 ) {
-							if ( args.length()>=5 && strcasecmp(args[4].c_str(), "update") == 0 ) {	
-								if ( args.length()>=6 && strcasecmp(args[5].c_str(), "current_timestamp") == 0 ) {
+					if ( jagstrcasecmp( args[2].c_str(), "current_timestamp") == 0 ) {
+						if ( args.length()>= 4 && jagstrcasecmp( args[3].c_str(), "on") == 0 ) {
+							if ( args.length()>=5 && jagstrcasecmp(args[4].c_str(), "update") == 0 ) {	
+								if ( args.length()>=6 && jagstrcasecmp(args[5].c_str(), "current_timestamp") == 0 ) {
 									if ( cattr.type == JAG_C_COL_TYPE_DATE ) { 
 										cattr.spare[4] = JAG_CREATE_DEFUPDATE_DATE;
 									} else if ( cattr.type == JAG_C_COL_TYPE_DATETIMESEC || cattr.type == JAG_C_COL_TYPE_TIMESTAMPSEC ) {
@@ -3756,10 +3756,10 @@ int JagParser::setOneCreateColumnAttribute( CreateAttribute &cattr )
 					} else { return -19150; }
 				}
 			} else { return -19160; }
-		} else if ( args.length()>=2 && strcasecmp( args[1].c_str(), "on" ) == 0 ) {
+		} else if ( args.length()>=2 && jagstrcasecmp( args[1].c_str(), "on" ) == 0 ) {
 			if ( isDateAndTime(cattr.type) || cattr.type == JAG_C_COL_TYPE_DATE ) {
-				if ( args.length()>=3 && strcasecmp(args[2].c_str(), "update") == 0 ) {	
-					if ( args.length()>=4 && strcasecmp(args[3].c_str(), "current_timestamp") == 0 ) {
+				if ( args.length()>=3 && jagstrcasecmp(args[2].c_str(), "update") == 0 ) {	
+					if ( args.length()>=4 && jagstrcasecmp(args[3].c_str(), "current_timestamp") == 0 ) {
 						if ( cattr.type == JAG_C_COL_TYPE_DATE ) {
 							cattr.spare[4] = JAG_CREATE_UPDATE_DATE;
 						} else if ( cattr.type == JAG_C_COL_TYPE_DATETIMESEC || cattr.type == JAG_C_COL_TYPE_TIMESTAMPSEC ) {
@@ -4032,9 +4032,9 @@ bool JagParser::isValidGrantObj( Jstr &obj )
 	else rc = false;
 
 	if ( sp.length() == 1 ) {
-		if ( 0==strcasecmp( obj.c_str(), "all" ) ) {
+		if ( 0==jagstrcasecmp( obj.c_str(), "all" ) ) {
 			obj = "*.*.*";
-		} else if ( 0==strcasecmp( obj.c_str(), "*" )  ) {
+		} else if ( 0==jagstrcasecmp( obj.c_str(), "*" )  ) {
 			obj = "*.*.*";
 		} else {
 			obj = obj + ".*.*";
@@ -4849,37 +4849,37 @@ int JagParser::getTypeNameArg( const char *gettok, Jstr &tname, Jstr &targ, int 
 	} else {
         dn("s22202080 targ=[%s]", targ.s() );
 
-		if ( 0==strcasecmp(targ.c_str(), "wgs84" ) ) {
+		if ( 0==jagstrcasecmp(targ.c_str(), "wgs84" ) ) {
 			collen = JAG_GEO_WGS84;
-		} else if ( 0==strcasecmp(targ.c_str(), "time" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "time" ) ) {
 			collen = JAG_RANGE_TIMEMICRO;
-		} else if ( 0==strcasecmp(targ.c_str(), "date" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "date" ) ) {
 			collen = JAG_RANGE_DATE;
-		} else if ( 0==strcasecmp(targ.c_str(), "datetimesec" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "datetimesec" ) ) {
 			collen = JAG_RANGE_DATETIMESEC;
-		} else if ( 0==strcasecmp(targ.c_str(), "datetimenano" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "datetimenano" ) ) {
 			collen = JAG_RANGE_DATETIMENANO;
-		} else if ( 0==strcasecmp(targ.c_str(), "datetimemill" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "datetimemill" ) ) {
 			collen = JAG_RANGE_DATETIMEMILL;
-		} else if ( 0==strcasecmp(targ.c_str(), "datetime" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "datetime" ) ) {
 			collen = JAG_RANGE_DATETIMEMICRO;
-		} else if ( 0==strcasecmp(targ.c_str(), "bigint" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "bigint" ) ) {
 			collen = JAG_RANGE_BIGINT;
-		} else if ( 0==strcasecmp(targ.c_str(), "int" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "int" ) ) {
 			collen = JAG_RANGE_INT;
-		} else if ( 0==strcasecmp(targ.c_str(), "smallint" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "smallint" ) ) {
 			collen = JAG_RANGE_SMALLINT;
-		} else if ( 0==strcasecmp(targ.c_str(), "longdouble" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "longdouble" ) ) {
 			collen = JAG_RANGE_LONGDOUBLE;
-		} else if ( 0==strcasecmp(targ.c_str(), "double" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "double" ) ) {
 			collen = JAG_RANGE_DOUBLE;
-		} else if ( 0==strcasecmp(targ.c_str(), "float" ) ) {
+		} else if ( 0==jagstrcasecmp(targ.c_str(), "float" ) ) {
 			collen = JAG_RANGE_FLOAT;
 		} else {
-			if ( 0==strncasecmp(targ.c_str(), "srid:", 5 ) ) {
+			if ( 0==jagstrncasecmp(targ.c_str(), "srid:", 5 ) ) {
 				d("s53310 see srid:\n");
 				JagStrSplit sp(targ, ':');
-				if ( 0==strcasecmp(sp[1].c_str(), "wgs84" ) ) {
+				if ( 0==jagstrcasecmp(sp[1].c_str(), "wgs84" ) ) {
 					collen = JAG_GEO_WGS84;
 				} else {
 					collen = jagatoi( sp[1].c_str() );
@@ -4892,7 +4892,7 @@ int JagParser::getTypeNameArg( const char *gettok, Jstr &tname, Jstr &targ, int 
 					metrics = jagatoi( sp2[1].c_str() );
 				}
 				d("s2838 pm=[%s] metrics=%d\n", pm, metrics );
-			} else if ( 0==strncasecmp(targ.c_str(), "metrics:", 8 ) ) {
+			} else if ( 0==jagstrncasecmp(targ.c_str(), "metrics:", 8 ) ) {
 				JagStrSplit sp(targ, ':');
 				metrics = jagatoi( sp[1].c_str() );
 			} else {
@@ -4926,27 +4926,27 @@ bool JagParser::hasPolyGeoType( const char *createSQL, int &dim )
 		if ( nt.length() < 2 ) continue;
 		//d("s5043 i=%d p=[%s]\n", i, p );
 
-		if ( 0==strncasecmp(nt[1].c_str(), "linestring3d", 12) ) {
+		if ( 0==jagstrncasecmp(nt[1].c_str(), "linestring3d", 12) ) {
 			if ( dim < 3 ) dim = 3;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "multipoint3d", 12) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "multipoint3d", 12) ) {
 			if ( dim < 3 ) dim = 3;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "polygon3d", 9) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "polygon3d", 9) ) {
 			if ( dim < 3 ) dim = 3;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "multipolygon3d", 14) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "multipolygon3d", 14) ) {
 			if ( dim < 3 ) dim = 3;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "multilinestring3d", 17) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "multilinestring3d", 17) ) {
 			if ( dim < 3 ) dim = 3;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "linestring", 10) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "linestring", 10) ) {
 			if ( dim < 2 ) dim = 2;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "vector", 6) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "vector", 6) ) {
 			if ( dim < 2 ) dim = 1;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "multipoint", 10) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "multipoint", 10) ) {
 			if ( dim < 2 ) dim = 2;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "polygon", 7) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "polygon", 7) ) {
 			if ( dim < 2 ) dim = 2;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "multipolygon", 12) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "multipolygon", 12) ) {
 			if ( dim < 2 ) dim = 2;
-		} else if ( 0==strncasecmp(nt[1].c_str(), "multilinestring", 15) ) {
+		} else if ( 0==jagstrncasecmp(nt[1].c_str(), "multilinestring", 15) ) {
 			if ( dim < 2 ) dim = 2;
 		}
 	}

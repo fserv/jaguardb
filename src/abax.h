@@ -41,8 +41,10 @@
 #include <limits.h>
 #include <stdint.h>
 #include <string>
+
 #include <AbaxCStr.h>
 #include <JagFixString.h>
+
 
 #define DNULLKEY -1
 typedef long long jagint;

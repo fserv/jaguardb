@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <jemalloc.h>
+
 
 class AbaxCStr
 {
@@ -28,6 +30,7 @@ class AbaxCStr
 
 		//static unsigned long  instances_;
 		// static int isinteger(const AbaxCStr &str);
+        static pthread_mutex_t     strMutex;
 
 		AbaxCStr(); 
 		AbaxCStr(const AbaxCStr& str);
@@ -138,11 +141,14 @@ class AbaxCStr
 		bool    _readOnly;
 		char 	*buf_;
 		ssize_t 	length_;
-		int  	nseg_;
+		ssize_t 	capacity_;
+		int  	    nseg_;
 		static const   int ASTRSIZ=16;
 
 		void allocMoreMemory( int len2 ); // len2 second string's length
 		void initMem( int size ); 
+
+
 
 };
 

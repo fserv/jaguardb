@@ -387,6 +387,10 @@ void    getMaskedKey(const JagSchemaRecord &record, const JagFixString &key, Jag
 Jstr    getFileHashDir( const JagSchemaRecord &record, const JagFixString &kstr );
 void    maskKey(const JagSchemaRecord &record, JagFixString &key );
 int     leadZeros( const char *str );
+int     jagstrcmp( const char *s1, const char *s2 );
+int     jagstrcasecmp( const char *s1, const char *s2 );
+int     jagstrncmp( const char *s1, const char *s2, int n );
+int     jagstrncasecmp( const char *s1, const char *s2, int n );
 
 
 

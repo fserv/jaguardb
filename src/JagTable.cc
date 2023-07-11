@@ -18,7 +18,7 @@
  */
 #include <JagGlobalDef.h>
 
-#include <malloc.h>
+//#include <malloc.h>
 #include <JagTable.h>
 #include <JagIndex.h>
 #include <JaguarCPPClient.h>
@@ -45,7 +45,7 @@ JagTable::JagTable( int replicType, const JagDBServer *servobj, const Jstr &dbna
 {
 	d("s111022 JagTable ctor ...\n");
 	_cfg = _servobj->_cfg;
-	_objectLock = servobj->_objectLock;
+	//_objectLock = servobj->_objectLock;
 	_dbname = dbname;
 	_tableName = tableName;
 	_dbtable = dbname + "." + tableName;
@@ -143,7 +143,7 @@ void JagTable::init( bool buildInitIndex )
 
 		iskey = cv[i].iskey;
 		if ( iskey ) continue;  // "counter" field is not in keys
-		if ( 0 == strcmp( cv[i].name.s(), "counter" ) ) {
+		if ( 0 == jagstrcmp( cv[i].name.s(), "counter" ) ) {
 			_counterOffset = cv[i].offset;
 			_counterLength = cv[i].length;
 			break;
@@ -181,9 +181,9 @@ void JagTable::buildInitIndexlist()
 		irecord = _indexschema->getAttr( dbtabindex );
         dn("s77220 getAttr(%s) got irecord=%p", dbtabindex.s(), irecord );
 		if ( irecord ) {
-			if ( _objectLock->writeLockIndex( JAG_CREATEINDEX_OP, _dbname, _tableName, vec[i],
+			if ( _servobj->_objectLock->writeLockIndex( JAG_CREATEINDEX_OP, _dbname, _tableName, vec[i],
 										      _tableschema, _indexschema, _replicType, 1, lockrc ) ) {
-				_objectLock->writeUnlockIndex( JAG_CREATEINDEX_OP, _dbname, _tableName, vec[i], _replicType, 1 );
+				_servobj->_objectLock->writeUnlockIndex( JAG_CREATEINDEX_OP, _dbname, _tableName, vec[i], _replicType, 1 );
 			}		
 			_indexlist.append( vec[i] );
 		} 
@@ -543,7 +543,7 @@ int JagTable::parsePair( int tzdiff, JagParseParam *parseParam, JagVector<JagDBP
     			d("i=%d is enum getpos=%d vData=[%s] listlen=%d\n", i, getpos, otherAttr.valueData.s(), _schAttr[getpos].enumList.length() );
     			for ( int j = 0; j < _schAttr[getpos].enumList.length(); ++j ) {
     				//d("s331109 oompare  enum=[%s]  valueData=[%s]\n", _schAttr[getpos].enumList[j].s(), otherAttr.valueData.s() );
-    				if ( strcmp( _schAttr[getpos].enumList[j].s(), otherAttr.valueData.s() ) == 0 ) {
+    				if ( jagstrcmp( _schAttr[getpos].enumList[j].s(), otherAttr.valueData.s() ) == 0 ) {
     					rc2 = true;
     					break;
     				}
@@ -1828,10 +1828,10 @@ int JagTable::insertIndex( JagDBPair &pair, bool doIndexLock, bool hasFlushed  )
 	for ( int i = 0; i < _indexlist.size(); ++i ) {
 		//d("s40124 writeLockIndex [%s] ... \n", _indexlist[i].s() );
 		if ( doIndexLock ) {
-			pindex = _objectLock->writeLockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i],
+			pindex = _servobj->_objectLock->writeLockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i],
 										      _tableschema, _indexschema, _replicType, true, lockrc );
 		} else {
-			pindex = _objectLock->getIndex(  _dbname, _indexlist[i], _replicType );
+			pindex = _servobj->_objectLock->getIndex(  _dbname, _indexlist[i], _replicType );
 		}
 
 		if ( pindex ) {
@@ -1844,7 +1844,7 @@ int JagTable::insertIndex( JagDBPair &pair, bool doIndexLock, bool hasFlushed  )
 
 			++ cnt;
 			if ( doIndexLock ) {
-				_objectLock->writeUnlockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
+				_servobj->_objectLock->writeUnlockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
 			}
 			//d("s40124 writeLockIndex [%s] done\n", _indexlist[i].s() );
 		}
@@ -1864,7 +1864,7 @@ jagint JagTable::getAllIndexBufferSize()
 	JagIndex *pindex;
 	for ( int i = 0; i < _indexlist.size(); ++i ) {
 		//d("s40124 writeLockIndex [%s] ... \n", _indexlist[i].s() );
-		pindex = _objectLock->getIndex(  _dbname, _indexlist[i], _replicType );
+		pindex = _servobj->_objectLock->getIndex(  _dbname, _indexlist[i], _replicType );
 		if ( pindex ) {
 			cnt += pindex->memoryBufferSize();
 			//d("s40124 writeLockIndex [%s] done\n", _indexlist[i].s() );
@@ -2048,7 +2048,7 @@ jagint JagTable::update( const JagRequest &req, const JagParseParam *parseParam,
 	for ( int i = 0; i < numIndexes; ++i ) {
 
         dn("s0202901001 i=%d writeLockIndex _tableName=%d index=%s  ...", i, _tableName.s(), _indexlist[i].s() );
-		lpindex[i] = _objectLock->writeLockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], 
+		lpindex[i] = _servobj->_objectLock->writeLockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], 
                                                   _tableschema, _indexschema, _replicType, true, lockrc );
         dn("s0202901001 i=%d writeLockIndex _tableName=%d index=%s lockrc=%d done", i, _tableName.s(), _indexlist[i].s(), lockrc );
 
@@ -2061,7 +2061,7 @@ jagint JagTable::update( const JagRequest &req, const JagParseParam *parseParam,
 			}
 			if ( ! needUpdate ) {
                 dn("s202228550  ! needUpdate writeUnlockIndex %s", _indexlist[i].s() );
-				_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, true );
+				_servobj->_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, true );
 				lpindex[i] = NULL;
 			} else {
 				++ setindexnum;
@@ -2085,7 +2085,7 @@ jagint JagTable::update( const JagRequest &req, const JagParseParam *parseParam,
 		for ( int i = 0; i < numIndexes; ++i ) {
 			if ( ! lpindex[i] ) continue;
             dn("s20524550  writeUnlockIndex %s ", _indexlist[i].s() );
-			_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, true );
+			_servobj->_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, true );
 		}
 		errmsg = Jstr("E10385 Invalid where range found");
 		return -1;
@@ -2259,7 +2259,7 @@ jagint JagTable::update( const JagRequest &req, const JagParseParam *parseParam,
 	for ( int i = 0; i < numIndexes; ++i ) {
 		if ( ! lpindex[i] ) continue;
         dn("s920003 writeUnlockIndex i=%d, _indexlist[i]=%s", i, _indexlist[i].s() );
-		_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, true );
+		_servobj->_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, true );
 	}
 	
 	d("s50284 updated=%lld/scanned=%lld records\n", cnt, scanned );
@@ -3650,7 +3650,7 @@ Jstr JagTable::drop( Jstr &errmsg, bool isTruncate )
 		int  lockrc;
 
 		while ( _indexlist.size() > 0 ) {
-			pindex = _objectLock->writeLockIndex( JAG_DROPINDEX_OP, _dbname, _tableName, _indexlist[_indexlist.size()-1],
+			pindex = _servobj->_objectLock->writeLockIndex( JAG_DROPINDEX_OP, _dbname, _tableName, _indexlist[_indexlist.size()-1],
 											      _tableschema, _indexschema, _replicType, 1, lockrc );
 			if ( pindex ) {
 				pindex->drop();
@@ -3661,7 +3661,7 @@ Jstr JagTable::drop( Jstr &errmsg, bool isTruncate )
 
 				if ( pindex ) { delete pindex; pindex = NULL; }
 
-				_objectLock->writeUnlockIndex( JAG_DROPINDEX_OP, _dbname, _tableName, _indexlist[_indexlist.size()-1],
+				_servobj->_objectLock->writeUnlockIndex( JAG_DROPINDEX_OP, _dbname, _tableName, _indexlist[_indexlist.size()-1],
 												_replicType, 1 );
 			}
 			_indexlist.removePos( _indexlist.size()-1 );				
@@ -3694,7 +3694,7 @@ void JagTable::dropFromIndexList( const Jstr &indexName )
 		}
 		++idxName;
 
-		if ( strcmp(indexName.s(), idxName) == 0 ) {
+		if ( jagstrcmp(indexName.s(), idxName) == 0 ) {
 			_indexlist.removePos( k );
 			break;
 		}
@@ -3716,11 +3716,11 @@ int JagTable::_removeIndexRecords( const char *buf )
 	int lockrc;
 
 	for ( int i = 0; i < _indexlist.size(); ++i ) {
-		pindex = _objectLock->writeLockIndex( JAG_DELETE_OP, _dbname, _tableName, _indexlist[i], _tableschema, _indexschema, _replicType, 1, lockrc );
+		pindex = _servobj->_objectLock->writeLockIndex( JAG_DELETE_OP, _dbname, _tableName, _indexlist[i], _tableschema, _indexschema, _replicType, 1, lockrc );
 		if ( pindex ) {
 			pindex->removeFromTable( buf );
 			++ cnt;
-			_objectLock->writeUnlockIndex( JAG_DELETE_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
+			_servobj->_objectLock->writeUnlockIndex( JAG_DELETE_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
 		}
 	}
 
@@ -3755,14 +3755,14 @@ int JagTable::renameIndexColumn( const JagParseParam *parseParam, Jstr &errmsg )
 		Jstr dbtab  = _dbname + "." + _tableName;
 		Jstr dbtabIndex;
 		for ( int k = 0; k < _indexlist.size(); ++k ) {
-			pindex = _objectLock->writeLockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k],
+			pindex = _servobj->_objectLock->writeLockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k],
 												  _tableschema, _indexschema, _replicType, 1, lockrc );
 			if ( pindex ) {
 				pindex->drop();
 				dbtabIndex = dbtab + "." + _indexlist[k];
 				_indexschema->addOrRenameColumn( dbtabIndex, parseParam );
 				pindex->refreshSchema();
-				_objectLock->writeUnlockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k], _replicType, 1 );
+				_servobj->_objectLock->writeUnlockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k], _replicType, 1 );
 			}
 		}
 	}
@@ -3780,14 +3780,14 @@ int JagTable::setIndexColumn( const JagParseParam *parseParam, Jstr &errmsg )
 		Jstr dbtab  = _dbname + "." + _tableName;
 		Jstr dbtabIndex;
 		for ( int k = 0; k < _indexlist.size(); ++k ) {
-			pindex = _objectLock->writeLockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k],
+			pindex = _servobj->_objectLock->writeLockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k],
 												   _tableschema, _indexschema, _replicType, 1, lockrc );
 			if ( pindex ) {
 				pindex->drop();
 				dbtabIndex = dbtab + "." + _indexlist[k];
 				_indexschema->setColumn( dbtabIndex, parseParam );
 				pindex->refreshSchema();
-				_objectLock->writeUnlockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k], _replicType, 1 );
+				_servobj->_objectLock->writeUnlockIndex( JAG_ALTER_OP, _dbname, _tableName, _indexlist[k], _replicType, 1 );
 			}
 		}
 	}
@@ -3871,10 +3871,10 @@ void JagTable::flushBlockIndexToDisk()
 	int lockrc;
 
 	for ( int i = 0; i < _indexlist.size(); ++i ) {
-		pindex = _objectLock->writeLockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i], _tableschema, _indexschema, _replicType, 1, lockrc );
+		pindex = _servobj->_objectLock->writeLockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i], _tableschema, _indexschema, _replicType, 1, lockrc );
 		if ( pindex ) {
 			pindex->flushBlockIndexToDisk();
-			_objectLock->writeUnlockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
+			_servobj->_objectLock->writeUnlockIndex( JAG_INSERT_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
 		}
 	}
 }
@@ -4642,7 +4642,7 @@ int JagTable
 	
 	setindexnum = 0;
 	for ( int i = 0; i < _indexlist.size(); ++i ) {
-		lpindex[i] = _objectLock->writeLockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], 
+		lpindex[i] = _servobj->_objectLock->writeLockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], 
 										   	    _tableschema, _indexschema, _replicType, 1, lockrc );
 		++setindexnum; 
 	}
@@ -4691,7 +4691,7 @@ int JagTable
 	free( tablenewbuf );
 	for ( int i = 0; i < _indexlist.size(); ++i ) {
 		if ( ! lpindex[i] ) { continue; }
-		_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
+		_servobj->_objectLock->writeUnlockIndex( JAG_UPDATE_OP, _dbname, _tableName, _indexlist[i], _replicType, 1 );
 	}
 	return cnt;
 }

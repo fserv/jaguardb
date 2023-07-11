@@ -128,12 +128,12 @@ bool JagRange::rangeWithinRange( const Jstr &subtype,
 
     if ( isDateTime( subtype ) ) {
 		if ( strict ) {
-			if ( strcmp( begin2.c_str(), begin1.c_str() ) < 0 && strcmp( end1.c_str(), end2.c_str() ) < 0 ) {
+			if ( jagstrcmp( begin2.c_str(), begin1.c_str() ) < 0 && jagstrcmp( end1.c_str(), end2.c_str() ) < 0 ) {
                 dn("s4500838 strict true");
 				return true;
 			}
 		} else {
-			if ( strcmp( begin2.c_str(), begin1.c_str() ) <= 0 && strcmp( end1.c_str(), end2.c_str() ) <= 0  ) {
+			if ( jagstrcmp( begin2.c_str(), begin1.c_str() ) <= 0 && jagstrcmp( end1.c_str(), end2.c_str() ) <= 0  ) {
                 dn("s4500838 non-strict true");
 				return true;
 			}
@@ -170,11 +170,11 @@ bool JagRange::pointWithinRange( const Jstr &subtype, const Jstr &data,
     if ( isDateTime( subtype ) ) {
         dn("s933939 isDateTime");
 		if ( strict ) {
-			if ( strcmp( begin2.c_str(), data.c_str() ) < 0 && strcmp( data.c_str(), end2.c_str() ) < 0 ) {
+			if ( jagstrcmp( begin2.c_str(), data.c_str() ) < 0 && jagstrcmp( data.c_str(), end2.c_str() ) < 0 ) {
 				return true;
 			}
 		} else {
-			if ( strcmp( begin2.c_str(), data.c_str() ) <= 0 && strcmp( data.c_str(), end2.c_str() ) <= 0  ) {
+			if ( jagstrcmp( begin2.c_str(), data.c_str() ) <= 0 && jagstrcmp( data.c_str(), end2.c_str() ) <= 0  ) {
 				return true;
 			}
 		}
@@ -290,9 +290,9 @@ bool JagRange::rangeIntersectRange( const Jstr &subtype,
 {
     if ( isDateTime( subtype ) ) {
 
-		if ( strcmp( end1.c_str(), begin2.c_str() ) <= 0 ) {
+		if ( jagstrcmp( end1.c_str(), begin2.c_str() ) <= 0 ) {
             // no-overlap OK
-		} else if (  strcmp( end2.c_str(), begin1.c_str() ) <= 0  ) {
+		} else if (  jagstrcmp( end2.c_str(), begin1.c_str() ) <= 0  ) {
             // no-overlap OK
         } else {
             // there is some strict overlap -- time conflict

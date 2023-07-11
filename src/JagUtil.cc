@@ -29,7 +29,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <math.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include <libgen.h>
 
 
@@ -2061,6 +2061,7 @@ jagint getBuffReaderWriterMemorySize( jagint value )
 	return value;
 }
 
+/**
 char *jagmalloc( jagint sz )
 {
 	char *p = NULL;
@@ -2074,6 +2075,46 @@ char *jagmalloc( jagint sz )
 
 	return p;
 }
+**/
+
+char *jagmalloc( jagint sz )
+{
+    return (char*)malloc(sz);
+}
+
+#if 0
+// int posix_memalign(void **memptr, size_t alignment, size_t size);
+// return 0 OK; EINVAL invalid align; ENOMEM: no more memory
+char *jagmalloc( jagint sz )
+{
+	void *p = NULL;
+    int rc;
+    int ALIGN = 8;
+
+    //extern pthread_mutex_t  mallocMutex;
+    //pthread_mutex_lock( &mallocMutex);
+
+	while ( NULL == p ) {
+		//p = (char*)malloc(sz);
+        rc = posix_memalign( &p, ALIGN, sz);
+
+		if ( ENOMEM == rc ) {
+			d("ERR0300 Error malloc %lld bytes memory, not enough memory. Please free up some memory. Retry in 10 seconds...\n", sz );
+			sleep(10);
+		} else if ( EINVAL == rc ) {
+            //pthread_mutex_unlock( &mallocMutex);
+            return NULL;
+        } else if ( 0 == rc ) {
+            //pthread_mutex_unlock( &mallocMutex);
+            return (char*)p;
+        }
+	}
+
+    //pthread_mutex_unlock( &mallocMutex);
+	return NULL;
+}
+#endif
+
 
 int jagpthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg)
 {
@@ -2575,8 +2616,9 @@ int jagmalloc_trim( jagint n )
 	#ifdef _WINDOWS64_
     return 1;
 	#else
-	int rc = malloc_trim( n );
-    return rc; 
+	//int rc = malloc_trim( n );
+    //return rc; 
+    return 1;
 	#endif
 }
 
@@ -3919,7 +3961,7 @@ bool likeMatch( const Jstr& str, const Jstr& like )
 			return true;
 		} 
 	} else if ( endc == '%' ) {
-		if ( 0 == strncmp( str.c_str(), like.c_str(), like.size()-1 ) ) {
+		if ( 0 == jagstrncmp( str.c_str(), like.c_str(), like.size()-1 ) ) {
 			return true;
 		}
 	} else {
@@ -5604,3 +5646,42 @@ const char *skipBBox(const char *str)
 }
 
 
+int jagstrcmp( const char *s1, const char *s2 )
+{
+    if ( NULL != s1 && NULL != s2 ) return strcmp(s1, s2);
+
+    if ( NULL != s1 ) return 1;
+    if ( NULL != s2 ) return -1;
+
+    return 0;
+}
+
+int jagstrcasecmp( const char *s1, const char *s2 )
+{
+    if ( NULL != s1 && NULL != s2 ) return strcasecmp(s1, s2);
+
+    if ( NULL != s1 ) return 1;
+    if ( NULL != s2 ) return -1;
+
+    return 0;
+}
+
+int jagstrncmp( const char *s1, const char *s2, int n )
+{
+    if ( NULL != s1 && NULL != s2 ) return strncmp(s1, s2, n);
+
+    if ( NULL != s1 ) return 1;
+    if ( NULL != s2 ) return -1;
+
+    return 0;
+}
+
+int jagstrncasecmp( const char *s1, const char *s2, int n )
+{
+    if ( NULL != s1 && NULL != s2 ) return strncasecmp(s1, s2, n);
+
+    if ( NULL != s1 ) return 1;
+    if ( NULL != s2 ) return -1;
+
+    return 0;
+}

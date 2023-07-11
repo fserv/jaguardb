@@ -124,7 +124,7 @@ int JagSingleMergeReader::getNext( JagVector<JagFixString> &vec )
 		return 0;
 	}
 	
-	char *buf = (char*)malloc(KEYVALLEN);
+	char *buf = (char*)jagmalloc(KEYVALLEN);
 	for ( int i = beginpos; i < _veclen; ++i ) {
 		if ( _goNext[i] != -1 ) {
 			memcpy(buf, _buf+i*KEYVALLEN, KEYVALLEN);

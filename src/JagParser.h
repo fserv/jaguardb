@@ -146,7 +146,7 @@ class JagParser
 	JagStrSplitWithQuote _splitwq;
 	JagParseParam *_ptrParam;
 	JagCfg      *_cfg;
-	void        *_obj; // servobj or cliobj
+	void  *_obj; // servobj or cliobj
 	bool        _isCli;
 
 	JagColumn   _dummy;

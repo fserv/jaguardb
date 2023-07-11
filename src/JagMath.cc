@@ -1288,7 +1288,7 @@ long JagMath::convertPosStrToNum(const char *instr, int size)
     }
 
     int frontzeros = 0;
-    char *newstr = (char*)malloc(size+1);
+    char *newstr = (char*)jagmalloc(size+1);
     memset( newstr, 0 , size+1);
 
     int  slen = strlen(instr);

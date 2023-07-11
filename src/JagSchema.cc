@@ -867,7 +867,7 @@ JagVector<AbaxString>* JagSchema
 		}
 
 		if ( dbtable.length() > 0 ) {
-			if ( 0 == strncmp( arr[i].key.c_str(), dbtable.c_str(), dbtable.length()) ) {
+			if ( 0 == jagstrncmp( arr[i].key.c_str(), dbtable.c_str(), dbtable.length()) ) {
 				xarr.insert( AbaxPair<AbaxString,char> (arr[i].key, '1') );
 			}
 		} else {
@@ -934,7 +934,7 @@ JagVector<AbaxString>* JagSchema::getAllTablesOrIndexes( const Jstr &dbtable, co
 		}
 
 		if ( dbtable.length() > 0 ) {
-			if ( 0 == strncmp( arr[i].key.c_str(), dbtable.c_str(), dbtable.length()) ) {
+			if ( 0 == jagstrncmp( arr[i].key.c_str(), dbtable.c_str(), dbtable.length()) ) {
 				xarr.insert( AbaxPair<AbaxString,char> (arr[i].key, '1') );
 			}
 		} else {
@@ -1091,7 +1091,9 @@ Jstr JagSchema::getDatabases( const JagCfg *cfg, int replicType )
 const JagColumn* JagSchema::getColumn( const Jstr &dbname, const Jstr &objname,
                             const Jstr &colname )
 {
-	Jstr key = dbname + "." + objname + "." + colname;
+	Jstr key;
+	key = dbname;
+	key += Jstr(".") + objname + "." + colname;
 	return _columnMap->getValue( key );
 }
 

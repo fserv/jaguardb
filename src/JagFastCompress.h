@@ -21,6 +21,7 @@
 
 #include <string>
 #include <abax.h>
+
 class JagFastCompress
 {
   public:

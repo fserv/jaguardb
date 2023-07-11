@@ -15,6 +15,7 @@ const JagColumn* JagParser::getColumn( const Jstr &db, const Jstr &objname, cons
         if ( ! schemaMap ) {
             return NULL;
         }
+
          bool rc2;
          AbaxString dbobj = AbaxString( db ) + "." + objname;
          JagTableOrIndexAttrs& objAttr = schemaMap->getValue( dbobj, rc2 );

@@ -78,6 +78,7 @@ int setupSignalHandler( JagDBServer *serv )
     JagSigPass *sigpass = new JagSigPass;
     sigpass->servobj = serv;
     sigpass->sigset = set;
+
     s = jagpthread_create(&thread, NULL, &signalHandler, (void *)sigpass);
     if (s != 0) {
         jd(JAG_LOG_LOW, "Error creating blocking all signals, exit\n" );

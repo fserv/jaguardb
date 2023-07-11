@@ -30,6 +30,7 @@ MPFR_INC=Web/MPFR/mpfr-4.2.0_install/include
 MPFR_LIB=Web/MPFR/mpfr-4.2.0_install/lib
 
 GEOGRAPH_LIB=Web/GeographicLib-1.49/lib
+JEMALLOC=Web/JEMALLOC/install
 
 
 BASICFLAGS=-I. -IWeb/GeographicLib-1.49/include \
@@ -37,6 +38,7 @@ BASICFLAGS=-I. -IWeb/GeographicLib-1.49/include \
 		  -IWeb/Snappy -IWeb/UTF -I$(BOOST_INC) \
 		  -I$(CGAL_INC) -I$(GMP_INC) -I$(MPFR_INC) \
 		  -IWeb/ConcaveHull \
+          -I$(JEMALLOC)/include/jemalloc \
           -I/usr/local/src/jdk19.0.2/include \
           -I/usr/local/src/jdk19.0.2/include/linux \
 	      -D_REENTRANT -std=c++14 -Wno-register \

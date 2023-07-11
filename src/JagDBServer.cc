@@ -32,7 +32,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <dirent.h>
-#include <malloc.h>
+//#include <malloc.h>
 
 #undef JAG_CLIENT_SIDE
 #define JAG_SERVER_SIDE 1
@@ -87,6 +87,8 @@ pthread_mutex_t JagDBServer::g_dbschemamutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t JagDBServer::g_flagmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t JagDBServer::g_wallogmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t JagDBServer::g_dlogmutex = PTHREAD_MUTEX_INITIALIZER;
+
+pthread_mutex_t mallocMutex;
 
 JagDBServer::JagDBServer() 
 {
@@ -417,12 +419,16 @@ void JagDBServer::destroy()
 	pthread_mutex_destroy( &_delNextRepMutex );
 	pthread_mutex_destroy( &_delNextOriRepMutex );
 
+	pthread_mutex_destroy( &mallocMutex );
+
 }
 
 int JagDBServer::main(int argc, char*argv[])
 {
+	pthread_mutex_init( &mallocMutex, NULL );
+
 	jagint callCounts = -1, lastBytes = 0;
-	jd(JAG_LOG_LOW, "s1101 availmem=%ld M\n", availableMemory( callCounts, lastBytes)/ONE_MEGA_BYTES );
+	jd(JAG_LOG_LOW, "s1101 server::main() availmem=%ld M\n", availableMemory( callCounts, lastBytes)/ONE_MEGA_BYTES );
 
 	JagNet::socketStartup();
 
@@ -446,7 +452,7 @@ int JagDBServer::main(int argc, char*argv[])
 	_activeClients = 0;
 	_threadGroupSeq = 0;
 
-	makeThreadGroups( _threadGroups + _initExtraThreads, _threadGroupSeq++ );
+	makeThreadGroups( _threadGroups + _initExtraThreads, _threadGroupSeq++, 0 );
 
 	jd(JAG_LOG_LOW, "Created socket thread groups\n" );
 	jd(JAG_LOG_LOW, "s1105 availmem=%ld M\n", availableMemory( callCounts, lastBytes)/ONE_MEGA_BYTES );
@@ -454,7 +460,10 @@ int JagDBServer::main(int argc, char*argv[])
 	initObjects();
 	jd(JAG_LOG_LOW, "s1102 availmem=%ld M\n", availableMemory( callCounts, lastBytes)/ONE_MEGA_BYTES );
 	createAdmin();
+
+	jd(JAG_LOG_LOW, "makeTableObjects ...\n");
 	makeTableObjects( );
+	jd(JAG_LOG_LOW, "makeTableObjects is done\n");
 
 	jd(JAG_LOG_LOW, "s1103 availmem=%ld M\n", availableMemory( callCounts, lastBytes)/ONE_MEGA_BYTES );
 
@@ -579,11 +588,15 @@ int JagDBServer::processMultiSingleCmd( JagRequest &req, const char *mesg, jagin
     }
 
 	int rc;
-	JagParseAttribute jpa( this, req.session->timediff, servtimediff, req.session->dbname, _cfg );
 	Jstr reterr, rowFilter;
+
+	//JAG_BLURT jaguar_mutex_lock ( &g_flagmutex ); JAG_OVER
+	    JagParseAttribute jpa( this, req.session->timediff, servtimediff, req.session->dbname, _cfg );
+	//jaguar_mutex_unlock ( &g_flagmutex );
 
 	JagParser parser((void*)this);
 	JagParseParam pparam( &parser ); 
+	//jaguar_mutex_unlock ( &g_flagmutex );
 	
     dn("s533001 req.batchReply=%d req.hasReply=%d req.session->replicType=%d", req.batchReply, req.hasReply, req.session->replicType  );
 	if ( req.batchReply ) {
@@ -3184,7 +3197,7 @@ Jstr JagDBServer::describeTable( int inObjType, const JagRequest &req,
 				continue;
 			}
 
-			if ( 0==strncmp( rcv[i].name.c_str(), "geo:", 4 ) ) {
+			if ( 0==jagstrncmp( rcv[i].name.c_str(), "geo:", 4 ) ) {
 				// geo:*** ommit
 				continue;
 			}
@@ -4052,13 +4065,20 @@ int JagDBServer::mainClose()
 }
 
 // object method: make thread groups
-int JagDBServer::makeThreadGroups( int threadGroups, int threadGroupNum )
+int JagDBServer::makeThreadGroups( int threadGroups, int threadGroupNum, int interval )
 {
 	this->_threadGroupNum = threadGroupNum;
 	pthread_t thr[threadGroups];
+
+	jd(JAG_LOG_LOW, "makeThreadGroups threadGroups=%d threadGroupNum=%d ...\n", threadGroups, threadGroupNum);
+
 	for ( int i = 0; i < threadGroups; ++i ) {
 		this->_groupSeq = i;
     	jagpthread_create( &thr[i], NULL, oneThreadGroupTask, (void*)this );
+	    jd(JAG_LOG_LOW, "i=%d oneThreadGroupTask is created\n", i );
+        if ( interval ) {
+            sleep(interval);
+        }
     	pthread_detach( thr[i] );
 	}
 
@@ -6331,6 +6351,8 @@ int JagDBServer::processSignal( int sig )
 		shutDown( "_exe_shutdown", req );
 	} else if ( sig == SIGSYS ) {
 		jd(JAG_LOG_LOW, "SIGSYS signal [%d] ignored.\n", sig );
+	} else if ( sig == SIGSEGV ) {
+		jd(JAG_LOG_LOW, "SIGSEGV signal [%d] ignored.\n", sig );
 	} else {
 		if ( sig != SIGCHLD && sig != SIGWINCH ) {
 			jd(JAG_LOG_LOW, "Unknown signal [%s(%d)] ignored.\n", strsignal(sig), sig );
@@ -6933,7 +6955,7 @@ void JagDBServer::sendOpInfo( const char *mesg, const JagRequest &req )
 	sprintf( buf, "%d|%d|%d|%lld|%lld|%lld|%lld|%lld", nsrv, dbs, tabs, 
 			(jagint)numSelects, (jagint)numInserts, 
 			(jagint)numUpdates, (jagint)numDeletes, 
-			_connections );
+			(jagint)_connections );
 
 	res = buf;
 	// printf("s4910 sendOpInfo [%s]\n", res.c_str() );
@@ -8235,7 +8257,7 @@ void JagDBServer::checkAndCreateThreadGroups()
 	if ( jagint(_activeClients) * 100 >= percent * (jagint)_activeThreadGroups ) {
 		jd(JAG_LOG_LOW, "s3380 create new threads activeClients=%ld activeGrps=%ld makeThreadGroups(%l) ...\n",
 				(jagint) _activeClients, (jagint)_activeThreadGroups, _threadGroupSeq );
-		makeThreadGroups( _threadGroups, _threadGroupSeq++ );
+		makeThreadGroups( _threadGroups, _threadGroupSeq++, 0 );
 	}
 }
 

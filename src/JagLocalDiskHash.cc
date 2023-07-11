@@ -610,7 +610,7 @@ jagint JagLocalDiskHash::removeMatchKey( const char *kstr, int klen )
     jagint cnt = 0;
     JagDBPair newpair;
     for ( jagint i = 0; i < sp.length(); ++i ) {
-        if ( 0 == strncasecmp( sp[i].c_str(), pair.key.c_str(), pair.key.size() ) ) {
+        if ( 0 == jagstrncasecmp( sp[i].c_str(), pair.key.c_str(), pair.key.size() ) ) {
             newpair.point( sp[i].c_str(), sp[i].size() );
             if ( remove( newpair ) ) {
                 ++cnt;

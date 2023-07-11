@@ -18,7 +18,7 @@
  */
 #include <JagGlobalDef.h>
 
-#include <malloc.h>
+//#include <malloc.h>
 #include <JagDiskArrayClient.h>
 #include <JagHotSpot.h>
 #include <JagTime.h>

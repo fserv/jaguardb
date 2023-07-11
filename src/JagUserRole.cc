@@ -424,7 +424,7 @@ Jstr JagUserRole::showRole( const AbaxString &uid )
 	for ( jagint i = 0; i < len; ++i ) {
 		if ( _hashmap->isNull(i) ) continue;
 		const AbaxPair<AbaxString, AbaxString> &kv = arr[i];
-		if ( 0 == strncmp(kv.key.c_str(), matchKey.c_str(), matchKey.size() ) ) {
+		if ( 0 == jagstrncmp(kv.key.c_str(), matchKey.c_str(), matchKey.size() ) ) {
 			JagStrSplit sp(kv.key.c_str(), '|');
 			// d("s4127 showRole kv.key=[%s]\n", kv.key.c_str() );
 			if ( sp.length() < 5 ) continue;

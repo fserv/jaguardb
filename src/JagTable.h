@@ -173,7 +173,7 @@ class JagTable
   protected:
 	pthread_mutex_t              _parseParamParentMutex;
 	const JagCfg  				*_cfg;
-	JagServerObjectLock 		*_objectLock;
+	//JagServerObjectLock 		*_objectLock;
 	Jstr  						_dbname;
 	Jstr 						_tableName;
 	int  						_objectType;

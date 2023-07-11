@@ -29,7 +29,8 @@
 JagServerObjectLock::JagServerObjectLock( const JagDBServer *servobj )
 : _servobj ( servobj )
 {
-	_hashLock = newObject<JagHashLock>();
+	//_hashLock = newObject<JagHashLock>();
+	_hashLock = new JagHashLock();
 	initObjects();
 }
 

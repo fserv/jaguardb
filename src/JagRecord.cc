@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include <sstream>
 #include "JagRecord.h"
 #include "JagUtil.h"
@@ -599,7 +599,7 @@ void JagRecord::setSource( const char *srcrec )
 	_record = NULL;
 
 	if ( NULL == srcrec ) {
-		_record = (char*)malloc( 1 );
+		_record = (char*)jagmalloc( 1 );
 		*_record = '\0';
 		return;
 	}
@@ -607,7 +607,7 @@ void JagRecord::setSource( const char *srcrec )
 	for ( i = 0; i <10; ++i ) {
 		buf[i ] = srcrec[i];
 		if ( srcrec[i] == '\0' ) {
-			_record = (char*)malloc( 1 );
+			_record = (char*)jagmalloc( 1 );
 			*_record = '\0';
 			return;
 		}

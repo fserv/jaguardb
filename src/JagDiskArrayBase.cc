@@ -18,7 +18,7 @@
  */
 #include <JagGlobalDef.h>
 
-#include <malloc.h>
+//#include <malloc.h>
 #include <JagDiskArrayBase.h>
 #include <JagHashLock.h>
 #include <JagBuffReader.h>

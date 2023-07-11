@@ -157,6 +157,7 @@ class JagDBServer
 	std::atomic<int>	 _restartRecover;
 	std::atomic<int>	 _addClusterFlag;
 	std::atomic<int>	 _newdcTrasmittingFin;
+	std::atomic<jagint>	 _connections;
 	int			_nthServer;
 	int			_numPrimaryServers;
 	int 		_hashRebalanceFD;
@@ -168,7 +169,6 @@ class JagDBServer
 	int			_isSSD;
 	int			_memoryMode;
 	int			servtimediff; // minutes
-	jagint		_connections;
 	jagint		_jdbMonitorTimedoutPeriod;
 	jagint		_hashRebalanceLen;
 	jaguint		_xferInsert;
@@ -371,7 +371,7 @@ class JagDBServer
 	int initObjects();
 	int createSocket( int argc, char *argv[] );
 	int initConfigs(); 
-	int makeThreadGroups( int grps, int grpseq );
+	int makeThreadGroups( int grps, int grpseq, int intervalSec );
 	int eventLoop( const char *port );
 	int copyLocalData( const Jstr &dirname, const Jstr &policy, const Jstr &tmstr, bool show );
 	bool isInteralIP( const Jstr &ip );

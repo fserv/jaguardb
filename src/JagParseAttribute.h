@@ -25,11 +25,11 @@ class JagDBServer;
 class JagParseAttribute
 {
   public:
-	int timediff;
-	int servtimediff;
-	Jstr dfdbname;
-	const JagCfg *cfg;
-	const JagDBServer *servobj;
+	int     timediff;
+	int     servtimediff;
+	Jstr    dfdbname;
+	const   JagCfg *cfg;
+	const   JagDBServer *servobj;
 
 	JagParseAttribute()
 	{
@@ -41,15 +41,13 @@ class JagParseAttribute
 
 	JagParseAttribute( const JagDBServer *iservobj, int itimediff=0, int iservtimediff=0, 
 					   Jstr idbname="", const JagCfg *icfg=NULL ) 
+           : timediff(itimediff), servtimediff(iservtimediff), cfg(icfg), servobj(iservobj)
     {
-		timediff = itimediff;
-		servtimediff = iservtimediff;
-		dfdbname = idbname;
-		cfg = icfg;
-		servobj = iservobj;
+        dfdbname = idbname;
 	}
 
-	void clean() {
+	void clean() 
+    {
 		timediff = 0;
 		servtimediff = 0;
 		dfdbname = "";
