@@ -155,7 +155,6 @@ AbaxCStr::~AbaxCStr()
 {
 	if ( ! _readOnly ) {
 		if ( buf_ ) free(buf_);
-		//if ( buf_ ) delete [] buf_;
 	}
 }
 
@@ -655,25 +654,6 @@ void AbaxCStr::replace( const char *oldstr, const char *newstr)
 	nseg_ = pnew->nseg_;
 }
 
-#if 0
-void AbaxCStr::initMem( int size )
-{
-	nseg_ = int(size/ASTRSIZ) + 1;
-    
-    if ( buf_ ) {
-        free( buf_ );
-        //delete [] buf_;
-    }
-
-	//buf_= (char*)malloc(nseg_ * ASTRSIZ);
-	buf_= (char*)jagmalloc(nseg_ * ASTRSIZ);
-	//buf_= new char[nseg_ * ASTRSIZ];
-
-	memset( (void*)buf_, 0, nseg_ * ASTRSIZ );
-	length_=0;
-}
-#endif
-
 void AbaxCStr::initMem( int size )
 {
     if ( buf_ ) {
@@ -761,10 +741,7 @@ AbaxCStr & AbaxCStr::pad0()
 	{
 		int len = length_;
 
-		//char *pc = (char*)malloc(len + 1);
 		char *pc = (char*)jagmalloc(len + 1);
-		//char *pc = new char[len + 1];
-
 		memcpy(pc, buf_, len);
 
 		allocMoreMemory(1);
@@ -772,7 +749,6 @@ AbaxCStr & AbaxCStr::pad0()
 		buf_[0] = '0';
 		memcpy( buf_+1, pc, len); 
 		free(pc);
-		//delete [] pc;
 		buf_[length_] = '\0';
 	}
 
@@ -809,9 +785,7 @@ AbaxCStr AbaxCStr::operator+(const AbaxCStr &s2 ) const
         abort();
 	}
 
-	//char *buf = (char*)malloc( length_ + s2.length_ + 1 );
 	char *buf = (char*)jagmalloc( length_ + s2.length_ + 1 );
-	//char *buf = new char[ length_ + s2.length_ + 1 ];
 
 	memcpy(buf, buf_, length_ );
 	memcpy(buf+length_, s2.buf_, s2.length_ );
@@ -819,7 +793,6 @@ AbaxCStr AbaxCStr::operator+(const AbaxCStr &s2 ) const
 	AbaxCStr res(buf, length_ + s2.length_ );
 
 	free( buf );
-	//delete []  buf ;
 
 	return res;
 }

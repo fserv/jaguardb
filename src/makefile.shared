@@ -13,8 +13,8 @@ CPP=$(GPP)  -g3 -DJAG_DEBUGCHECK
 CPP=$(GPP)  -O3 -g -DJAG_DEBUGCHECK
 CPP=$(GPP)  -O3 -DJAG_DEBUGCHECK
 CPP=$(GPP)  -ggdb
-CPP=$(GPP) 
 CPP=$(GPP)  -O3 -g
+CPP=$(GPP) -g  -DUSE_MALLOC0
 CPP=$(GPP)  -O3
 
 
@@ -38,12 +38,14 @@ BASICFLAGS=-I. -IWeb/GeographicLib-1.49/include \
 		  -IWeb/Snappy -IWeb/UTF -I$(BOOST_INC) \
 		  -I$(CGAL_INC) -I$(GMP_INC) -I$(MPFR_INC) \
 		  -IWeb/ConcaveHull \
-          -I$(JEMALLOC)/include/jemalloc \
           -I/usr/local/src/jdk19.0.2/include \
           -I/usr/local/src/jdk19.0.2/include/linux \
 	      -D_REENTRANT -std=c++14 -Wno-register \
           -Wno-unused-result \
+          -I$(JEMALLOC)/include/jemalloc \
 		  -DTFM_DESC $(USER_DEFINE)
+
+          #-I$(JEMALLOC)/include/jemalloc \
          
 CCFLAGS_DYNAMIC=$(BASICFLAGS) -fPIC
 CCFLAGS=$(CCFLAGS_DYNAMIC)

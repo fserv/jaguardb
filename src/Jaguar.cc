@@ -336,9 +336,9 @@ JNIEXPORT jstring JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getNthValu
 	jlong fieldVal = env->GetLongField( obj, adbFieldID);
 	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
 
-	char *str = padb->getNthValue( nth);
+	const char *str = padb->getNthValue( nth);
 	jstring res =  env->NewStringUTF( str);
-	if ( str ) free( str );
+	//if ( str ) free( str );
 	return res;
 }
 
@@ -350,9 +350,9 @@ JNIEXPORT jstring JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getAllByIn
 	jlong fieldVal = env->GetLongField( obj, adbFieldID);
 	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
 
-	char *str = padb->getAllByIndex( nth);
+	const char *str = padb->getAllByIndex( nth);
 	jstring res =  env->NewStringUTF( str);
-	if ( str ) free( str );
+	//if ( str ) free( str );
 	return res;
 }
 
@@ -365,10 +365,10 @@ JNIEXPORT jint JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getIntByCol
 	jlong fieldVal = env->GetLongField( obj, adbFieldID);
 	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
 
-	char *str = padb->getNthValue( nth);
+	const char *str = padb->getNthValue( nth);
 	if ( ! str ) return 0;
 	jint res =  atoi(str);
-	if ( str ) free( str );
+	//if ( str ) free( str );
 	return res;
 }
 
@@ -397,10 +397,10 @@ JNIEXPORT jlong JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getLongByCol
 	jlong fieldVal = env->GetLongField( obj, adbFieldID);
 	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
 
-	char *str = padb->getNthValue( nth);
+	const char *str = padb->getNthValue( nth);
 	if ( ! str ) return 0;
 	jlong res =  atol(str);
-	if ( str ) free( str );
+	// if ( str ) free( str );
 	return res;
 }
 
@@ -428,10 +428,10 @@ JNIEXPORT jfloat JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getFloat
 	jlong fieldVal = env->GetLongField( obj, adbFieldID);
 	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
 
-	char *str = padb->getNthValue( nth);
+	const char *str = padb->getNthValue( nth);
 	if ( ! str ) return 0.0;
 	jfloat res =  atof(str);
-	if ( str ) free( str );
+	// if ( str ) free( str );
 	return res;
 }
 
@@ -443,10 +443,10 @@ JNIEXPORT jdouble JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getDouble
 	jlong fieldVal = env->GetLongField( obj, adbFieldID);
 	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
 
-	char *str = padb->getNthValue( nth);
+	const char *str = padb->getNthValue( nth);
 	if ( ! str ) return 0.0;
 	jdouble res =  atof(str);
-	if ( str ) free( str );
+	// if ( str ) free( str );
 	return res;
 }
 
@@ -483,6 +483,18 @@ JNIEXPORT jstring JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_jsonString
 	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
 
 	const char *str = padb->jsonString( );
+	return env->NewStringUTF( str);
+}
+
+JNIEXPORT jstring JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getLastUuid
+  (JNIEnv *env, jobject obj )
+{
+	jclass objClass = env->GetObjectClass( obj);
+	jfieldID adbFieldID = env->GetFieldID( objClass, "_adb", "J");
+	jlong fieldVal = env->GetLongField( obj, adbFieldID);
+	JaguarCPPClient *padb = (JaguarCPPClient*)fieldVal;
+
+	const char *str = padb->getLastUuid();
 	return env->NewStringUTF( str);
 }
 

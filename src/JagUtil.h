@@ -382,7 +382,7 @@ int     get4ByteInt( char *str );
 jagint  sendOneBatch( int sock, int fd, jagint size );
 bool    isAutoUpdateTime( char spare4);
 void    reverseStr(char *s);
-jagint  readSockAndSave( int sock, const Jstr &recvpath, jagint fsize );
+jagint  readSockAndSave( bool toStdout, int sock, const Jstr &recvpath, jagint fsize );
 void    getMaskedKey(const JagSchemaRecord &record, const JagFixString &key, JagFixString &maskedKey );
 Jstr    getFileHashDir( const JagSchemaRecord &record, const JagFixString &kstr );
 void    maskKey(const JagSchemaRecord &record, JagFixString &key );
@@ -391,6 +391,8 @@ int     jagstrcmp( const char *s1, const char *s2 );
 int     jagstrcasecmp( const char *s1, const char *s2 );
 int     jagstrncmp( const char *s1, const char *s2, int n );
 int     jagstrncasecmp( const char *s1, const char *s2, int n );
+
+char   *jagstrdup(const char *s);
 
 
 

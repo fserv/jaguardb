@@ -96,6 +96,7 @@ public class Jaguar
     public native String getMessage( );
     public native String getAll( );
     public native String jsonString( );
+    public native String getLastUuid( );
 
     public native int getIntByCol( int nth );
     public native int getIntByName( String name  );

@@ -85,7 +85,7 @@ class EXP_LIB_API JaguarAPI
 
     // get n-th column in the row  1--N
     // NULL if not found; malloced char* if found, must be freed later
-    char *getNthValue( int nth );
+    const char *getNthValue( int nth );
 
     // returns a pointer to char string as value for name
     // The buffer needs to be freed after use
@@ -115,7 +115,7 @@ class EXP_LIB_API JaguarAPI
 
 	// return last uuid
 	// caller should free the pointer
-	char *getLastUuid();
+	const char *getLastUuid();
 
 	// return curtent cluser number
 	int getCurrentCluster();
@@ -130,7 +130,7 @@ class EXP_LIB_API JaguarAPI
 
     // get n-th value (GeoJson) 1--N in GeoJson
     // NULL if not found; malloced char* if found, must be freed later
-    char *getAllByIndex( int nth );
+    const char *getAllByIndex( int nth );
 
     // returns a pointer to char string as value for name in GeoJson
     // The buffer needs to be freed after use

@@ -1,0 +1,21 @@
+pom.xml
+
+Use Java JDK 1.9
+
+-                    <source>1.5</source>
+-                    <target>1.5</target>
++                    <source>1.9</source>
++                    <target>1.9</target>
+                 </configuration>
+             </plugin>
+             <plugin>
+@@ -151,7 +151,7 @@
+               <configuration>
+                 <sourceEncoding>utf-8</sourceEncoding>
+                 <minimumTokens>100</minimumTokens>
+-                <targetJdk>1.6</targetJdk>
++                <targetJdk>1.9</targetJdk>
+               </configuration>
+
+
+

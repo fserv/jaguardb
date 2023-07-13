@@ -107,7 +107,7 @@ char *JaguarAPI::getRow()
 
 // get n-th column in the row
 // NULL if not found; malloced char* if found, must be freed later
-char* JaguarAPI::getNthValue( int nth )
+const char* JaguarAPI::getNthValue( int nth )
 {
 	return _jcli->getNthValue( nth );
 }
@@ -141,11 +141,9 @@ char * JaguarAPI::getValue( const char *name )
 }
 
 // caller should free the pointer if not NULL
-char *JaguarAPI::getLastUuid()
+const char *JaguarAPI::getLastUuid()
 {
-	Jstr uuid = _jcli->getLastUuid();
-	if ( uuid.size() < 0 ) return NULL;
-	return strdup( uuid.c_str() );
+	return _jcli->getLastUuid();
 }
 
 // return curtent cluser number
@@ -169,7 +167,7 @@ char * JaguarAPI::getAllByName( const char *name )
 	return _jcli->getAllByName( name );
 }
 
-char *JaguarAPI::getAllByIndex( int nth )
+const char *JaguarAPI::getAllByIndex( int nth )
 {
 	return _jcli->getAllByIndex( nth );
 }

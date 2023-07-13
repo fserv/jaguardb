@@ -145,6 +145,14 @@ JNIEXPORT jstring JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_jsonString
 
 /*
  * Class:     com_jaguar_jdbc_internal_jaguar_Jaguar
+ * Method:    getLastUuid
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_jaguar_jdbc_internal_jaguar_Jaguar_getLastUuid
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_jaguar_jdbc_internal_jaguar_Jaguar
  * Method:    getIntByCol
  * Signature: (I)I
  */

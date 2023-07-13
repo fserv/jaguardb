@@ -21,15 +21,18 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+
+#ifdef USE_MALLOC
+#include <malloc.h>
+#else
 #include <jemalloc.h>
+#endif
 
 
 class AbaxCStr
 {
 	public:   
 
-		//static unsigned long  instances_;
-		// static int isinteger(const AbaxCStr &str);
         static pthread_mutex_t     strMutex;
 
 		AbaxCStr(); 

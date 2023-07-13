@@ -2413,7 +2413,9 @@ void JagDBServer::helpTopic( const JagRequest &req, const char *cmd )
 		str += "time() inserts the number of seconds since the Epoch.\n";
 	} else if ( 0 == strncasecmp( cmd, "getfile", 7 ) ) {
 		str += "getfile FILECOL1 into LOCALFILE, FILECOL2 into LOCALFILE2, ... from TABLE where ...;\n";
-		str += "    (The above command downloads data of column(s) of type file and save to client side files)\n";
+		str += "    (The above command downloads data of column(s) of type file and saves to client side files)\n";
+		str += "getfile FILECOL into stdout from TABLE where ...;\n";
+		str += "    (The above command reads the data of a file column and writes the data to stdout)\n";
 		str += "getfile FILECOL1 time, FILECOL2 size, FILECOL3 md5 from TABLE where ...;\n";
 		str += "getfile FILECOL1 time, FILECOL1 size, FILECOL1 md5 from TABLE where ...;\n";
 		str += "    (The above command displays modification time, size (in bytes), and md5sum of file column)\n";
@@ -2431,6 +2433,7 @@ void JagDBServer::helpTopic( const JagRequest &req, const char *cmd )
 		str += "Example:\n";
 		str += "getfile img1 into myimg1.jpg, img2 into myimg2.jog from media where uid='100';\n"; 
 		str += "    (assume img1 and img2 are two file type columns in table media)\n";
+		str += "getfile img1 into stdout from media where uid='100';\n"; 
 		str += "getfile img time, img size, img md5 from TABLE where ...;\n";
 		str += "getfile img fpath from TABLE where ...;\n";
 		str += "getfile img hostfpath from TABLE where ...;\n";

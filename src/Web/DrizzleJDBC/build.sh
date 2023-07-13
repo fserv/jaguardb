@@ -12,4 +12,4 @@
 
 /bin/cp -f ../../Jaguar.java src/main/java/com/jaguar/jdbc/internal/jaguar
 
-mvn -e -Dmaven.test.skip=true -Dmaven.javadoc.skip=true  package
+mvn -X -e -Dmaven.test.skip=true -Dmaven.javadoc.skip=true  package

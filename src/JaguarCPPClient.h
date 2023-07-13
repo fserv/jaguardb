@@ -105,7 +105,7 @@ class JaguarCPPClient
 	bool 	printAll();
 	char   *getAll();
 	char   *getAllByName( const char *name );
-	char   *getAllByIndex( int i ); // 1---->len
+	const char   *getAllByIndex( int i ); // 1---->len
 	char    *getRow();
 	int 	hasError( );
 	int 	freeRow( int type=0 );
@@ -115,9 +115,10 @@ class JaguarCPPClient
     const 	char *getMessage();
     const 	char *message();
 	const 	char *jsonString();
+	const 	char *getLastUuid();
 
 	char 	*getValue( const char *name );
-	char 	*getNthValue( int nth );
+	const char 	*getNthValue( int nth );
 	int  	getColumnCount();
 
 	char 	*getCatalogName( int col );
@@ -182,7 +183,7 @@ class JaguarCPPClient
 	jagint doRecvRawDirectFromSockAll( char *&buf, jagint len );
 	void appendJSData( const Jstr &line );
 	bool _isInsert;
-	Jstr  getLastUuid();
+	Jstr  getLastUuidData();
 	Jstr  getUuid();
 	int   getHostCluster();
 	int   getCurrentCluster();
@@ -306,7 +307,7 @@ class JaguarCPPClient
 	jagint doGetMessageLen();
 	char doGetMessageType();
     char *doGetValue( const char *name );    
-	char *doGetNthValue( int nth );
+	const char *doGetNthValue( int nth );
 	int doGetColumnCount();	
 	char *doGetCatalogName( int col );
 	char *doGetColumnClassName( int col );	
@@ -327,7 +328,7 @@ class JaguarCPPClient
 	bool doIsSearchable( int col );
 	bool doIsSigned( int col );
 	char 	*_getValue( const char *name );
-	char 	*_getNthValue( int nth );
+	const char 	*_getNthValue( int nth );
 	void	clearError();
 	void	printError( const char *id);
 	void 	setupHostCluster();
@@ -515,6 +516,8 @@ class JaguarCPPClient
 	Jstr 						_session;
 	Jstr 						_logFPath;
 	Jstr 						_jsonString;
+	Jstr 						_lastUuidString;
+	Jstr 						_nthValue;
 	JagUUID    					*_jagUUID;
 	bool 					    _isSelectConst;
 };

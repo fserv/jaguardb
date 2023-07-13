@@ -27,16 +27,17 @@ public class example
         rc = client.execute( "create table testjava (key: id uuid, value: ssn char(32), model char(32) )  ");
 
         rc = client.execute( "insert into testjava values (  '3000000', 'm222')" );
-		String id = client.getLastUuid();
-        System.out.println( "id=" + id );
+		String zuid = client.getLastUuid();
+        System.out.println( "lastuuid=[" + zuid + "]" );
 
         rc = client.execute( "insert into testjava values (  '123000', 'm223' )" );
-		id = client.getLastUuid();
-        System.out.println( "id=" + id );
+		//id = client.getLastUuid();
+        //System.out.println( "id=" + id );
 
         rc = client.execute( "insert into testjava values (  '32100000', 'm301' )" );
-		id = client.getLastUuid();
-        System.out.println( "id=" + id );
+		//id = client.getLastUuid();
+		String js = client.jsonString();
+        System.out.println( "jsonString=" + js );
 
 		try { TimeUnit.SECONDS.sleep(1); } catch ( Exception e) { System.out.println( "sleep error"); }
         rc = client.query( "select id, ssn, model from testjava limit 10;" );
@@ -67,17 +68,18 @@ public class example
             val = client.getNthValue( 3 );
             System.out.println( "3-th="+val );
 
+            // invalid
             val = client.getNthValue( 5 );
-            System.out.println( "5-th=" + val );
+            System.out.println( "5-th=[" + val + "]" );
 
             val = client.getNthValue( 0 );
-            System.out.println( "0-th=" + val );
+            System.out.println( "0-th=[" + val + "]" );
 
             val = client.getNthValue( -1 );
-            System.out.println( "col -1=" + val );
+            System.out.println( "col -1=[" + val + "]" );
 
             val = client.jsonString();
-            System.out.println( "json=" + val );
+            System.out.println( "json=[" + val + "]" );
         }
 
         if ( client.hasError( ) ) {

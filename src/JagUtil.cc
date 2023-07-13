@@ -29,7 +29,6 @@
 #include <errno.h>
 #include <ctype.h>
 #include <math.h>
-//#include <malloc.h>
 #include <libgen.h>
 
 
@@ -3321,49 +3320,19 @@ int oneFileReceiver( JAGSOCK sock, const Jstr &filesPath, const Jstr &hashDir, b
         outpath = filesPath + "/" + sp[4];
     }
 
-	if ( isDirPath ) recvpath = outpath + "/" + filename;
-	else recvpath = filesPath;
-
-    /***
-	fd = jagopen( recvpath.c_str(), O_CREAT|O_RDWR|O_TRUNC, S_IRUSR|S_IWUSR );
-
-	if ( fd < 0 ) {
-		dn("u0394 jagopen(recvpath=[%s]) error ",  recvpath.c_str() );
-		if ( newbuf ) free(newbuf );
-	}
-
-	char *mbuf =(char*)jagmalloc(memsize);
-	while( 1 ) {
-		if ( totlen >= fsize ) break;
-		if ( fsize-totlen < memsize ) {
-			recvlen = fsize-totlen;
-		} else {
-			recvlen = memsize;
-		}
-		rlen = recvRawData( sock, mbuf, recvlen );
-		if ( rlen < recvlen ) {
-			rlen = -1;
-			break;
-		}
-		raysafewrite( fd, mbuf, rlen );
-		totlen += rlen;
-	}
-
-
-	if ( mbuf ) free( mbuf );
-	if ( newbuf ) free( newbuf );
-
-    if ( fd < 0 ) {
-        return -10;
+    bool toStdout = false;
+	if ( isDirPath ) {
+        recvpath = outpath + "/" + filename;
+        dn("u22209881 isDirPath filename=[%s]", filename.s() );
+    } else {
+        recvpath = filesPath;
+        dn("u22209801 not isDirPath recvpath=[%s]", recvpath.s() );
+        if ( recvpath == "stdout" ) {
+            toStdout = true;
+        }
     }
 
-	jagfdatasync( fd ); 
-    jagclose( fd );
-
-	return 1;
-    ****/
-
-    jagint totlen = readSockAndSave( sock, recvpath, fsize );
+    jagint totlen = readSockAndSave( toStdout, sock, recvpath, fsize );
     dn("c202293 readSockAndSave recvpath=[%s] totlen=%ld", recvpath.s(), totlen );
     if ( totlen == fsize ) {
         return 1;
@@ -3374,12 +3343,16 @@ int oneFileReceiver( JAGSOCK sock, const Jstr &filesPath, const Jstr &hashDir, b
 }
 
 // return < 0: error;  else bytes received
-jagint readSockAndSave( int sock, const Jstr &recvpath, jagint fsize )
+jagint readSockAndSave( bool toStdout, int sock, const Jstr &recvpath, jagint fsize )
 {
     int fd;
 	jagint totlen = 0, recvlen = 0, rlen, memsize = 64*JAG_MEGABYTEUNIT;
 
-	fd = jagopen( recvpath.c_str(), O_CREAT|O_RDWR|O_TRUNC, S_IRUSR|S_IWUSR );
+    if ( toStdout ) {
+        fd = fileno( stdout );
+    } else {
+	    fd = jagopen( recvpath.c_str(), O_CREAT|O_RDWR|O_TRUNC, S_IRUSR|S_IWUSR );
+    }
 
 	if ( fd < 0 ) {
 		dn("u0394 jagopen(recvpath=[%s]) error ",  recvpath.c_str() );
@@ -3415,10 +3388,14 @@ jagint readSockAndSave( int sock, const Jstr &recvpath, jagint fsize )
         return -10;
     }
 
-	jagfsync( fd ); 
-    jagclose( fd );
+    if ( toStdout ) {
+        dn("u820128 read and writes to stdout done  totlen=%ld", totlen );
+    } else {
+	    jagfsync( fd ); 
+        jagclose( fd );
+        dn("u820128 read and save file [%s] done  totlen=%ld", recvpath.s(), totlen );
+    }
 
-    dn("u820128 read and save file [%s] done  totlen=%ld", recvpath.s(), totlen );
 	return totlen;
 }
 
@@ -5684,4 +5661,31 @@ int jagstrncasecmp( const char *s1, const char *s2, int n )
     if ( NULL != s2 ) return -1;
 
     return 0;
+}
+
+char  *jagstrdup(const char *s)
+{
+    #ifdef USE_MALLOC222
+        if ( NULL == s ) {
+            return strdup("");
+        } else {
+            return strdup(s);
+        }
+    #else
+
+        int len;
+        if ( NULL == s ) {
+            len = 0;
+        } else {
+            len = strlen(s);
+        }
+
+        char *p = jagmalloc( len + 1 );
+        p[len] = '\0';
+        if ( len > 0 ) {
+            memcpy(p, s, len );
+        }
+        return p;
+    #endif
+
 }

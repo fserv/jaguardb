@@ -13,8 +13,8 @@ GPP=g++
 CPP=$(GPP)  -pg
 CPP=$(GPP)  -O3 -g
 CPP=$(GPP)  -ggdb  -O0
-CPP=$(GPP) 
 CPP=$(GPP) -g -DMALLOC_DEBUG 
+CPP=$(GPP)  -g
 CPP=$(GPP) -O3
 
 
@@ -120,4 +120,15 @@ createKeyPair: build/createKeyPair.o
 
 testjdb: build/testjdb.o $(OBJS) $(SERVEROBJS) $(ALLEXTOBJS) 
 	$(CPP) $(CCFLAGS) -o testjdb build/testjdb.o $(SERVEROBJS) $(ALLEXTOBJS) $(STDLIBS) 
+
+jql2:  $(ALLCLIENTOBJS) $(SERVEROBJS) build/jagserv.o build/jql.o
+	$(CPP) $(CCFLAGS) -o jql.bin build/jql.o libJaguarClient.a $(THREADLIB)
+	/bin/cp -f jql.bin ~/jbin
+	/bin/cp -f jql.bin ~/jaguar/bin/ 
+
+jbench:  $(ALLCLIENTOBJS) $(SERVEROBJS) build/jagserv.o build/jbench.o
+	$(CPP) $(CCFLAGS) -o jbench build/jbench.o libJaguarClient.a $(THREADLIB)
+	/bin/cp -f jbench ~/jbin
+	/bin/cp -f jbench ~/qatest
+
 
