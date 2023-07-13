@@ -86,7 +86,7 @@ int Jaguar::freeResult()
 }
 
 // needs free
-char *Jaguar::getNthValue( int nth )
+const char *Jaguar::getNthValue( int nth )
 {
 	return _api->getNthValue( nth );
 }
@@ -169,7 +169,7 @@ char *Jaguar::getAll()
 }
 
 // needs free
-char *Jaguar::getAllByIndex( int nth )
+const char *Jaguar::getAllByIndex( int nth )
 {
 	return _api->getAllByIndex( nth );
 }

@@ -826,10 +826,10 @@ void JagAPI::getAllByIndex(const FunctionCallbackInfo<Value>& args){
   Local<Context> ctx = isolate->GetCurrentContext();
   int nth = args[0]->Uint32Value( ctx ).FromJust();
   JagAPI *jag = ObjectWrap::Unwrap<JagAPI>(args.This());
-  char *p = jag->jaguarapi->JaguarAPI::getAllByIndex(nth);
+  const char *p = jag->jaguarapi->JaguarAPI::getAllByIndex(nth);
   if ( p ) {
   	args.GetReturnValue().Set(String::NewFromUtf8(isolate, p).ToLocalChecked());
-	free(p);
+	//free(p);
   } else {
   	args.GetReturnValue().Set(String::NewFromUtf8(isolate, "").ToLocalChecked());
   }

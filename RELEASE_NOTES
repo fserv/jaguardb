@@ -1,4 +1,9 @@
 
+JaguarDB 3.3.0 07/12/2023
+------------------------------------------------------------------
+. use jemalloc for memory allocation
+. added getfile into stdout for streaming file data to client
+. added getLastUuid into java API
 
 JaguarDB 3.2.9 07/07/2023
 ------------------------------------------------------------------

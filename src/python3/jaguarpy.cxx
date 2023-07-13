@@ -301,13 +301,13 @@ public:
 		} 
 
 	    Py::Long hdr( arg[0] );
-		char *v =  _api->getNthValue( hdr.as_long() );
+		const char *v =  _api->getNthValue( hdr.as_long() );
 		if ( ! v ) {
         	return Py::None();
 		}
 
 		Py::String res(v);
-		free( v );
+		//free( v );
         return res;
     }
     PYCXX_VARARGS_METHOD_DECL( Jaguar, Jaguar_getNthValue )

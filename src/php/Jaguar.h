@@ -41,7 +41,7 @@ class Jaguar
 	const char *error( );
 	int hasError( );
 	int freeResult();
-	char *getNthValue( int nth );
+	const char *getNthValue( int nth );
 	char *getValue( const char *name );
 	int getLong(  const char *name, long long *value );
 	int getDouble(  const char *name, double *value );
@@ -59,7 +59,7 @@ class Jaguar
 	char *getAll();
 	char *getLastUuid();
 	char *getAllByName( const char *name);
-	char *getAllByIndex( int nth ); // 1--N
+	const char *getAllByIndex( int nth ); // 1--N
 	void setDebug( bool flag );
 
   protected:

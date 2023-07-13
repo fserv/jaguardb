@@ -240,11 +240,11 @@ PHP_METHOD(Jaguar, getNthValue )
     jaguar_object *obj = (jaguar_object *)Z_TSTOBJ_P( getThis() );
     jaguar = obj->jaguar;
     if (jaguar != NULL) {
-		char *val = NULL;
+		const char *val = NULL;
 		val = jaguar->getNthValue( col );
 		if ( val ) {
 			std::string res( val );
-			free( val );
+			//free( val );
         	RETURN_STRING( res.c_str() );
 		} else {
     		RETURN_NULL();
@@ -426,11 +426,11 @@ PHP_METHOD(Jaguar, getAllByIndex )
     jaguar_object *obj = (jaguar_object *)Z_TSTOBJ_P( getThis() );
     jaguar = obj->jaguar;
     if (jaguar != NULL) {
-		char *val = NULL;
+		const char *val = NULL;
 		val = jaguar->getAllByIndex( col );
 		if ( val ) {
 			std::string res( val );
-			free( val );
+			//free( val );
         	RETURN_STRING( res.c_str() );
 		} else {
     		RETURN_NULL();

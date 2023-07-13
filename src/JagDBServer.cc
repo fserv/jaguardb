@@ -9935,7 +9935,7 @@ void JagDBServer::receiveFile( const char *mesg, const JagRequest &req )
 
 	int sock = req.session->sock;
 
-    jagint totlen = readSockAndSave( sock, fpath, fsize.tol() );
+    jagint totlen = readSockAndSave( false, sock, fpath, fsize.tol() );
     dn("s03039001 readSockAndSave totlen=%ld fsize=%s", totlen, fsize.s() );
 
 	sendEOM( req, "receiveFile" ); 
